@@ -1,0 +1,15 @@
+{
+  "name": "iKILL Pest Control Services",
+  "short_name": "iKILL",
+  "description": "خدمات مكافحة الآفات والتعقيم والصحة العامة في مصر.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5faf5",
+  "theme_color": "#087149",
+  "icons": [
+    { "src": "/img/ikill-logo.png", "sizes": "684x307", "type": "image/png", "purpose": "any" }
+  ]
+}

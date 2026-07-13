@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | IKILL Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link id="favicon" rel="icon" href="img/ikill-logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #070B14;
+            --surface: #0F1520;
+            --surface2: #162030;
+            --border: rgba(255,255,255,0.08);
+            --accent: #10B981;
+            --primary: #0A4D3C;
+            --primary-light: #1A6B4F;
+            --text: #E2E8F0;
+            --muted: #64748B;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #0A4D3C, transparent);
+            top: -200px; right: -200px;
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #10B981, transparent);
+            bottom: -150px; left: -150px;
+            animation-delay: 3s;
+        }
+        .orb-3 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, #1A6B4F, transparent);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 6s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        /* Grid pattern */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Card */
+        .login-card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            margin: 20px;
+            background: linear-gradient(145deg, rgba(15,21,32,0.97), rgba(10,14,26,0.97));
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 28px;
+            padding: 48px 40px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04),
+                0 50px 100px rgba(0,0,0,0.7),
+                0 0 80px rgba(10,77,60,0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Header */
+        .card-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .logo-box {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #0A4D3C, #1A6B4F);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(10,77,60,0.5), 0 0 0 1px rgba(16,185,129,0.2);
+            position: relative;
+        }
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 21px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.4), transparent);
+            z-index: -1;
+        }
+        .logo-text {
+            color: #fff;
+            font-weight: 900;
+            font-size: 24px;
+            letter-spacing: -1px;
+        }
+        .card-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 11px;
+            color: #10B981;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #10B981;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Error box */
+        #login-error {
+            display: none;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #F87171;
+            font-size: 13px;
+            text-align: center;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Form */
+        .field-group { margin-bottom: 18px; }
+        .field-label {
+            display: block;
+            color: rgba(255,255,255,0.55);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .field-wrap { position: relative; }
+        .field-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 13px 16px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .field-input::placeholder { color: rgba(255,255,255,0.25); }
+        .field-input:focus {
+            border-color: rgba(16,185,129,0.5);
+            background: rgba(16,185,129,0.05);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
+        }
+        .field-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.25);
+            font-size: 13px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .field-icon:hover { color: rgba(255,255,255,0.6); }
+        .field-input.has-icon { padding-left: 42px; }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0A4D3C, #1A6B4F);
+            border: none;
+            border-radius: 14px;
+            padding: 15px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(10,77,60,0.4);
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .submit-btn:hover::before { opacity: 1; }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(10,77,60,0.5);
+        }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Spinner */
+        .spinner-inline {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Footer note */
+        .card-footer {
+            margin-top: 28px;
+            text-align: center;
+            color: rgba(255,255,255,0.18);
+            font-size: 11px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+        .card-footer i { margin-left: 5px; color: #10B981; }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text); }
+
+        /* Loading overlay */
+        #auth-check {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .check-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(16,185,129,0.15);
+            border-top-color: #10B981;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+    <link rel="stylesheet" href="admin-login-theme.css">
+</head>
+<body class="login-shell">
+
+<!-- Auth check overlay -->
+<div id="auth-check">
+    <div class="check-spinner"></div>
+</div>
+
+<!-- Background decorations -->
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<!-- Login Card -->
+<div class="login-card" id="login-card" style="display:none;">
+
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-right"></i>
+        <span>العودة للموقع</span>
+    </a>
+
+    <div class="card-header">
+        <div class="logo-box">
+            <img src="img/ikill-logo.png" alt="iKILL Pest Control Services">
+        </div>
+        <div class="card-title">IKILL Admin</div>
+        <div class="card-subtitle">لوحة التحكم الإدارية</div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>نظام آمن ومشفر</span>
+        </div>
+    </div>
+
+    <!-- Error -->
+    <div id="login-error"></div>
+
+    <!-- Form -->
+    <form id="login-form" autocomplete="off" novalidate>
+        <div class="field-group">
+            <label class="field-label" for="l-email">البريد الإلكتروني</label>
+            <div class="field-wrap">
+                <input type="email" id="l-email" name="email"
+                       class="field-input"
+                       placeholder="info@ikill.net"
+                       required maxlength="150"
+                       autocomplete="email">
+            </div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="l-password">كلمة المرور</label>
+            <div class="field-wrap">
+                <input type="password" id="l-password" name="password"
+                       class="field-input has-icon"
+                       placeholder="••••••••••"
+                       required maxlength="128"
+                       autocomplete="current-password">
+                <button type="button" class="field-icon" id="toggle-pw" aria-label="إظهار/إخفاء كلمة المرور">
+                    <i class="fas fa-eye" id="pw-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+            <span id="btn-text">دخول لوحة التحكم</span>
+            <span id="btn-loading" style="display:none;">
+                جاري التحقق
+                <span class="spinner-inline"></span>
+            </span>
+        </button>
+    </form>
+
+    <div class="card-footer">
+        <i class="fas fa-shield-alt"></i>
+        محمي بـ Firebase Authentication — جلسة محدودة المدة
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
+<script>
+(function() {
+    const authCheck = document.getElementById('auth-check');
+    const loginCard = document.getElementById('login-card');
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('l-email');
+    const passwordInput = document.getElementById('l-password');
+    const errorBox = document.getElementById('login-error');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnLoading = document.getElementById('btn-loading');
+    const togglePw = document.getElementById('toggle-pw');
+    const pwIcon = document.getElementById('pw-icon');
+
+    // Wait until window.auth is initialized
+    const checkInterval = setInterval(() => {
+        if (window.auth) {
+            clearInterval(checkInterval);
+            
+            // Check if already authenticated
+            window.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Already logged in — go to dashboard
+                    window.location.replace('./admin.html');
+                    return;
+                }
+                // Not logged in — show form
+                authCheck.style.display = 'none';
+                loginCard.style.display = 'block';
+                setTimeout(() => emailInput && emailInput.focus(), 100);
+            });
+        }
+    }, 50);
+
+    // Toggle password visibility
+    togglePw && togglePw.addEventListener('click', () => {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        pwIcon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    // Show error
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+        // Re-trigger animation
+        errorBox.style.animation = 'none';
+        requestAnimationFrame(() => { errorBox.style.animation = ''; });
+    }
+    function hideError() {
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+    }
+
+    // Set loading state
+    function setLoading(v) {
+        submitBtn.disabled = v;
+        btnText.style.display = v ? 'none' : 'inline';
+        btnLoading.style.display = v ? 'inline' : 'none';
+    }
+
+    // Form submit
+    form && form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideError();
+
+        const email = emailInput ? emailInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value : '';
+
+        if (!email || !password) {
+            showError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError('صيغة البريد الإلكتروني غير صحيحة');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await window.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            await window.auth.signInWithEmailAndPassword(email, password);
+            window.location.replace('./admin.html');
+        } catch (err) {
+            // SECURITY: never expose raw Firebase error messages
+            console.warn('[Auth] Login failed', err);
+            setLoading(false);
+            showError('بيانات الدخول غير صحيحة. تحقق من البريد وكلمة المرور وحاول مجدداً.');
+            if (passwordInput) { passwordInput.value = ''; passwordInput.focus(); }
+        }
+    });
+
+    // Timeout fallback for local file execution (CORS block on file:// protocol) or network lag
+    setTimeout(() => {
+        if (authCheck && authCheck.style.display !== 'none') {
+            authCheck.style.display = 'none';
+            if (loginCard) loginCard.style.display = 'block';
+            
+            // Show a helpful warning if running locally via file://
+            if (window.location.protocol === 'file:') {
+                showError('تنبيه: يرجى فتح الموقع عبر Firebase Hosting أو Live Server وليس مباشرة من الملف.');
+            }
+        }
+    }, 3000);
+
+})();
+    </script>
+</body>
+</html>

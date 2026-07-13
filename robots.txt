@@ -1,0 +1,7 @@
+# iKILL Pest Control Services - crawler directives
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-login.html
+
+Sitemap: https://ikill.net/sitemap.xml
