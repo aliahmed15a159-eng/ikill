@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // Contact Form Submissions
+    // - Public: can CREATE only (validated)
+    // - Admin (authenticated): can READ + DELETE
+    // ============================================================
+    match /contact_submissions/{docId} {
+      allow read, delete: if request.auth != null;
+
+      allow create: if
+        request.resource.data.keys().hasAll(['name', 'email', 'message', 'timestamp', 'phone', 'address']) &&
+        request.resource.data.name is string &&
+        request.resource.data.email is string &&
+        request.resource.data.message is string &&
+        request.resource.data.phone is string &&
+        request.resource.data.address is string &&
+        request.resource.data.name.size() >= 2 &&
+        request.resource.data.name.size() <= 100 &&
+        request.resource.data.email.size() >= 5 &&
+        request.resource.data.email.size() <= 150 &&
+        request.resource.data.message.size() >= 10 &&
+        request.resource.data.message.size() <= 2000 &&
+        request.resource.data.phone.size() <= 20 &&
+        request.resource.data.address.size() >= 5 &&
+        request.resource.data.address.size() <= 200;
+
+      allow update: if false;
+    }
+
+    // ============================================================
+    // Page Views Analytics
+    // - Public: can CREATE (anonymous tracking)
+    // - Admin: can READ for analytics dashboard
+    // ============================================================
+    match /page_views/{docId} {
+      allow create: if
+        request.resource.data.keys().hasAll(['page', 'timestamp']) &&
+        request.resource.data.page is string &&
+        request.resource.data.page.size() <= 100;
+
+      allow read: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // Site Settings (Admin CMS)
+    // - Admin only: full read/write
+    // ============================================================
+    match /site_settings/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ============================================================
+    // Branches Management
+    // - Public: can READ
+    // - Admin only: WRITE
+    // ============================================================
+    match /branches/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ============================================================
+    // Block all other collections by default
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
