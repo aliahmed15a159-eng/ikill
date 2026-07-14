@@ -44,7 +44,7 @@ const TRANSLATIONS = {
     'hero.title1':   'نحمي',
     'hero.title2':   'بيئتك',
     'hero.title3':   'باحترافية عالمية',
-    'hero.subtitle': 'حلول متكاملة لمكافحة الآفات، التعقيم، وسلامة الغذاء. نخدمك في مصر والشرق الأوسط بأعلى معايير الجودة.',
+    'hero.subtitle': 'حلول متكاملة وآمنة لمكافحة الآفات. نخدمك في مصر والشرق الأوسط بأعلى معايير الجودة.',
     'hero.cta1':     'احجز الآن',
     'hero.cta2':     'استكشف خدماتنا',
     'hero.clients':  'عميل راضٍ+',
@@ -60,9 +60,9 @@ const TRANSLATIONS = {
 
     // Services section
     'services.badge':     'خدماتنا',
-    'services.title':     'حلول صحة عامة متكاملة',
-    'services.subtitle':  'نقدم طيفاً واسعاً من الخدمات الاحترافية لحماية منشآتك وتعزيز بيئة صحية وآمنة.',
-    'services.all':       'جميع الخدمات',
+    'services.title':     'حلول مكافحة الآفات الاحترافية',
+    'services.subtitle':  'نقدم حلولاً آمنة وفعالة لمكافحة الآفات وحماية منشآتك.',
+    'services.all':       'استكشف مكافحة الآفات',
 
     // Locations section
     'locations.badge':    'فروعنا',
@@ -99,7 +99,7 @@ const TRANSLATIONS = {
     'about.vision_title': 'رؤيتنا',
     'about.vision_desc': 'أن نكون الشركة الأولى في تقديم حلول الصحة العامة المتكاملة في مصر والشرق الأوسط وأفريقيا.',
     'about.mission_title': 'مهمتنا',
-    'about.mission_desc': 'تعزيز حياة الناس من خلال تقديم حلول فعالة وآمنة لمكافحة الآفات والجراثيم وتحسين جودة الحياة.',
+    'about.mission_desc': 'تعزيز حياة الناس من خلال تقديم حلول فعالة وآمنة لمكافحة الآفات وتحسين جودة الحياة.',
     'about.stat1_lbl': 'سنة خبرة عالمية',
     'about.stat2_lbl': 'دولة نعمل بها',
     'about.stat3_lbl': 'عميل موثوق',
@@ -135,11 +135,11 @@ const TRANSLATIONS = {
     'sectors.subtitle': 'نقدم حلولاً متخصصة لجميع القطاعات بأعلى معايير الجودة والسلامة.',
     'sectors.desc': 'حلول متكاملة ومخصصة لمختلف المجالات الصناعية والتجارية والخدمية.',
     'sectors.food_title': 'المؤسسات الغذائية',
-    'sectors.food_desc': 'خدمات متكاملة للمطاعم والفنادق ومصانع الأغذية وسلاسل التوريد لضمان السلامة والنظافة والامتثال التام لقوانين الصحة العامة.',
+    'sectors.food_desc': 'خدمات مكافحة آفات متكاملة للمطاعم والفنادق ومصانع الأغذية وسلاسل التوريد لدعم الامتثال لمتطلبات الصحة العامة.',
     'sectors.edu_title': 'المؤسسات التعليمية',
-    'sectors.edu_desc': 'برامج مكافحة الآفات والتعقيم في المدارس والجامعات والحضانات لضمان بيئة تعليمية آمنة ومريحة لأبنائنا الطلاب.',
+    'sectors.edu_desc': 'برامج مكافحة آفات للمدارس والجامعات والحضانات للحفاظ على بيئة تعليمية آمنة ومريحة للطلاب.',
     'sectors.health_title': 'الرعاية الصحية',
-    'sectors.health_desc': 'حلول متخصصة في المستشفيات والعيادات والمراكز الطبية ومصانع الأدوية لضمان بيئات خالية تماماً من الجراثيم ومسببات العدوى.',
+    'sectors.health_desc': 'حلول مكافحة آفات متخصصة للمستشفيات والعيادات والمراكز الطبية ومصانع الأدوية.',
     'sectors.ind_title': 'القطاع الصناعي',
     'sectors.ind_desc': 'خدمات حماية متطورة للمصانع والمنشآت الصناعية والمستودعات لحفظ المواد الخام والمنتجات النهائية من التلف.',
     'sectors.retail_title': 'البيع بالتجزئة',
@@ -150,9 +150,6 @@ const TRANSLATIONS = {
     // Services page
     'services.page_title':    'خدماتنا',
     'services.pest_title':    'مكافحة الآفات',
-    'services.germ_title':    'مكافحة الجراثيم - VORTEX™',
-    'services.food_title':    'سلامة الغذاء',
-    'services.hygiene_title': 'النظافة والتعطير',
 
     // Search
     'search.placeholder': 'ابحث هنا...',
@@ -187,7 +184,7 @@ const TRANSLATIONS = {
     'hero.title1':   'We Protect',
     'hero.title2':   'Your Space',
     'hero.title3':   'With World-Class Expertise',
-    'hero.subtitle': 'Complete pest control, sterilization, and food safety solutions. Serving Egypt and the Middle East to the highest quality standards.',
+    'hero.subtitle': 'Complete, safe pest-control solutions. Serving Egypt and the Middle East to the highest quality standards.',
     'hero.cta1':     'Book Now',
     'hero.cta2':     'Explore Services',
     'hero.clients':  'Satisfied Clients+',
@@ -203,9 +200,9 @@ const TRANSLATIONS = {
 
     // Services section
     'services.badge':    'Our Services',
-    'services.title':    'Complete Public Health Solutions',
-    'services.subtitle': 'We offer a wide range of professional services to protect your premises and create a safe, healthy environment.',
-    'services.all':      'All Services',
+    'services.title':    'Professional Pest Control Solutions',
+    'services.subtitle': 'We provide safe, effective pest-control solutions to protect your premises.',
+    'services.all':      'Explore Pest Control',
 
     // Locations section
     'locations.badge':    'Our Branches',
@@ -242,7 +239,7 @@ const TRANSLATIONS = {
     'about.vision_title': 'Our Vision',
     'about.vision_desc': 'To be the premier provider of integrated public health solutions in Egypt, the Middle East, and Africa.',
     'about.mission_title': 'Our Mission',
-    'about.mission_desc': 'Enhance people\'s lives by providing effective and safe pest & germ control solutions, improving overall quality of life.',
+    'about.mission_desc': 'Enhance people\'s lives with effective, safe pest-control solutions that improve quality of life.',
     'about.stat1_lbl': 'Years Global Experience',
     'about.stat2_lbl': 'Countries Operated In',
     'about.stat3_lbl': 'Trusted Clients',
@@ -278,11 +275,11 @@ const TRANSLATIONS = {
     'sectors.subtitle': 'We provide specialized solutions for all sectors with the highest quality and safety standards.',
     'sectors.desc': 'Integrated, customized solutions for various industrial, commercial, and service fields.',
     'sectors.food_title': 'Food Establishments',
-    'sectors.food_desc': 'Comprehensive services for restaurants, hotels, food processing plants, and supply chains to ensure safety, hygiene, and full compliance with public health regulations.',
+    'sectors.food_desc': 'Integrated pest-control services for restaurants, hotels, food factories, and supply chains to support public-health compliance.',
     'sectors.edu_title': 'Educational Institutions',
-    'sectors.edu_desc': 'Pest control and sterilization programs in schools, universities, and nurseries to guarantee a safe and comfortable learning environment for our students.',
+    'sectors.edu_desc': 'Pest-control programs for schools, universities, and nurseries that help maintain a safe, comfortable learning environment.',
     'sectors.health_title': 'Healthcare Sector',
-    'sectors.health_desc': 'Specialized solutions in hospitals, clinics, medical centers, and pharmaceutical factories to ensure environments are completely free of germs and infectious pathogens.',
+    'sectors.health_desc': 'Specialised pest-control solutions for hospitals, clinics, medical centres, and pharmaceutical factories.',
     'sectors.ind_title': 'Industrial Sector',
     'sectors.ind_desc': 'Advanced protection services for factories, industrial facilities, and warehouses to protect raw materials and finished products from damage.',
     'sectors.retail_title': 'Retail Sector',
@@ -293,9 +290,6 @@ const TRANSLATIONS = {
     // Services page
     'services.page_title':    'Our Services',
     'services.pest_title':    'Pest Control',
-    'services.germ_title':    'Germ Control - VORTEX™',
-    'services.food_title':    'Food Safety',
-    'services.hygiene_title': 'Hygiene & Fragrance',
 
     // Search
     'search.placeholder': 'Search here...',
@@ -322,12 +316,6 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'مكافحة الآفات': 'Pest Control',
   'حلول شاملة لمكافحة جميع أنواع الآفات باستخدام أحدث التقنيات وأكثرها أماناً.': 'Comprehensive control for every type of pest, using the latest and safest techniques.',
   'اكتشف المزيد': 'Discover more',
-  'مكافحة الجراثيم - VORTEX™': 'Germ Control – VORTEX™',
-  'تعقيم متطور بتقنية VORTEX™ لضمان بيئة خالية من الجراثيم الضارة.': 'Advanced VORTEX™ disinfection for an environment free of harmful germs.',
-  'سلامة الغذاء': 'Food Safety',
-  'برامج متخصصة لضمان سلامة الغذاء وتلبية المعايير الصحية الدولية.': 'Specialized programs that protect food safety and meet international health standards.',
-  'النظافة والتعطير': 'Hygiene & Fragrance',
-  'حلول شاملة للنظافة والتعطير تمنح مساحتك أجواء نقية وعطرة طوال اليوم.': 'Complete hygiene and fragrance solutions for a fresh, inviting space all day.',
   'الآفات التي نتعامل معها': 'Pests We Handle',
   'نقضي على كل آفة': 'We Eliminate Every Pest',
   'الصراصير': 'Cockroaches', 'القوارض': 'Rodents', 'البعوض': 'Mosquitoes', 'الذباب': 'Flies',
@@ -355,7 +343,7 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   '© iKILL 2026 - جميع الحقوق محفوظة': '© iKILL 2026 — All rights reserved',
 
   'حلول شاملة للصحة العامة': 'Comprehensive Public Health Solutions',
-  'نقدم خدمات متكاملة ومبتكرة في مكافحة الآفات، التعقيم، سلامة الغذاء، والنظافة.': 'We deliver integrated, innovative pest control, disinfection, food safety, and hygiene services.',
+  'نقدم حلولاً متخصصة وآمنة لمكافحة الآفات في المنازل والمنشآت.': 'We provide specialised, safe pest-control solutions for homes and facilities.',
   'حلول احترافية للقضاء على جميع أنواع الآفات': 'Professional solutions for eliminating every type of pest',
   'مكافحة الجرذان': 'Rat Control',
   'نقوم بتحديد أماكن الجرذان واستخدام تقنيات متقدمة للقضاء عليها بطرق آمنة وفعالة مع ضمان عدم عودتها.': 'We identify rat activity and use advanced, safe, effective techniques to eliminate it and prevent its return.',
@@ -369,32 +357,11 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'حلول فعالة لمكافحة الذباب في المنازل والمنشآت التجارية والصناعية.': 'Effective fly-control solutions for homes and commercial and industrial facilities.',
   'مكافحة البق': 'Bed Bug Control',
   'خدمات شاملة للقضاء على البق باستخدام تقنيات حديثة وآمنة.': 'Complete bed-bug elimination using modern, safe techniques.',
-  'حلول متقدمة للتعقيم والتطهير وجودة الهواء': 'Advanced disinfection, sanitation, and air-quality solutions',
-  'الضمان لجودة الهواء الداخلي': 'Indoor Air Quality Assurance',
-  'خدمة Vortex™ تقوم بتنظيف وتعقيم مجاري الهواء في أجهزة التكييف والتهوية للتخلص من الجراثيم والفطريات، مما يضمن تدفق هواء نقي وصحي وخالٍ تماماً من مسببات الأمراض والروائح الكريهة.': 'Vortex™ cleans and disinfects air ducts in air-conditioning and ventilation systems, removing germs and fungi for fresh, healthy air free from pathogens and unpleasant odours.',
-  'اطلب الخدمة الآن': 'Request the Service Now',
-  'إزالة العفن والفطريات': 'Mould & Fungi Removal',
-  'نقدم خدمة إزالة العفن المتكاملة عبر مرحلتين: المعالجة والتطهير المباشر للقضاء على الجراثيم الفطرية، يتبعها تطبيق درع حماية طويل المدى لمنع عودتها للنمو مجدداً.': 'Our integrated mould-removal service has two stages: direct treatment and disinfection to eliminate fungal organisms, followed by a long-term protective shield to prevent regrowth.',
-  'مناسب للمكاتب والمنازل والمخازن': 'Suitable for offices, homes, and warehouses',
-  'استشارات وتدريب احترافي لتطبيق معايير الجودة العالمية': 'Professional consulting and training for global quality standards',
-  'تدريب السلامة الغذائية': 'Food Safety Training',
-  'برامج تدريبية معتمدة عالمياً للعاملين في قطاع الأغذية والمطاعم والفنادق لتطبيق أنظمة الهاسب وحفظ سلامة الأطعمة.': 'Globally recognised training for food-sector, restaurant, and hotel teams to apply HACCP systems and protect food safety.',
-  'سلامة الأغذية': 'Food Safety', 'الاستشارات الغذائية': 'Food Consulting',
-  'نقوم بمرافقة المنشآت لضمان مطابقتها للمواصفات القياسية، فحص نقاط التحكم الحرجة وتقييم الموردين وسلاسل التوريد.': 'We support facilities in meeting standards, checking critical control points, and assessing suppliers and supply chains.',
-  'تقييم المخاطر': 'Risk Assessment', 'التدقيق الداخلي': 'Internal Auditing', 'الامتثال القانوني': 'Legal Compliance',
-  'روائح عطرة وتطهير مستمر لمساحات أعمالك': 'Premium fragrance and continuous sanitation for your workplace',
-  'أنظمة التعطير الفاخرة': 'Premium Fragrance Systems',
-  'أجهزة نشر روائح ذكية وتناغم عطري مخصص لمداخل الفنادق والشركات الكبرى لتقديم تجربة ترحيبية لا تُنسى.': 'Smart scent-diffusion devices and bespoke fragrance harmonies for hotel entrances and major businesses, creating an unforgettable welcome.',
-  'تعقيم دورات المياه': 'Washroom Sanitation',
-  'موزعات صابون ومعقمات أوتوماتيكية، سلات مهملات صحية، وتطهير دوري للمرافق لضمان أعلى مستويات الأمان الصحي.': 'Automatic soap and sanitiser dispensers, hygienic waste bins, and regular facility sanitation for the highest health-safety standards.',
-  'حماية وتطهير الأسطح': 'Surface Protection & Disinfection',
-  'تطبيق معقمات متطورة على الأسطح المشتركة تضمن قتل البكتيريا والفيروسات لفترات طويلة مع الحفاظ على سلامة المواد.': 'Advanced disinfectants on shared surfaces provide long-lasting protection against bacteria and viruses while preserving material safety.',
-
   'نشط': 'Active', 'الفرع الرئيسي - القاهرة والجيزة': 'Head Office – Cairo & Giza',
   'هاتف': 'Phone', 'البريد الإلكتروني': 'Email', 'ساعات العمل': 'Working Hours',
   '24 ساعة / 7 أيام': '24 Hours / 7 Days', 'المقر الرئيسي': 'Head Office',
   'الاسم الكامل': 'Full Name', 'رقم الهاتف': 'Phone Number', 'العنوان بالتفصيل': 'Detailed Address',
-  'نوع الخدمة': 'Service Type', 'مكافحة الجراثيم (Vortex)': 'Germ Control (Vortex)', 'خدمة مخصصة': 'Custom Service', 'رسالتك': 'Your Message',
+  'نوع الخدمة': 'Service Type', 'خدمة مخصصة': 'Custom Service', 'رسالتك': 'Your Message',
   'معلومات الاتصال': 'Contact Information', 'الهاتف': 'Phone', 'متوفر 24/7': 'Available 24/7',
   'جاري الإرسال...': 'Sending…', 'شارع الملك فيصل الجيزة': 'King Faisal St., Giza, Egypt',
   'سياسة الخصوصية': 'Privacy Policy', 'شروط الاستخدام': 'Terms of Use'
@@ -441,16 +408,16 @@ const StaticContentTranslator = {
     const file = location.pathname.split('/').pop() || 'index.html';
     const titles = {
       ar: {
-        'index.html': 'iKILL | مكافحة الآفات والتعقيم وسلامة الغذاء في مصر',
-        'services.html': 'خدمات مكافحة الآفات والتعقيم | iKILL مصر',
+        'index.html': 'iKILL | مكافحة الآفات في مصر',
+        'services.html': 'خدمات مكافحة الآفات | iKILL مصر',
         'sectors.html': 'حلول مكافحة الآفات للقطاعات | iKILL مصر',
         'about.html': 'من نحن | iKILL Pest Control Services مصر',
         'locations.html': 'فروع iKILL وعنوان الشركة | مكافحة الآفات في مصر',
         'contact.html': 'اتصل بـ iKILL | طلب خدمة مكافحة آفات'
       },
       en: {
-        'index.html': 'iKILL | Pest Control, Disinfection & Food Safety in Egypt',
-        'services.html': 'Pest Control & Disinfection Services | iKILL Egypt',
+        'index.html': 'iKILL | Pest Control Services in Egypt',
+        'services.html': 'Pest Control Services | iKILL Egypt',
         'sectors.html': 'Pest Control Solutions by Sector | iKILL Egypt',
         'about.html': 'About Us | iKILL Pest Control Services Egypt',
         'locations.html': 'iKILL Locations & Address | Pest Control in Egypt',
@@ -933,9 +900,6 @@ const TiltEffect = {
 const SearchManager = {
   ITEMS: [
     { key: 'pest',     icon: 'fa-bug',           ar: 'مكافحة الآفات',               en: 'Pest Control',             url: 'services.html#pest' },
-    { key: 'germ',     icon: 'fa-biohazard',     ar: 'مكافحة الجراثيم VORTEX',       en: 'Germ Control VORTEX',      url: 'services.html#germ' },
-    { key: 'food',     icon: 'fa-utensils',      ar: 'سلامة الغذاء',                 en: 'Food Safety',              url: 'services.html#food' },
-    { key: 'hygiene',  icon: 'fa-wind',          ar: 'النظافة والتعطير',             en: 'Hygiene & Fragrance',      url: 'services.html#hygiene' },
     { key: 'about',    icon: 'fa-info-circle',   ar: 'من نحن',                    en: 'About Us',                 url: 'about.html' },
     { key: 'contact',  icon: 'fa-phone-alt',     ar: 'اتصل بنا',                 en: 'Contact Us',               url: 'contact.html' },
     { key: 'branches', icon: 'fa-map-marker-alt',ar: 'فروعنا',                    en: 'Our Branches',             url: 'locations.html' },

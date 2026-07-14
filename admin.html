@@ -100,6 +100,8 @@
         }
     </style>
     <link rel="stylesheet" href="admin-theme.css">
+    <!-- Dedicated phone and compact-device layout -->
+    <link rel="stylesheet" href="mobile.css">
 </head>
 <body class="admin-shell bg-[#070B14] overflow-x-hidden text-[#F1F5F9]">
 
@@ -366,9 +368,6 @@
                             <select id="sub-service-filter" class="bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none text-zinc-300">
                                 <option value="ALL">كل الخدمات</option>
                                 <option value="مكافحة الآفات">مكافحة الآفات</option>
-                                <option value="مكافحة الجراثيم (Vortex)">مكافحة الجراثيم (Vortex)</option>
-                                <option value="سلامة الغذاء">سلامة الغذاء</option>
-                                <option value="النظافة والتعطير">النظافة والتعطير</option>
                                 <option value="خدمة مخصصة">خدمة مخصصة</option>
                             </select>
                         </div>
@@ -587,6 +586,12 @@
         let branchesCache = [];
         let isFirstLoad = true;
 
+        // Only Pest Control remains a published service. Historical records for removed
+        // services are retained in Firestore but displayed as a generic custom request.
+        function normaliseRequestedService(service) {
+            return service === 'مكافحة الآفات' ? 'مكافحة الآفات' : 'خدمة مخصصة';
+        }
+
         // Chart instances
         let visitsChart = null;
         let servicesChart = null;
@@ -738,7 +743,7 @@
 
             setModalText('modal-sub-name', submission.name || 'عميل جديد');
             setModalText('modal-sub-date', formatSubmissionDate(submission));
-            setModalText('modal-sub-service', submission.service || 'طلب استشارة');
+            setModalText('modal-sub-service', normaliseRequestedService(submission.service));
             setModalText('modal-sub-phone', submission.phone || '—');
             setModalText('modal-sub-email', submission.email || '—');
             setModalText('modal-sub-address', submission.address || '—');
@@ -890,7 +895,7 @@
                             <span class="font-bold text-xs text-white">${s.name}</span>
                             <span class="text-[10px] text-zinc-500">${time}</span>
                         </div>
-                        <div class="text-xs text-emerald-400 font-semibold">${s.service || 'طلب استشارة'}</div>
+                        <div class="text-xs text-emerald-400 font-semibold">${normaliseRequestedService(s.service)}</div>
                         <p class="text-xs text-zinc-400 line-clamp-1 mt-1">${s.message || ''}</p>
                     `;
                     recentContainer.appendChild(div);
@@ -1029,19 +1034,11 @@
 
             const servicesCounter = {
                 'مكافحة الآفات': 0,
-                'مكافحة الجراثيم (Vortex)': 0,
-                'سلامة الغذاء': 0,
-                'النظافة والتعطير': 0,
                 'خدمة مخصصة': 0
             };
 
             submissionsCache.forEach(s => {
-                const sName = s.service || 'خدمة مخصصة';
-                if (servicesCounter[sName] !== undefined) {
-                    servicesCounter[sName]++;
-                } else {
-                    servicesCounter['خدمة مخصصة']++;
-                }
+                servicesCounter[normaliseRequestedService(s.service)]++;
             });
 
             if (servicesChart) servicesChart.destroy();
@@ -1054,14 +1051,9 @@
                         data: Object.values(servicesCounter),
                         backgroundColor: [
                             'rgba(16, 185, 129, 0.65)',
-                            'rgba(59, 130, 246, 0.65)',
-                            'rgba(245, 158, 11, 0.65)',
-                            'rgba(139, 92, 246, 0.65)',
-                            'rgba(107, 114, 128, 0.65)'
+                            'rgba(59, 130, 246, 0.65)'
                         ],
-                        borderColor: [
-                            '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#6B7280'
-                        ],
+                        borderColor: ['#10B981', '#3B82F6'],
                         borderWidth: 1.5,
                         borderRadius: 8
                     }]
@@ -1105,7 +1097,7 @@
                     (s.phone || '').toLowerCase().includes(queryText) ||
                     (s.message || '').toLowerCase().includes(queryText);
 
-                const matchesService = serviceFilterValue === 'ALL' || s.service === serviceFilterValue;
+                const matchesService = serviceFilterValue === 'ALL' || normaliseRequestedService(s.service) === serviceFilterValue;
 
                 return matchesSearch && matchesService;
             });
@@ -1143,7 +1135,7 @@
                         </div>
                     </td>
                     <td class="p-5 text-xs">
-                        <span class="px-2.5 py-1 rounded-full text-emerald-400 bg-emerald-500/10 font-bold border border-emerald-500/15">${s.service || 'طلب مخصص'}</span>
+                        <span class="px-2.5 py-1 rounded-full text-emerald-400 bg-emerald-500/10 font-bold border border-emerald-500/15">${normaliseRequestedService(s.service)}</span>
                     </td>
                     <td class="p-5 text-xs max-w-xs truncate text-zinc-400" title="${s.message || ''}">${s.message || '—'}</td>
                     <td class="p-5 text-xs text-zinc-500">${dateStr}</td>
