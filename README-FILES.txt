@@ -1,3 +1,2 @@
-Copy these files over matching files in your existing project.
-Latest text update: Giza-only main branch and Egypt-only footer description.
-No images are included.
+Copy styles.css over the matching file in your existing project.
+Latest repair: collision-free grid layout for visible desktop/laptop navbar links.
