@@ -1,2 +1,2 @@
 Copy styles.css over the matching file in your existing project.
-Latest repair: evenly spaced desktop navbar links with animated green underline.
+Latest repair: forced single-row desktop navbar links with no split or overlap.
