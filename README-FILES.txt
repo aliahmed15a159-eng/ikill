@@ -1,3 +1,3 @@
-Copy these files over the matching files in your prior project.
-Includes the mobile recovery CSS and the corrected slow/looping partners carousel.
+Copy these files over matching files in your existing project.
+Latest fix restores the classic three-bar menu at the far left of the mobile navbar.
 No images are included.

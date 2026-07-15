@@ -203,3 +203,32 @@
   .hero-section .hero-copy h1 { font-size:1.9rem !important; }
   .stats-bar div[style*="grid-template-columns"] { grid-template-columns:1fr !important; }
 }
+
+/* Mobile navbar: restore the classic three-bar button at the far physical left. */
+@media screen and (max-width: 767px) {
+  .ikill-navbar > div > div { position:relative !important; display:flex !important; justify-content:flex-end !important; }
+  .ikill-navbar a[href="index.html"] { position:absolute !important; right:0 !important; left:auto !important; }
+  .site-menu-wrap {
+    position:absolute !important; left:0 !important; right:auto !important; top:50% !important;
+    transform:translateY(-50%); width:42px !important; height:42px !important;
+  }
+  .site-menu-trigger {
+    width:42px !important; height:42px !important; min-width:42px !important; min-height:42px !important;
+    display:grid !important; place-items:center; padding:0 !important; border-radius:11px !important;
+    color:var(--text-primary) !important; background:var(--bg-secondary) !important;
+    border:1px solid var(--border-color) !important; box-shadow:none !important; transform:none !important;
+  }
+  .site-menu-trigger:hover,
+  .site-menu-trigger[aria-expanded="true"] {
+    color:#fff !important; background:var(--green-700) !important; border-color:var(--green-700) !important;
+    transform:none !important;
+  }
+  .site-menu-trigger .site-menu-icon { font-size:1.05rem !important; }
+  .ikill-navbar > div > div > div:last-child {
+    position:absolute !important; left:50px !important; right:auto !important; top:50% !important;
+    transform:translateY(-50%); background:transparent !important;
+  }
+  [dir="ltr"] .ikill-navbar a[href="index.html"] { right:auto !important; left:0 !important; }
+  [dir="ltr"] .site-menu-wrap { left:auto !important; right:0 !important; }
+  [dir="ltr"] .ikill-navbar > div > div > div:last-child { left:auto !important; right:50px !important; }
+}
