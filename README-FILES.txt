@@ -1,3 +1,3 @@
 Copy these files over matching files in your existing project.
-Latest fix restores the classic three-bar menu at the far left of the mobile navbar.
+Latest fix: icon-only three-bar menu button and non-overlapping popup submenus.
 No images are included.

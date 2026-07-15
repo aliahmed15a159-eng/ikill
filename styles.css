@@ -1580,3 +1580,22 @@ body { font-weight: 500; }
 
 /* Keep the auto-scroll free from scroll-snap so it never appears frozen between cards. */
 .partners-carousel .marquee-wrapper { scroll-snap-type:none !important; }
+
+/* Menu trigger is intentionally icon-only: the classic three bars, no label. */
+.site-menu-trigger { width:44px; min-width:44px; height:44px; min-height:44px; padding:0; display:grid; place-items:center; }
+.site-menu-trigger .site-menu-icon { margin:0; font-size:1rem; }
+
+/* Give every pop-up menu item enough room; never compress text into adjacent items. */
+.site-menu-popover { width:min(820px,calc(100vw - 2rem)); }
+.site-menu-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; }
+.site-menu-group { min-width:0; }
+.site-menu-group summary { min-width:0; }
+.site-menu-group summary span { min-width:0; overflow-wrap:anywhere; }
+.site-submenu { gap:.2rem; }
+.site-submenu a { line-height:1.6; overflow-wrap:anywhere; }
+@media (max-width:767px) {
+  .site-menu-popover { width:calc(100vw - 1.25rem); left:.625rem; }
+  .site-menu-grid { grid-template-columns:1fr; gap:.5rem; }
+  .site-submenu { display:flex; flex-direction:column; align-items:stretch; flex-wrap:nowrap; gap:.1rem; padding:.1rem .75rem .65rem; }
+  .site-submenu a { display:block; padding:.38rem .25rem; white-space:normal; }
+}
