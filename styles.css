@@ -1577,3 +1577,6 @@ body { font-weight: 500; }
   .site-menu-trigger { min-width:40px; box-shadow:0 5px 13px rgba(7,134,83,.18); }
   .site-menu-popover::before { display:none; }
 }
+
+/* Keep the auto-scroll free from scroll-snap so it never appears frozen between cards. */
+.partners-carousel .marquee-wrapper { scroll-snap-type:none !important; }

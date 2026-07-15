@@ -11,7 +11,7 @@
     text-size-adjust: 100%;
   }
 
-  body { min-width: 320px; }
+  body { min-width: 0; }
 
   /* --- Shared top information & navigation --- */
   .top-bar { padding: .45rem 0; }
@@ -142,4 +142,64 @@
   .top-bar [style*="font-size:0.8rem"] { font-size:.62rem !important; }
   .lang-btn { padding:.22rem .55rem; }
   .section-title { font-size:1.55rem !important; }
+}
+
+/* =====================================================================
+   Mobile recovery layer — hard limits that prevent overflow and cramped UI
+   ===================================================================== */
+@media screen and (max-width: 767px) {
+  *, *::before, *::after { min-width: 0; }
+  html, body { width:100%; max-width:100%; overflow-x:hidden !important; }
+  img, svg, video, iframe { max-width:100%; }
+
+  /* Header stays inside even on 320px phones. */
+  .ikill-navbar > div { padding-inline:10px !important; }
+  .ikill-navbar > div > div { gap:7px !important; }
+  .ikill-navbar a[href="index.html"] { flex:0 0 82px; }
+  .ikill-navbar a[href="index.html"] > div:first-child { width:82px !important; height:32px !important; }
+  .site-menu-wrap { flex:0 0 40px; }
+  .site-menu-trigger { width:40px !important; height:38px; }
+  .ikill-navbar > div > div > div:last-child { flex:0 0 auto; gap:0 !important; }
+  .ikill-navbar .lang-toggle { transform:scale(.74); margin-inline:-6px !important; }
+  .ikill-navbar .theme-toggle { transform:scale(.74); margin-inline:-5px !important; }
+
+  /* One-column content without horizontal clipping. */
+  main, section, footer, .legal-content, .branch-info-card { max-width:100%; }
+  section[style], section > div[style*="max-width"] { padding-inline:15px !important; }
+  div[style*="grid-template-columns"] { grid-template-columns:1fr !important; }
+  .stats-bar div[style*="grid-template-columns"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .stats-bar .stat-item:nth-child(2)::after { display:none; }
+  .stats-bar .stat-item:nth-child(3)::after { display:block; }
+
+  /* Hero maintains hierarchy without spilling outside narrow screens. */
+  .hero-section { min-height:620px !important; }
+  .hero-section .hero-content-shell { top:51% !important; width:100vw !important; padding-inline:14px !important; }
+  .hero-section .hero-copy h1 { font-size:clamp(2rem,11vw,2.85rem) !important; word-break:normal; }
+  .hero-section .hero-copy p { font-size:.9rem !important; max-width:100% !important; }
+  .hero-section .hero-copy > div[style*="display:flex"] { flex-direction:column; align-items:center; }
+  .hero-section .hero-copy .btn { width:min(100%,260px); }
+
+  /* Cards, footer and contact widgets. */
+  .card, .service-feature-card, .testimonial-card, .branch-info-card { width:100%; }
+  .home-branch-card, .home-branch-address, .home-branch-details { min-width:0; overflow-wrap:anywhere; }
+  .ikill-footer [style*="display:flex"] { gap:.85rem !important; }
+  .ikill-footer a, .ikill-footer span { overflow-wrap:anywhere; }
+
+  /* Partner carousel never widens the page; cards stay legible and controls remain tappable. */
+  .partners-carousel { width:100%; max-width:100%; }
+  .partners-carousel .marquee-wrapper { width:100%; max-width:100%; overflow-x:auto !important; }
+  .partners-carousel .marquee-track { padding-inline:42px !important; }
+  .partners-carousel .logo-card { width:86px; height:86px; }
+  .partners-control { width:32px; height:32px; }
+
+  /* Admin table and modal retain usable touch dimensions. */
+  .admin-shell .submission-modal-card { width:100%; }
+  .admin-shell .submission-modal-actions { flex-direction:column; }
+}
+
+@media screen and (max-width: 360px) {
+  .ikill-navbar a[href="index.html"] { flex-basis:74px; }
+  .ikill-navbar a[href="index.html"] > div:first-child { width:74px !important; }
+  .hero-section .hero-copy h1 { font-size:1.9rem !important; }
+  .stats-bar div[style*="grid-template-columns"] { grid-template-columns:1fr !important; }
 }

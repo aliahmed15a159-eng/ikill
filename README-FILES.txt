@@ -1,3 +1,3 @@
-Copy these latest modified files over the matching files in your prior project.
-Includes: refined popup navbar, slow draggable/repeating partners carousel, Cairo/Inter font refresh, mobile navbar refinements, and the Egypt-only hero sentence.
+Copy these files over the matching files in your prior project.
+Includes the mobile recovery CSS and the corrected slow/looping partners carousel.
 No images are included.
