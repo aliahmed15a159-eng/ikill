@@ -80,7 +80,7 @@ const TRANSLATIONS = {
     'cta.book':      'احجز خدمة',
 
     // Footer
-    'footer.desc':    'الشركة الرائدة في الصحة العامة في مصر والشرق الأوسط. نقدم حلولاً متكاملة ومعتمدة عالمياً.',
+    'footer.desc':    'الشركة الرائدة في الصحة العامة في مصر. نقدم حلولاً متكاملة ومعتمدة عالمياً.',
     'footer.company': 'الشركة',
     'footer.links':   'روابط سريعة',
     'footer.contact_title': 'تواصل معنا',
@@ -156,7 +156,7 @@ const TRANSLATIONS = {
     'search.admin_hint':  'إدخال لوحة التحكم',
 
     // Branch info
-    'branch.name':          'الفرع الرئيسي - القاهرة والجيزة',
+    'branch.name':          'الفرع الرئيسي - الجيزة',
     'branch.country':       'مصر',
     'branch.address_label': 'العنوان',
     'branch.phone_label':   'هاتف',
@@ -220,7 +220,7 @@ const TRANSLATIONS = {
     'cta.book':      'Book Service',
 
     // Footer
-    'footer.desc':    'The leading public health company in Egypt and the Middle East. We provide comprehensive, globally certified solutions.',
+    'footer.desc':    'The leading public health company in Egypt. We provide comprehensive, globally certified solutions.',
     'footer.company': 'Company',
     'footer.links':   'Quick Links',
     'footer.contact_title': 'Contact Us',
@@ -296,7 +296,7 @@ const TRANSLATIONS = {
     'search.admin_hint':  'Admin Panel',
 
     // Branch info
-    'branch.name':          'Head Office - Cairo & Giza',
+    'branch.name':          'Head Office - Giza',
     'branch.country':       'Egypt',
     'branch.address_label': 'Address',
     'branch.phone_label':   'Phone',
@@ -331,7 +331,7 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'خبراء معتمدون دولياً مع أكثر من 15 عاماً من الخبرة في الصحة العامة.': 'Internationally certified experts with more than 15 years of public-health experience.',
   'استجابة فورية 24/7': 'Immediate 24/7 Response',
   'خدمة طوارئ على مدار الساعة لضمان استجابة فورية لحالات الإصابة الحرجة.': 'Emergency support around the clock for a swift response to critical infestations.',
-  'العنوان': 'Address', 'شارع الملك فيصل، الجيزة، مصر': 'King Faisal St., Giza, Egypt', 'الفرع الرئيسي': 'Head Office', 'القاهرة والجيزة': 'Cairo & Giza',
+  'العنوان': 'Address', 'شارع الملك فيصل، الجيزة، مصر': 'King Faisal St., Giza, Egypt', 'الفرع الرئيسي': 'Head Office', 'الجيزة': 'Giza',
   'آراء عملائنا': 'Client Testimonials', 'ماذا يقولون عنا': 'What Our Clients Say',
   '“أفضل شركة مكافحة حشرات تعاملت معها. فريق محترف واستجابة سريعة جداً.”': '“The best pest-control company I have worked with. A highly professional team and very fast response.”',
   'أحمد السيد': 'Ahmed El Sayed', 'مدير مطعم': 'Restaurant Manager',
@@ -361,7 +361,7 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'حلول فعالة لمكافحة الذباب في المنازل والمنشآت التجارية والصناعية.': 'Effective fly-control solutions for homes and commercial and industrial facilities.',
   'مكافحة البق': 'Bed Bug Control',
   'خدمات شاملة للقضاء على البق باستخدام تقنيات حديثة وآمنة.': 'Complete bed-bug elimination using modern, safe techniques.',
-  'نشط': 'Active', 'الفرع الرئيسي - القاهرة والجيزة': 'Head Office – Cairo & Giza',
+  'نشط': 'Active', 'الفرع الرئيسي - الجيزة': 'Head Office – Giza',
   'هاتف': 'Phone', 'البريد الإلكتروني': 'Email', 'ساعات العمل': 'Working Hours',
   '24 ساعة / 7 أيام': '24 Hours / 7 Days', 'المقر الرئيسي': 'Head Office',
   'الاسم الكامل': 'Full Name', 'رقم الهاتف': 'Phone Number', 'العنوان بالتفصيل': 'Detailed Address',
