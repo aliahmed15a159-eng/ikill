@@ -1,2 +1,2 @@
 Copy styles.css over the matching file in your existing project.
-Latest repair: forced single-row desktop navbar links with no split or overlap.
+Final navbar repair: all desktop/tablet items are laid out in one simple RTL flex row.

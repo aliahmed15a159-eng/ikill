@@ -1816,3 +1816,83 @@ html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:au
   .desktop-nav-links { gap:.48rem !important; }
   .desktop-nav-link { font-size:.68rem !important; }
 }
+
+/* =====================================================================
+   FINAL NAVBAR LAYOUT RESET
+   A simple flex row replaces all prior grid/absolute desktop positioning.
+   ===================================================================== */
+@media (min-width:768px) {
+  .ikill-navbar > div > div {
+    display:flex !important;
+    direction:rtl !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+    height:72px !important;
+    min-height:72px !important;
+  }
+  /* Right: logo */
+  .ikill-navbar > div > div > a[href="index.html"] {
+    position:static !important;
+    order:1;
+    flex:0 0 auto;
+    align-self:center;
+  }
+  /* Centre: the six requested links occupy the genuine available space. */
+  .ikill-navbar > div > div > .desktop-nav-links {
+    position:static !important;
+    order:2;
+    flex:1 1 auto;
+    min-width:0;
+    width:auto !important;
+    max-width:none !important;
+    display:flex !important;
+    flex-direction:row !important;
+    flex-wrap:nowrap !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:clamp(.6rem,1.5vw,1.55rem) !important;
+    transform:none !important;
+    direction:rtl;
+  }
+  .ikill-navbar > div > div > .desktop-nav-links > .desktop-nav-link {
+    flex:0 0 auto;
+    width:auto !important;
+    min-height:40px;
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    white-space:nowrap;
+  }
+  /* Left-middle: language/search controls */
+  .ikill-navbar > div > div > div:last-child {
+    position:static !important;
+    order:3;
+    flex:0 0 auto;
+    transform:none !important;
+    left:auto !important;
+    right:auto !important;
+    top:auto !important;
+    direction:rtl;
+  }
+  /* Far physical left: compact three-bars control */
+  .ikill-navbar > div > div > .site-menu-wrap {
+    position:relative !important;
+    order:4;
+    flex:0 0 38px;
+    width:38px;
+    height:38px;
+    transform:none !important;
+    left:auto !important;
+    right:auto !important;
+    top:auto !important;
+  }
+  .ikill-navbar > div > div > .site-menu-wrap .site-menu-popover {
+    left:0 !important;
+    right:auto !important;
+  }
+}
+@media (min-width:768px) and (max-width:1040px) {
+  .ikill-navbar > div > div > .desktop-nav-links { gap:.45rem !important; }
+  .ikill-navbar > div > div > .desktop-nav-links > .desktop-nav-link { font-size:.67rem !important; }
+}
