@@ -1,3 +1,3 @@
 Copy these files over matching files in your existing project.
-Latest repair: far-left compact hamburger on desktop/mobile plus separated popup Home links.
+Latest repair: Home popup links are individual icon card rows with no overlap.
 No images are included.

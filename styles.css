@@ -1647,3 +1647,21 @@ html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:au
   html[dir="ltr"] .ikill-navbar .site-menu-wrap { left:0 !important; right:auto !important; }
   html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:46px !important; right:auto !important; }
 }
+
+/* Home submenu: explicit card rows avoid any inline-text collision. */
+.site-menu-group:first-child .site-home-submenu {
+  display:flex !important; flex-direction:column !important; flex-wrap:nowrap !important;
+  gap:.45rem !important; padding:.2rem .7rem .8rem !important;
+}
+.site-menu-group:first-child .site-home-submenu a {
+  display:flex !important; align-items:center; gap:.55rem; width:100%; min-height:36px !important;
+  margin:0 !important; padding:.5rem .6rem !important; border:1px solid var(--border-light);
+  border-radius:9px; background:var(--bg-card); white-space:nowrap; line-height:1.25 !important;
+}
+.site-menu-group:first-child .site-home-submenu a i { width:16px; flex:0 0 16px; color:var(--green-700); text-align:center; }
+.site-menu-group:first-child .site-home-submenu a span { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.site-menu-group:first-child .site-home-submenu a::before { display:none; }
+.site-menu-group:first-child .site-home-submenu a:hover { border-color:#9bdcaf; background:var(--green-50); transform:none; }
+@media(max-width:767px) {
+  .site-menu-group:first-child .site-home-submenu a { min-height:38px !important; font-size:.76rem; }
+}
