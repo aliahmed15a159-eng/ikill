@@ -1040,6 +1040,7 @@ const PartnersCarousel = {
     const track = viewport?.querySelector('.marquee-track');
     const prev = document.getElementById('partners-prev');
     const next = document.getElementById('partners-next');
+    const carousel = viewport?.closest('.partners-carousel');
     if (!viewport || !track || track.children.length < 6) return;
 
     const setCount = Math.floor(track.children.length / 3);
@@ -1055,7 +1056,10 @@ const PartnersCarousel = {
       const nextSet = track.children[setCount];
       if (!first || !nextSet) return;
       loopWidth = nextSet.offsetLeft - first.offsetLeft;
-      if (loopWidth > 0 && viewport.scrollLeft < 2) viewport.scrollLeft = loopWidth;
+      if (loopWidth > 0) {
+        if (viewport.scrollLeft < 2) viewport.scrollLeft = loopWidth;
+        carousel?.classList.add('is-interactive');
+      }
     };
 
     const pause = (milliseconds = 2800) => { pauseUntil = Date.now() + milliseconds; };
@@ -1110,9 +1114,9 @@ const PartnersCarousel = {
       let autoRemainder = 0;
       const tick = () => {
         if (!document.hidden && !isDragging && Date.now() > pauseUntil && loopWidth) {
-          // ~20px/sec: intentionally calm, so every logo can be seen.
+          // ~29px/sec: calm enough to read each mark, fast enough to stay visibly alive.
           // Keep fractional movement in a buffer for browsers that round scrollLeft to pixels.
-          autoRemainder += 0.34;
+          autoRemainder += 0.48;
           const movement = Math.floor(autoRemainder);
           if (movement) {
             viewport.scrollLeft += movement;
