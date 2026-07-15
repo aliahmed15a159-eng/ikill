@@ -35,7 +35,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
           crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -81,13 +81,43 @@
                 </div>
             </a>
 
-            <div class="hidden lg:flex" style="align-items:center;gap:2rem;">
-                <a href="index.html"    class="nav-link" data-i18n="nav.home">الرئيسية</a>
-                <a href="services.html" class="nav-link" data-i18n="nav.services">خدماتنا</a>
-                <a href="sectors.html"  class="nav-link" data-i18n="nav.sectors">القطاعات</a>
-                <a href="about.html"    class="nav-link active" data-i18n="nav.about">من نحن</a>
-                <a href="locations.html"class="nav-link" data-i18n="nav.branches">فروعنا</a>
-                <a href="contact.html"  class="nav-link" data-i18n="nav.contact">اتصل بنا</a>
+            <div class="site-menu-wrap">
+                <button id="site-menu-toggle" class="site-menu-trigger" type="button" aria-expanded="false" aria-controls="site-menu-popover">
+                    <span><i class="fas fa-compass"></i> <span>القائمة</span></span>
+                    <i class="fas fa-chevron-down site-menu-chevron"></i>
+                </button>
+                <div id="site-menu-popover" class="site-menu-popover" aria-hidden="true">
+                    <div class="site-menu-popover-head">
+                        <div><span>استكشف صفحات الموقع</span><strong>iKILL</strong></div>
+                        <button id="site-menu-close" type="button" aria-label="إغلاق القائمة"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="site-menu-grid">
+                        <details class="site-menu-group" open>
+                            <summary><i class="fas fa-house"></i><span data-i18n="nav.home">الرئيسية</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="index.html">نظرة عامة</a><a href="index.html#services">طلبات الخدمة</a><a href="index.html#partners">شركاء النجاح</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-bug"></i><span data-i18n="nav.services">خدماتنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="services.html#pest">مكافحة الآفات</a><a href="services.html#cockroach">مكافحة الصراصير</a><a href="services.html#rat">مكافحة القوارض</a><a href="services.html#bedbug">بق الفراش</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-building"></i><span data-i18n="nav.sectors">القطاعات</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="sectors.html#food">المؤسسات الغذائية</a><a href="sectors.html#healthcare">الرعاية الصحية</a><a href="sectors.html#hospitality">قطاع الضيافة</a><a href="sectors.html#industry">القطاع الصناعي</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-circle-info"></i><span data-i18n="nav.about">من نحن</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="about.html">نبذة عن iKILL</a><a href="about.html#csr">الاستدامة</a><a href="about.html#partners">شركاء النجاح</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-location-dot"></i><span data-i18n="nav.branches">فروعنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="locations.html">الفرع الرئيسي</a><a href="locations.html">العنوان وساعات العمل</a><a href="locations.html">اتصل بالفرع</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-phone"></i><span data-i18n="nav.contact">اتصل بنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="contact.html">إرسال طلب خدمة</a><a href="tel:01020019042">اتصال مباشر</a><a href="mailto:info@ikill.net">البريد الإلكتروني</a></div>
+                        </details>
+                    </div>
+                </div>
             </div>
 
             <div style="display:flex;align-items:center;gap:0.75rem;">
@@ -112,9 +142,6 @@
                     </div>
                 </label>
                 <a href="contact.html" class="btn btn-primary hidden md:flex" style="padding:0.55rem 1.3rem;font-size:0.85rem;" data-i18n="nav.cta">اطلب خدمة</a>
-                <button id="mobile-menu-toggle" class="lg:hidden" aria-expanded="false" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;background:var(--bg-secondary);border-radius:10px;cursor:pointer;color:var(--text-primary);">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
         </div>
     </div>

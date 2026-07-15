@@ -36,7 +36,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -223,13 +223,43 @@
             </a>
 
             <!-- Desktop nav -->
-            <div class="hidden lg:flex" style="align-items:center;gap:2rem;">
-                <a href="index.html"    class="nav-link active" data-i18n="nav.home">الرئيسية</a>
-                <a href="services.html" class="nav-link" data-i18n="nav.services">خدماتنا</a>
-                <a href="sectors.html"  class="nav-link" data-i18n="nav.sectors">القطاعات</a>
-                <a href="about.html"    class="nav-link" data-i18n="nav.about">من نحن</a>
-                <a href="locations.html"class="nav-link" data-i18n="nav.branches">فروعنا</a>
-                <a href="contact.html"  class="nav-link" data-i18n="nav.contact">اتصل بنا</a>
+            <div class="site-menu-wrap">
+                <button id="site-menu-toggle" class="site-menu-trigger" type="button" aria-expanded="false" aria-controls="site-menu-popover">
+                    <span><i class="fas fa-compass"></i> <span>القائمة</span></span>
+                    <i class="fas fa-chevron-down site-menu-chevron"></i>
+                </button>
+                <div id="site-menu-popover" class="site-menu-popover" aria-hidden="true">
+                    <div class="site-menu-popover-head">
+                        <div><span>استكشف صفحات الموقع</span><strong>iKILL</strong></div>
+                        <button id="site-menu-close" type="button" aria-label="إغلاق القائمة"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="site-menu-grid">
+                        <details class="site-menu-group" open>
+                            <summary><i class="fas fa-house"></i><span data-i18n="nav.home">الرئيسية</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="index.html">نظرة عامة</a><a href="index.html#services">طلبات الخدمة</a><a href="index.html#partners">شركاء النجاح</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-bug"></i><span data-i18n="nav.services">خدماتنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="services.html#pest">مكافحة الآفات</a><a href="services.html#cockroach">مكافحة الصراصير</a><a href="services.html#rat">مكافحة القوارض</a><a href="services.html#bedbug">بق الفراش</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-building"></i><span data-i18n="nav.sectors">القطاعات</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="sectors.html#food">المؤسسات الغذائية</a><a href="sectors.html#healthcare">الرعاية الصحية</a><a href="sectors.html#hospitality">قطاع الضيافة</a><a href="sectors.html#industry">القطاع الصناعي</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-circle-info"></i><span data-i18n="nav.about">من نحن</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="about.html">نبذة عن iKILL</a><a href="about.html#csr">الاستدامة</a><a href="about.html#partners">شركاء النجاح</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-location-dot"></i><span data-i18n="nav.branches">فروعنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="locations.html">الفرع الرئيسي</a><a href="locations.html">العنوان وساعات العمل</a><a href="locations.html">اتصل بالفرع</a></div>
+                        </details>
+                        <details class="site-menu-group">
+                            <summary><i class="fas fa-phone"></i><span data-i18n="nav.contact">اتصل بنا</span><i class="fas fa-chevron-down"></i></summary>
+                            <div class="site-submenu"><a href="contact.html">إرسال طلب خدمة</a><a href="tel:01020019042">اتصال مباشر</a><a href="mailto:info@ikill.net">البريد الإلكتروني</a></div>
+                        </details>
+                    </div>
+                </div>
             </div>
 
             <div style="display:flex;align-items:center;gap:0.75rem;">
@@ -261,11 +291,6 @@
 
                 <!-- CTA -->
                 <a href="contact.html" class="btn btn-primary hidden md:flex" data-i18n="nav.cta" style="padding:0.55rem 1.3rem;font-size:0.85rem;">اطلب خدمة</a>
-
-                <!-- Mobile burger -->
-                <button id="mobile-menu-toggle" class="lg:hidden" aria-expanded="false" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;background:var(--bg-secondary);border-radius:10px;cursor:pointer;color:var(--text-primary);">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
         </div>
     </div>
@@ -312,7 +337,7 @@
             </div>
 
             <!-- Title -->
-            <h1 style="width:100%;text-align:center;font-size:clamp(2.8rem,7vw,4.5rem);font-weight:900;color:white;line-height:1.2;margin:0 auto 1.5rem;font-family:'Noto Sans Arabic', 'Inter', sans-serif;">
+            <h1 style="width:100%;text-align:center;font-size:clamp(2.8rem,7vw,4.5rem);font-weight:900;color:white;line-height:1.2;margin:0 auto 1.5rem;font-family:'Cairo', 'Inter', sans-serif;">
                 <span data-i18n="hero.title1">نحمي</span>
                 <span style="display:inline-block;" class="text-gradient" data-i18n="hero.title2">بيئتك</span>
                 <span data-i18n="hero.title3">باحترافية عالمية</span>
@@ -320,7 +345,7 @@
 
             <!-- Subtitle -->
             <p style="font-size:1.2rem;color:rgba(255,255,255,0.8);max-width:700px;margin:0 auto 2.5rem;line-height:1.8;" data-i18n="hero.subtitle">
-                حلول متكاملة وآمنة لمكافحة الآفات. نخدمك في مصر والشرق الأوسط بأعلى معايير الجودة.
+                حلول متكاملة وآمنة لمكافحة الآفات. نخدمك في مصر بأعلى معايير الجودة.
             </p>
 
             <!-- CTAs -->
@@ -348,14 +373,16 @@
 </section>
 
 <!-- ==================== LOGOS STRIP ==================== -->
-<section style="padding:3rem 0;background:var(--bg-primary);">
+<section id="partners" style="padding:3rem 0;background:var(--bg-primary);">
     <div style="max-width:1536px;margin:0 auto;padding:0 1.5rem;">
         <div class="animate-fade-up" style="text-align:center;margin-bottom:1.75rem;">
             <p style="font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;" data-i18n="logos.title">شركاء النجاح وسابقة أعمالنا</p>
         </div>
 
-        <div class="marquee-wrapper">
-            <div class="marquee-track">
+        <div class="partners-carousel" aria-label="شركاء النجاح وسابقة الأعمال">
+            <button class="partners-control partners-prev" id="partners-prev" type="button" aria-label="عرض الشعارات السابقة"><i class="fas fa-chevron-right"></i></button>
+            <div class="marquee-wrapper" id="partners-marquee" tabindex="0" aria-label="اسحب يميناً أو يساراً لاستعراض شعارات شركاء النجاح">
+                <div class="marquee-track">
                 <!-- Set 1 -->
                 <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
                 <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
@@ -410,7 +437,9 @@
                 <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
                 <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
                 <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
+                </div>
             </div>
+            <button class="partners-control partners-next" id="partners-next" type="button" aria-label="عرض الشعارات التالية"><i class="fas fa-chevron-left"></i></button>
         </div>
     </div>
 </section>
@@ -481,7 +510,7 @@
 
         <div class="animate-stagger" style="display:flex;flex-wrap:wrap;gap:0.75rem;">
             <div class="pest-pill" onclick="location.href='services.html#cockroach'"><i class="fas fa-bug"></i> الصراصير</div>
-            <div class="pest-pill" onclick="location.href='services.html#rodent'"><i class="fas fa-paw"></i> القوارض</div>
+            <div class="pest-pill" onclick="location.href='services.html#rat'"><i class="fas fa-paw"></i> القوارض</div>
             <div class="pest-pill" onclick="location.href='services.html#mosquito'"><i class="fas fa-mosquito"></i> البعوض</div>
             <div class="pest-pill" onclick="location.href='services.html#fly'"><i class="fas fa-feather-alt"></i> الذباب</div>
             <div class="pest-pill" onclick="location.href='services.html#termite'"><i class="fas fa-bug"></i> النمل الأبيض</div>
@@ -509,11 +538,11 @@
                 <div class="icon-box"><i class="fas fa-utensils"></i></div>
                 <span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">المؤسسات الغذائية</span>
             </div>
-            <div class="sector-card" onclick="location.href='sectors.html#health'">
+            <div class="sector-card" onclick="location.href='sectors.html#healthcare'">
                 <div class="icon-box"><i class="fas fa-hospital"></i></div>
                 <span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">الرعاية الصحية</span>
             </div>
-            <div class="sector-card" onclick="location.href='sectors.html#hotel'">
+            <div class="sector-card" onclick="location.href='sectors.html#hospitality'">
                 <div class="icon-box"><i class="fas fa-hotel"></i></div>
                 <span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">قطاع الضيافة</span>
             </div>

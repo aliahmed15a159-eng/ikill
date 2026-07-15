@@ -3,7 +3,7 @@
    Professional Redesign 2026
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 /* =============================================
    CSS Custom Properties (Tokens)
@@ -109,7 +109,7 @@ html {
 }
 
 body {
-  font-family: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color var(--duration-normal) var(--ease-smooth),
@@ -1394,3 +1394,105 @@ body::selection { background: var(--green-600); color: #fff; }
   to { transform:translateX(calc(-33.333333% - .416667rem)); }
 }
 .hero-section { justify-content:center; }
+
+/* =====================================================================
+   Typography refresh, popup navigation and interactive partners carousel
+   ===================================================================== */
+html[lang="en"] body { font-family: 'Inter', system-ui, sans-serif; }
+h1, h2, h3, h4, .section-title, .stat-value, .site-menu-trigger, .btn {
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+html[lang="en"] h1,
+html[lang="en"] h2,
+html[lang="en"] h3,
+html[lang="en"] h4,
+html[lang="en"] .section-title,
+html[lang="en"] .stat-value,
+html[lang="en"] .site-menu-trigger,
+html[lang="en"] .btn { font-family: 'Inter', system-ui, sans-serif; }
+.section-title { letter-spacing: -.045em; }
+body { font-weight: 500; }
+
+/* Compact pop-up site navigation with a sub-menu for every category. */
+.site-menu-wrap { position:relative; z-index:450; }
+.site-menu-trigger {
+  display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+  min-height:42px; padding:.55rem 1rem; border:1px solid var(--border-color); border-radius:999px;
+  background:var(--bg-card); color:var(--green-900); box-shadow:0 4px 14px rgba(6,67,40,.06);
+  font-size:.84rem; font-weight:800; cursor:pointer; transition:.25s var(--ease-smooth);
+}
+.site-menu-trigger > span { display:inline-flex; align-items:center; gap:.45rem; }
+.site-menu-trigger > span i { color:var(--green-600); }
+.site-menu-trigger:hover,
+.site-menu-trigger[aria-expanded="true"] { border-color:#8bd7a1; color:var(--green-700); box-shadow:0 10px 24px rgba(6,67,40,.12); }
+.site-menu-trigger[aria-expanded="true"] .site-menu-chevron { transform:rotate(180deg); }
+.site-menu-chevron { font-size:.65rem; transition:transform .25s var(--ease-spring); }
+.site-menu-popover {
+  position:absolute; top:calc(100% + 17px); left:50%; width:min(740px,calc(100vw - 2rem));
+  padding:1rem; border:1px solid rgba(14,119,72,.17); border-radius:24px; background:rgba(255,255,255,.97);
+  box-shadow:0 24px 65px rgba(3,55,31,.20); backdrop-filter:blur(20px) saturate(150%);
+  opacity:0; visibility:hidden; pointer-events:none; transform:translate(-50%,-10px) scale(.98);
+  transform-origin:top center; transition:opacity .22s ease,transform .25s var(--ease-spring),visibility .22s ease;
+}
+.site-menu-popover.open { opacity:1; visibility:visible; pointer-events:auto; transform:translate(-50%,0) scale(1); }
+.site-menu-popover-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.3rem .35rem 1rem; border-bottom:1px solid var(--border-light); }
+.site-menu-popover-head div { display:flex; align-items:baseline; gap:.55rem; }
+.site-menu-popover-head span { color:var(--text-muted); font-size:.72rem; font-weight:700; }
+.site-menu-popover-head strong { color:var(--green-800); font-size:1rem; font-weight:900; letter-spacing:.02em; }
+.site-menu-popover-head button { display:grid; place-items:center; width:34px; height:34px; border:0; border-radius:11px; color:var(--text-muted); background:var(--bg-secondary); cursor:pointer; transition:.2s; }
+.site-menu-popover-head button:hover { color:#fff; background:var(--green-700); transform:rotate(90deg); }
+.site-menu-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; padding-top:.85rem; }
+.site-menu-group { border:1px solid var(--border-light); border-radius:15px; background:var(--bg-secondary); overflow:hidden; transition:border-color .2s,background .2s; }
+.site-menu-group[open] { border-color:#bfe7ca; background:#fbfffc; }
+.site-menu-group summary { display:flex; align-items:center; gap:.55rem; min-height:44px; padding:.65rem .75rem; color:var(--text-primary); font-size:.78rem; font-weight:800; cursor:pointer; list-style:none; }
+.site-menu-group summary::-webkit-details-marker { display:none; }
+.site-menu-group summary > i:first-child { width:24px; color:var(--green-700); text-align:center; }
+.site-menu-group summary > i:last-child { margin-right:auto; font-size:.6rem; color:var(--text-muted); transition:transform .2s; }
+.site-menu-group[open] summary > i:last-child { transform:rotate(180deg); }
+.site-submenu { display:flex; flex-direction:column; gap:.1rem; padding:.15rem .75rem .75rem; }
+.site-submenu a { padding:.35rem .3rem; color:var(--text-secondary); font-size:.73rem; font-weight:600; text-decoration:none; transition:color .18s,transform .18s; }
+.site-submenu a::before { content:'•'; margin-left:.4rem; color:var(--green-400); }
+.site-submenu a:hover { color:var(--green-700); transform:translateX(-3px); }
+[dir="ltr"] .site-submenu a::before { margin-left:0; margin-right:.4rem; }
+[dir="ltr"] .site-menu-group summary > i:last-child { margin-right:0; margin-left:auto; }
+[dir="ltr"] .site-submenu a:hover { transform:translateX(3px); }
+[data-theme="dark"] .site-menu-trigger { background:var(--bg-card); color:var(--green-300); }
+[data-theme="dark"] .site-menu-popover { background:rgba(12,40,27,.98); border-color:rgba(104,220,135,.18); }
+[data-theme="dark"] .site-menu-group { background:rgba(255,255,255,.03); border-color:var(--border-color); }
+[data-theme="dark"] .site-menu-group[open] { background:rgba(71,185,103,.07); }
+
+/* Partner logos: slow automatic loop plus touch/mouse drag and previous/next controls. */
+.partners-carousel { position:relative; display:flex; align-items:center; }
+.partners-carousel .marquee-wrapper {
+  width:100%; overflow-x:auto; overflow-y:hidden; direction:ltr; scroll-snap-type:x mandatory;
+  scrollbar-width:none; -ms-overflow-style:none; cursor:grab; touch-action:pan-x; user-select:none;
+}
+.partners-carousel .marquee-wrapper::-webkit-scrollbar { display:none; }
+.partners-carousel .marquee-wrapper.is-dragging { cursor:grabbing; }
+.partners-carousel .marquee-wrapper::before,
+.partners-carousel .marquee-wrapper::after { display:none; }
+.partners-carousel .marquee-track { animation:none !important; width:max-content; gap:1.25rem; padding:4px 3.4rem; }
+.partners-carousel .logo-card { scroll-snap-align:start; cursor:grab; }
+.partners-control {
+  position:absolute; z-index:3; display:grid; place-items:center; width:42px; height:42px;
+  border:1px solid #cbe8d3; border-radius:50%; color:var(--green-800); background:rgba(255,255,255,.96);
+  box-shadow:0 6px 20px rgba(3,62,36,.15); cursor:pointer; transition:.22s var(--ease-spring);
+}
+.partners-control:hover { color:#fff; background:var(--green-700); border-color:var(--green-700); transform:scale(1.1); }
+.partners-prev { right:0; }
+.partners-next { left:0; }
+[data-theme="dark"] .partners-control { color:var(--green-200); background:var(--bg-card); border-color:var(--border-color); }
+
+@media (max-width: 767px) {
+  .site-menu-trigger { min-height:38px; padding:.45rem .72rem; font-size:.75rem; }
+  .site-menu-trigger > span i { font-size:.8rem; }
+  .site-menu-popover { position:fixed; top:72px; left:1rem; width:calc(100vw - 2rem); max-height:calc(100svh - 88px); overflow-y:auto; border-radius:19px; }
+  .site-menu-popover.open { transform:translate(0,0) scale(1); }
+  .site-menu-grid { grid-template-columns:1fr; gap:.4rem; }
+  .site-menu-group summary { min-height:40px; padding:.52rem .65rem; }
+  .site-submenu { flex-direction:row; flex-wrap:wrap; gap:.2rem .35rem; padding:.05rem .6rem .55rem; }
+  .site-submenu a { padding:.28rem .15rem; font-size:.7rem; }
+  .partners-carousel .marquee-track { gap:.8rem; padding-inline:2.65rem; }
+  .partners-control { width:34px; height:34px; font-size:.75rem; }
+}

@@ -44,7 +44,7 @@ const TRANSLATIONS = {
     'hero.title1':   'نحمي',
     'hero.title2':   'بيئتك',
     'hero.title3':   'باحترافية عالمية',
-    'hero.subtitle': 'حلول متكاملة وآمنة لمكافحة الآفات. نخدمك في مصر والشرق الأوسط بأعلى معايير الجودة.',
+    'hero.subtitle': 'حلول متكاملة وآمنة لمكافحة الآفات. نخدمك في مصر بأعلى معايير الجودة.',
     'hero.cta1':     'احجز الآن',
     'hero.cta2':     'استكشف خدماتنا',
     'hero.clients':  'عميل راضٍ+',
@@ -184,7 +184,7 @@ const TRANSLATIONS = {
     'hero.title1':   'We Protect',
     'hero.title2':   'Your Space',
     'hero.title3':   'With World-Class Expertise',
-    'hero.subtitle': 'Complete, safe pest-control solutions. Serving Egypt and the Middle East to the highest quality standards.',
+    'hero.subtitle': 'Complete, safe pest-control solutions. Serving Egypt to the highest quality standards.',
     'hero.cta1':     'Book Now',
     'hero.cta2':     'Explore Services',
     'hero.clients':  'Satisfied Clients+',
@@ -323,7 +323,7 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'العقارب': 'Scorpions', 'الطيور': 'Birds', 'العفن': 'Mould', 'وأكثر...': 'And more…',
   'القطاعات': 'Sectors', 'القطاعات التي نخدمها': 'Sectors We Serve',
   'المؤسسات الغذائية': 'Food Establishments', 'الرعاية الصحية': 'Healthcare',
-  'قطاع الضيافة': 'Hospitality', 'التعليم': 'Education', 'الصناعة': 'Industry', 'البيع بالتجزئة': 'Retail',
+  'قطاع الضيافة': 'Hospitality', 'التعليم': 'Education', 'الصناعة': 'Industry', 'القطاع الصناعي': 'Industrial Sector', 'البيع بالتجزئة': 'Retail',
   'لماذا iKILL': 'Why iKILL', 'ما يميزنا عن الآخرين': 'What Makes Us Different',
   'حلول آمنة 100%': '100% Safe Solutions',
   'نستخدم مواد معتمدة ومرخصة تماماً وآمنة للبشر والحيوانات الأليفة.': 'We use fully approved, licensed materials that are safe for people and pets.',
@@ -340,6 +340,10 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   '“تعاملنا معهم لحماية مستودعاتنا. النتائج مذهلة والفريق محترف جداً.”': '“We worked with them to protect our warehouses. The results were excellent and the team was very professional.”',
   'محمد الشيخ': 'Mohamed El Sheikh', 'مدير عمليات': 'Operations Manager',
   'تم التطوير بواسطة': 'Developed by', 'علي أحمد': 'Ali Ahmed',
+  'القائمة': 'Menu', 'استكشف صفحات الموقع': 'Explore the site', 'نظرة عامة': 'Overview',
+  'طلبات الخدمة': 'Service Requests', 'شركاء النجاح': 'Success Partners', 'مكافحة القوارض': 'Rodent Control',
+  'نبذة عن iKILL': 'About iKILL', 'الاستدامة': 'Sustainability', 'العنوان وساعات العمل': 'Address & Hours',
+  'اتصل بالفرع': 'Contact the Branch', 'إرسال طلب خدمة': 'Send a Service Request', 'اتصال مباشر': 'Call Directly',
   '© iKILL 2026 - جميع الحقوق محفوظة': '© iKILL 2026 — All rights reserved',
 
   'حلول شاملة للصحة العامة': 'Comprehensive Public Health Solutions',
@@ -996,6 +1000,134 @@ const SearchManager = {
 };
 
 /* =============================================
+   POP-UP SITE NAVIGATION
+   ============================================= */
+const SiteMenu = {
+  init() {
+    const toggle = document.getElementById('site-menu-toggle');
+    const popover = document.getElementById('site-menu-popover');
+    const close = document.getElementById('site-menu-close');
+    if (!toggle || !popover) return;
+
+    const setOpen = (open) => {
+      popover.classList.toggle('open', open);
+      popover.setAttribute('aria-hidden', String(!open));
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setOpen(!popover.classList.contains('open'));
+    });
+    close && close.addEventListener('click', () => setOpen(false));
+    popover.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.site-menu-wrap')) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+  }
+};
+
+/* =============================================
+   PARTNERS CAROUSEL
+   Slow, seamless auto-scroll with buttons, mouse drag, touch swipe and keyboard support.
+   ============================================= */
+const PartnersCarousel = {
+  init() {
+    const viewport = document.getElementById('partners-marquee');
+    const track = viewport?.querySelector('.marquee-track');
+    const prev = document.getElementById('partners-prev');
+    const next = document.getElementById('partners-next');
+    if (!viewport || !track || track.children.length < 6) return;
+
+    const setCount = Math.floor(track.children.length / 3);
+    let loopWidth = 0;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+    let isDragging = false;
+    let pauseUntil = 0;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const calculateLoopWidth = () => {
+      const first = track.children[0];
+      const nextSet = track.children[setCount];
+      if (!first || !nextSet) return;
+      loopWidth = nextSet.offsetLeft - first.offsetLeft;
+      if (loopWidth > 0 && viewport.scrollLeft < 2) viewport.scrollLeft = loopWidth;
+    };
+
+    const pause = (milliseconds = 2800) => { pauseUntil = Date.now() + milliseconds; };
+    const normalisePosition = () => {
+      if (!loopWidth) return;
+      if (viewport.scrollLeft >= loopWidth * 2) viewport.scrollLeft -= loopWidth;
+      if (viewport.scrollLeft <= 0) viewport.scrollLeft += loopWidth;
+    };
+    const moveBy = (amount) => {
+      pause(4200);
+      viewport.scrollBy({ left: amount, behavior: 'smooth' });
+    };
+
+    prev?.addEventListener('click', () => moveBy(-330));
+    next?.addEventListener('click', () => moveBy(330));
+    viewport.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') { event.preventDefault(); moveBy(330); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); moveBy(-330); }
+    });
+    viewport.addEventListener('wheel', () => pause(5000), { passive: true });
+    viewport.addEventListener('mouseenter', () => pause(7000));
+
+    viewport.addEventListener('pointerdown', (event) => {
+      isDragging = true;
+      dragStartX = event.clientX;
+      dragStartScroll = viewport.scrollLeft;
+      viewport.classList.add('is-dragging');
+      pause(7000);
+      viewport.setPointerCapture?.(event.pointerId);
+    });
+    viewport.addEventListener('pointermove', (event) => {
+      if (!isDragging) return;
+      const delta = event.clientX - dragStartX;
+      if (Math.abs(delta) > 3) {
+        viewport.scrollLeft = dragStartScroll - delta;
+        event.preventDefault();
+      }
+    });
+    const endDrag = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      viewport.classList.remove('is-dragging');
+      pause(3500);
+      normalisePosition();
+    };
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+    window.addEventListener('resize', calculateLoopWidth, { passive: true });
+
+    requestAnimationFrame(() => requestAnimationFrame(calculateLoopWidth));
+    if (!reducedMotion) {
+      let autoRemainder = 0;
+      const tick = () => {
+        if (!document.hidden && !isDragging && Date.now() > pauseUntil && loopWidth) {
+          // ~20px/sec: intentionally calm, so every logo can be seen.
+          // Keep fractional movement in a buffer for browsers that round scrollLeft to pixels.
+          autoRemainder += 0.34;
+          const movement = Math.floor(autoRemainder);
+          if (movement) {
+            viewport.scrollLeft += movement;
+            autoRemainder -= movement;
+            normalisePosition();
+          }
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+};
+
+/* =============================================
    MAIN INIT
    ============================================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1010,6 +1142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   MobileMenu.init();
   TiltEffect.init();
   SearchManager.init();
+  SiteMenu.init();
+  PartnersCarousel.init();
 
   // Wire up theme toggles
   document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach(btn => {
