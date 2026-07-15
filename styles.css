@@ -1599,3 +1599,51 @@ body { font-weight: 500; }
   .site-submenu { display:flex; flex-direction:column; align-items:stretch; flex-wrap:nowrap; gap:.1rem; padding:.1rem .75rem .65rem; }
   .site-submenu a { display:block; padding:.38rem .25rem; white-space:normal; }
 }
+
+/* Final desktop navbar layout: compact three bars at the far physical left. */
+.ikill-navbar > div > div { justify-content:flex-end !important; }
+.ikill-navbar .site-menu-wrap {
+  position:absolute; left:0; right:auto; top:50%; width:38px; height:38px;
+  transform:translateY(-50%); display:grid; place-items:center;
+}
+.ikill-navbar .site-menu-trigger {
+  width:38px; min-width:38px; height:38px; min-height:38px; padding:0;
+  display:grid; place-items:center; border-radius:10px; color:var(--text-primary);
+  background:var(--bg-secondary); border:1px solid var(--border-color); box-shadow:none;
+}
+.ikill-navbar .site-menu-trigger:hover,
+.ikill-navbar .site-menu-trigger[aria-expanded="true"] {
+  color:#fff; background:var(--green-700); border-color:var(--green-700); box-shadow:none; transform:none;
+}
+.ikill-navbar .site-menu-trigger .site-menu-icon { font-size:.95rem; }
+.ikill-navbar > div > div > div:last-child {
+  left:48px; right:auto; top:50%; transform:translateY(-50%); padding:.25rem;
+}
+.ikill-navbar .site-menu-popover {
+  left:0; right:auto; transform:translate(0,-10px) scale(.98); transform-origin:top left;
+}
+.ikill-navbar .site-menu-popover.open { transform:translate(0,0) scale(1); }
+.ikill-navbar .site-menu-popover::before { left:19px; transform:rotate(45deg); }
+
+/* Submenu rows are deliberately separated so the Home links never overlap. */
+.site-submenu { display:grid; grid-template-columns:1fr; gap:.35rem; }
+.site-submenu a { display:block; min-height:29px; padding:.38rem .35rem; border-radius:7px; }
+.site-submenu a:hover { background:var(--green-50); }
+.site-menu-group:first-child .site-submenu { gap:.45rem; }
+.site-menu-group:first-child .site-submenu a { min-height:32px; }
+
+@media (max-width:767px) {
+  .ikill-navbar > div > div { justify-content:flex-end !important; }
+  .ikill-navbar .site-menu-wrap { left:0; right:auto; width:38px !important; height:38px !important; }
+  .ikill-navbar .site-menu-trigger { width:38px !important; min-width:38px !important; height:38px !important; min-height:38px !important; }
+  .ikill-navbar > div > div > div:last-child { left:46px !important; right:auto !important; }
+  .ikill-navbar .site-menu-popover { left:.625rem; right:auto; transform:translate(0,-10px) scale(.98); }
+  .ikill-navbar .site-menu-popover.open { transform:translate(0,0) scale(1); }
+}
+/* Keep the menu button on the physical left after switching to English as well. */
+html[dir="ltr"] .ikill-navbar .site-menu-wrap { left:0; right:auto; }
+html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:auto; }
+@media (max-width:767px) {
+  html[dir="ltr"] .ikill-navbar .site-menu-wrap { left:0 !important; right:auto !important; }
+  html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:46px !important; right:auto !important; }
+}
