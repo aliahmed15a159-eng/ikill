@@ -1896,3 +1896,26 @@ html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:au
   .ikill-navbar > div > div > .desktop-nav-links { gap:.45rem !important; }
   .ikill-navbar > div > div > .desktop-nav-links > .desktop-nav-link { font-size:.67rem !important; }
 }
+
+/* Illustrated pest images replace generic glyphs in the pest directory. */
+.pest-pill {
+  gap:.55rem;
+  min-height:48px;
+  padding:.45rem .78rem;
+}
+.pest-pill .pest-image {
+  width:29px;
+  height:29px;
+  flex:0 0 29px;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 2px rgba(5,75,43,.10));
+  transition:transform .26s var(--ease-spring),filter .26s ease;
+}
+.pest-pill:hover .pest-image { transform:scale(1.14) rotate(-5deg); filter:drop-shadow(0 5px 5px rgba(5,100,56,.17)); }
+@media(max-width:767px) {
+  .pest-pill { min-height:44px; padding:.4rem .65rem; font-size:.78rem; }
+  .pest-pill .pest-image { width:25px; height:25px; flex-basis:25px; }
+}
+.service-pest-image { width:100%; height:100%; object-fit:contain; display:block; }
+.service-page-card .service-pest-image { width:42px; height:42px; }
+.card-icon .service-pest-image { width:42px; height:42px; }
