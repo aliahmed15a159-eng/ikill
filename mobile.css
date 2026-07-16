@@ -232,3 +232,35 @@
   [dir="ltr"] .site-menu-wrap { left:auto !important; right:0 !important; }
   [dir="ltr"] .ikill-navbar > div > div > div:last-child { left:auto !important; right:50px !important; }
 }
+
+/* English phone layout: brand moves left and the three-bars control moves to the right. */
+@media screen and (max-width:767px) {
+  html[dir="ltr"] .ikill-navbar > div > div { direction:ltr !important; }
+  html[dir="ltr"] .ikill-navbar a[href="index.html"] { left:0 !important; right:auto !important; }
+  html[dir="ltr"] .ikill-navbar .site-menu-wrap { right:0 !important; left:auto !important; }
+  html[dir="ltr"] .ikill-navbar > div > div > div:last-child { right:46px !important; left:auto !important; }
+}
+@media screen and (max-width:767px) {
+  .service-request-panel { width:100%; }
+  .service-request-card .contact-input { max-width:100%; }
+}
+
+/* Compact phone footer: keep useful links side-by-side instead of a very long column. */
+@media screen and (max-width:767px) {
+  .ikill-footer > div[style*="padding:4rem"] { padding:1.6rem .95rem 1rem !important; }
+  .ikill-footer > div[style*="padding:3rem"] { padding:1.35rem .95rem .85rem !important; }
+  .ikill-footer [style*="grid-template-columns:2fr"] {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:1.05rem !important;
+    margin-bottom:1.35rem !important;
+  }
+  .ikill-footer [style*="grid-template-columns:2fr"] > :first-child,
+  .ikill-footer [style*="grid-template-columns:2fr"] > :last-child { grid-column:1 / -1; }
+  .ikill-footer p[data-i18n="footer.desc"] { display:none; }
+  .ikill-footer [style*="font-size:0.95rem"] { margin-bottom:.6rem !important; }
+  .ikill-footer [style*="display:flex;flex-direction:column"] { gap:.35rem !important; }
+  .ikill-footer .footer-link { font-size:.76rem; }
+  .ikill-footer [style*="border-top"] { padding-top:.9rem !important; gap:.55rem !important; }
+  .ikill-footer [style*="justify-content:space-between"] { gap:.6rem !important; }
+  .developer-credit { margin-top:.65rem !important; padding-top:.65rem !important; font-size:.68rem !important; }
+}
