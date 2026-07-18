@@ -41,7 +41,7 @@
           crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="utilities.css">
 
     <style>
         .service-page-card {
@@ -156,7 +156,7 @@
                 <div class="global-search-wrap hidden lg:flex">
                     <div class="global-search-bar" id="global-search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="global-search-input" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
+                        <input type="text" id="global-search-input" aria-label="البحث في الموقع" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
                     </div>
                     <div class="search-dropdown" id="search-dropdown"></div>
                 </div>
@@ -165,7 +165,7 @@
                     <button class="lang-btn" data-lang="en">EN</button>
                 </div>
                 <label class="theme-toggle" title="تبديل الوضع">
-                    <input type="checkbox" class="theme-checkbox">
+                    <input type="checkbox" class="theme-checkbox" aria-label="تبديل الوضع الداكن">
                     <div class="theme-toggle-track"></div>
                     <div class="theme-toggle-thumb">
                         <i class="fas fa-moon theme-icon-moon" style="display:none;color:var(--green-300);font-size:9px;"></i>
@@ -308,11 +308,8 @@
 </footer>
 
 <!-- SCRIPTS -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js"></script>
+<script src="./firebase-loader.js"></script>
 <script src="./app.js"></script>
-<script src="./analytics.js"></script>
 
 </body>
 </html>

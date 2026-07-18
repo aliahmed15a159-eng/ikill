@@ -41,7 +41,7 @@
           crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="utilities.css">
     <!-- Dedicated phone and compact-device layout -->
     <link rel="stylesheet" href="mobile.css">
 </head>
@@ -123,12 +123,21 @@
                 </div>
             </div>
 
+            <div class="desktop-nav-links" aria-label="روابط صفحات الموقع">
+                <a href="index.html" class="desktop-nav-link" data-i18n="nav.home">الرئيسية</a>
+                <a href="services.html" class="desktop-nav-link" data-i18n="nav.services">خدماتنا</a>
+                <a href="sectors.html" class="desktop-nav-link" data-i18n="nav.sectors">القطاعات</a>
+                <a href="about.html" class="desktop-nav-link active" data-i18n="nav.about">من نحن</a>
+                <a href="locations.html" class="desktop-nav-link" data-i18n="nav.branches">فروعنا</a>
+                <a href="contact.html" class="desktop-nav-link" data-i18n="nav.contact">اتصل بنا</a>
+            </div>
+
             <div style="display:flex;align-items:center;gap:0.75rem;">
                 <!-- Global Search -->
                 <div class="global-search-wrap hidden lg:flex">
                     <div class="global-search-bar" id="global-search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="global-search-input" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
+                        <input type="text" id="global-search-input" aria-label="البحث في الموقع" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
                     </div>
                     <div class="search-dropdown" id="search-dropdown"></div>
                 </div>
@@ -137,7 +146,7 @@
                     <button class="lang-btn" data-lang="en">EN</button>
                 </div>
                 <label class="theme-toggle" title="تبديل الوضع">
-                    <input type="checkbox" class="theme-checkbox">
+                    <input type="checkbox" class="theme-checkbox" aria-label="تبديل الوضع الداكن">
                     <div class="theme-toggle-track"></div>
                     <div class="theme-toggle-thumb">
                         <i class="fas fa-moon theme-icon-moon" style="display:none;color:var(--green-300);font-size:9px;"></i>
@@ -270,22 +279,22 @@
         </div>
 
         <div class="animate-stagger" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1rem;">
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner"></div>
-            <div class="logo-grid-card"><img src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner"></div>
+            <div class="logo-grid-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner"></div>
         </div>
     </div>
 </section>
@@ -319,11 +328,8 @@
 </footer>
 
 <!-- SCRIPTS -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js"></script>
+<script src="./firebase-loader.js"></script>
 <script src="./app.js"></script>
-<script src="./analytics.js"></script>
 
 </body>
 </html>

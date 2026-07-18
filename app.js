@@ -367,6 +367,10 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'الاسم الكامل': 'Full Name', 'رقم الهاتف': 'Phone Number', 'العنوان بالتفصيل': 'Detailed Address',
   'نوع الخدمة': 'Service Type', 'خدمة مخصصة': 'Custom Service', 'رسالتك': 'Your Message',
   'معلومات الاتصال': 'Contact Information', 'الهاتف': 'Phone', 'متوفر 24/7': 'Available 24/7',
+  'طلب خدمة': 'Service Request', 'بيانات التواصل': 'Contact Details', 'تفاصيل الطلب': 'Request Details', 'مراجعة وإرسال': 'Review & Submit',
+  'سنستخدمها للتواصل معك بخصوص طلبك': 'We will use these details to contact you about your request.',
+  'أخبرنا بالموقع ونوع الخدمة المطلوبة': 'Tell us the location and the service you need.',
+  'نلتزم بالحفاظ على خصوصية بياناتك وسنتواصل معك في أقرب وقت.': 'We protect your privacy and will contact you as soon as possible.',
   'جاري الإرسال...': 'Sending…', 'شارع الملك فيصل الجيزة': 'King Faisal St., Giza, Egypt',
   'سياسة الخصوصية': 'Privacy Policy', 'شروط الاستخدام': 'Terms of Use'
 });

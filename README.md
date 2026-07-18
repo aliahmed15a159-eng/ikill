@@ -21,6 +21,7 @@
 - بطاقة تفاصيل كاملة لكل طلب تواصل داخل لوحة الإدارة.
 - صفحات سياسة الخصوصية وشروط الاستخدام.
 - إعدادات SEO تشمل: Canonical URLs، Open Graph، Twitter Cards، Schema.org، `robots.txt`، و`sitemap.xml`.
+- تحسينات أداء للصفحات العامة: CSS Utilities محلية بدلاً من Tailwind CDN، Firebase مؤجل، صورة Hero بصيغة WebP، وتحميل كسول للشعارات.
 
 ---
 

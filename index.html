@@ -32,6 +32,7 @@
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"iKILL | مكافحة الآفات في مصر","url":"https://ikill.net/","inLanguage":"ar-EG","isPartOf":{"@id":"https://ikill.net/#organization"}}</script>
     <!-- SEO:END -->
     <link id="favicon" rel="icon" href="img/ikill-logo.png" type="image/png">
+    <link rel="preload" as="image" href="img/eco-environment-hero.webp" type="image/webp" fetchpriority="high">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,9 +46,9 @@
 
     <!-- Design System -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="utilities.css">
 
     <!-- Tailwind (utility classes supplement) -->
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         /* ===== Page-specific extras ===== */
@@ -280,7 +281,7 @@
                 <div class="global-search-wrap hidden lg:flex">
                     <div class="global-search-bar" id="global-search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="global-search-input" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
+                        <input type="text" id="global-search-input" aria-label="البحث في الموقع" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
                     </div>
                     <div class="search-dropdown" id="search-dropdown"></div>
                 </div>
@@ -396,59 +397,59 @@
             <div class="marquee-wrapper" id="partners-marquee" tabindex="0" aria-label="اسحب يميناً أو يساراً لاستعراض شعارات شركاء النجاح">
                 <div class="marquee-track">
                 <!-- Set 1 -->
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
                 <!-- Set 2 (duplicate for infinite) -->
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
                 <!-- Set 3 (extra loop buffer) -->
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
-                <div class="logo-card"><img src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_6iehnd6iehnd6ieh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7j9gi17j9gi17j9g.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_7zmwdg7zmwdg7zmw.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_c0m5wsc0m5wsc0m5.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_e91d4ne91d4ne91d.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_eht4gqeht4gqeht4.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_etmov0etmov0etmo.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nloezonloezonloe.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_nwhhcunwhhcunwhh.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_r6z331r6z331r6z3.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_s17yhas17yhas17y.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_stuxbwstuxbwstux.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_szod9tszod9tszod.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_u4e8jfu4e8jfu4e8.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_wljzufwljzufwljz.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_x39k4lx39k4lx39k.png" alt="Partner Logo"></div>
+                <div class="logo-card"><img loading="lazy" decoding="async" src="img/partners-clean/Gemini_Generated_Image_yprav4yprav4ypra.png" alt="Partner Logo"></div>
                 </div>
             </div>
             <button class="partners-control partners-next" id="partners-next" type="button" aria-label="عرض الشعارات التالية"><i class="fas fa-chevron-left"></i></button>
@@ -787,15 +788,12 @@
 
 <!-- ==================== SCRIPTS ==================== -->
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js"></script>
+<script src="./firebase-loader.js"></script>
 
 <!-- Global App -->
 <script src="./app.js"></script>
 
 <!-- Analytics -->
-<script type="module" src="./analytics.js"></script>
 
 </body>
 </html>

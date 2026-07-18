@@ -41,7 +41,7 @@
           crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="utilities.css">
 
     <style>
         .contact-input {
@@ -147,12 +147,21 @@
                 </div>
             </div>
 
+            <div class="desktop-nav-links" aria-label="روابط صفحات الموقع">
+                <a href="index.html" class="desktop-nav-link" data-i18n="nav.home">الرئيسية</a>
+                <a href="services.html" class="desktop-nav-link" data-i18n="nav.services">خدماتنا</a>
+                <a href="sectors.html" class="desktop-nav-link" data-i18n="nav.sectors">القطاعات</a>
+                <a href="about.html" class="desktop-nav-link" data-i18n="nav.about">من نحن</a>
+                <a href="locations.html" class="desktop-nav-link" data-i18n="nav.branches">فروعنا</a>
+                <a href="contact.html" class="desktop-nav-link active" data-i18n="nav.contact">اتصل بنا</a>
+            </div>
+
             <div style="display:flex;align-items:center;gap:0.75rem;">
                 <!-- Global Search -->
                 <div class="global-search-wrap hidden lg:flex">
                     <div class="global-search-bar" id="global-search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="global-search-input" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
+                        <input type="text" id="global-search-input" aria-label="البحث في الموقع" placeholder="ابحث هنا..." data-i18n-placeholder="search.placeholder" autocomplete="off">
                     </div>
                     <div class="search-dropdown" id="search-dropdown"></div>
                 </div>
@@ -161,7 +170,7 @@
                     <button class="lang-btn" data-lang="en">EN</button>
                 </div>
                 <label class="theme-toggle" title="تبديل الوضع">
-                    <input type="checkbox" class="theme-checkbox">
+                    <input type="checkbox" class="theme-checkbox" aria-label="تبديل الوضع الداكن">
                     <div class="theme-toggle-track"></div>
                     <div class="theme-toggle-thumb">
                         <i class="fas fa-moon theme-icon-moon" style="display:none;color:var(--green-300);font-size:9px;"></i>
@@ -190,61 +199,72 @@
     <div style="max-width:1536px;margin:0 auto;">
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:4rem;align-items:start;" class="grid-cols-1 lg:grid-cols-12">
             
-            <!-- Form -->
-            <div class="lg:col-span-7 animate-fade-up">
-                <div>
-                    <h1 class="section-title" data-i18n="contact.title">تواصل معنا</h1>
-                    <p class="section-subtitle" data-i18n="contact.subtitle" style="margin-bottom:2rem;">فريقنا جاهز للرد على استفساراتكم وتقديم أفضل الحلول.</p>
+            <!-- Premium Service Request Form -->
+            <div class="lg:col-span-7 animate-fade-up service-request-panel">
+                <div class="service-request-card">
+                    <div class="service-request-header">
+                        <div class="service-request-header-icon"><i class="fas fa-shield-heart"></i></div>
+                        <div>
+                            <div class="service-request-badge"><i class="fas fa-sparkles"></i> طلب خدمة</div>
+                            <h1 data-i18n="contact.title">تواصل معنا</h1>
+                            <p data-i18n="contact.subtitle">فريقنا جاهز للرد على استفساراتكم وتقديم أفضل الحلول.</p>
+                        </div>
+                    </div>
+
+                    <div class="service-request-steps" aria-label="خطوات الطلب">
+                        <div class="request-step active"><span>01</span><small>بيانات التواصل</small></div>
+                        <div class="request-step"><span>02</span><small>تفاصيل الطلب</small></div>
+                        <div class="request-step"><span>03</span><small>مراجعة وإرسال</small></div>
+                    </div>
+
+                    <form id="contact-form" class="service-request-form" novalidate>
+                        <div class="form-section-heading"><span>01</span><div><strong>بيانات التواصل</strong><small>سنستخدمها للتواصل معك بخصوص طلبك</small></div></div>
+                        <div class="service-form-grid">
+                            <div class="service-form-field">
+                                <label for="contact-name" class="contact-label" data-i18n="contact.form.name">الاسم الكامل</label>
+                                <div class="service-input-wrap"><i class="fas fa-user"></i><input type="text" id="contact-name" name="name" maxlength="100" class="contact-input" placeholder="محمد أحمد" required autocomplete="name"></div>
+                            </div>
+                            <div class="service-form-field">
+                                <label for="contact-phone" class="contact-label" data-i18n="contact.form.phone">رقم الهاتف</label>
+                                <div class="service-input-wrap"><i class="fas fa-phone-alt"></i><input type="tel" id="contact-phone" name="phone" maxlength="20" class="contact-input" placeholder="+20 100 555 2222" autocomplete="tel"></div>
+                            </div>
+                        </div>
+                        <div class="service-form-field">
+                            <label for="contact-email" class="contact-label" data-i18n="contact.form.email">البريد الإلكتروني</label>
+                            <div class="service-input-wrap"><i class="fas fa-envelope"></i><input type="email" id="contact-email" name="email" maxlength="150" class="contact-input" placeholder="example@company.com" required autocomplete="email"></div>
+                        </div>
+
+                        <div class="form-section-heading form-section-heading-second"><span>02</span><div><strong>تفاصيل الطلب</strong><small>أخبرنا بالموقع ونوع الخدمة المطلوبة</small></div></div>
+                        <div class="service-form-field">
+                            <label for="contact-address" class="contact-label" data-i18n="contact.form.address">العنوان بالتفصيل</label>
+                            <div class="service-input-wrap"><i class="fas fa-location-dot"></i><input type="text" id="contact-address" name="address" maxlength="200" class="contact-input" placeholder="مثال: الجيزة - شارع فيصل" required autocomplete="street-address"></div>
+                        </div>
+                        <div class="service-form-field">
+                            <label for="contact-service" class="contact-label" data-i18n="contact.form.service">نوع الخدمة</label>
+                            <div class="service-input-wrap"><i class="fas fa-bug"></i><select id="contact-service" name="service" class="contact-input service-select">
+                                <option value="مكافحة الآفات">مكافحة الآفات</option>
+                                <option value="خدمة مخصصة">خدمة مخصصة</option>
+                            </select><i class="fas fa-chevron-down select-arrow"></i></div>
+                        </div>
+                        <div class="service-form-field">
+                            <label for="contact-message" class="contact-label" data-i18n="contact.form.message">رسالتك</label>
+                            <div class="service-input-wrap service-textarea-wrap"><i class="fas fa-comment-dots"></i><textarea id="contact-message" name="message" rows="5" maxlength="2000" class="contact-input" placeholder="أخبرنا عن احتياجاتك..." required></textarea></div>
+                        </div>
+
+                        <div id="form-error" class="service-form-error" style="display:none;"></div>
+                        <button type="submit" id="contact-submit" class="service-submit-button">
+                            <span id="submit-text" data-i18n="contact.form.submit">إرسال الطلب</span>
+                            <span id="submit-spinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i> جاري الإرسال...</span>
+                            <i class="fas fa-arrow-left" id="submit-icon"></i>
+                        </button>
+                        <p class="service-form-note"><i class="fas fa-lock"></i> نلتزم بالحفاظ على خصوصية بياناتك وسنتواصل معك في أقرب وقت.</p>
+                    </form>
                 </div>
-
-                <form id="contact-form" class="space-y-5" novalidate>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;" class="grid-cols-1 md:grid-cols-2">
-                        <div>
-                            <label for="contact-name" class="contact-label" data-i18n="contact.form.name">الاسم الكامل</label>
-                            <input type="text" id="contact-name" name="name" maxlength="100" class="contact-input" placeholder="محمد أحمد" required autocomplete="name">
-                        </div>
-                        <div>
-                            <label for="contact-phone" class="contact-label" data-i18n="contact.form.phone">رقم الهاتف</label>
-                            <input type="tel" id="contact-phone" name="phone" maxlength="20" class="contact-input" placeholder="+20 100 555 2222" autocomplete="tel">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="contact-email" class="contact-label" data-i18n="contact.form.email">البريد الإلكتروني</label>
-                        <input type="email" id="contact-email" name="email" maxlength="150" class="contact-input" placeholder="example@company.com" required autocomplete="email">
-                    </div>
-
-                    <div>
-                        <label for="contact-address" class="contact-label" data-i18n="contact.form.address">العنوان بالتفصيل</label>
-                        <input type="text" id="contact-address" name="address" maxlength="200" class="contact-input" placeholder="مثال: الجيزة - شارع فيصل" required autocomplete="street-address">
-                    </div>
-
-                    <div>
-                        <label for="contact-service" class="contact-label" data-i18n="contact.form.service">نوع الخدمة</label>
-                        <select id="contact-service" name="service" class="contact-input" style="appearance:none;">
-                            <option value="مكافحة الآفات">مكافحة الآفات</option>
-                            <option value="خدمة مخصصة">خدمة مخصصة</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="contact-message" class="contact-label" data-i18n="contact.form.message">رسالتك</label>
-                        <textarea id="contact-message" name="message" rows="5" maxlength="2000" class="contact-input" placeholder="أخبرنا عن احتياجاتك..." required style="resize:none;border-radius:var(--radius-xl);"></textarea>
-                    </div>
-
-                    <div id="form-error" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#EF4444;font-size:0.88rem;padding:0.75rem 1.25rem;border-radius:var(--radius-md);"></div>
-
-                    <button type="submit" id="contact-submit" class="btn btn-primary w-full md:w-auto">
-                        <span id="submit-text" data-i18n="contact.form.submit">إرسال الطلب</span>
-                        <span id="submit-spinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i> جاري الإرسال...</span>
-                        <i class="fas fa-paper-plane" id="submit-icon" style="font-size:0.85rem;"></i>
-                    </button>
-                </form>
             </div>
 
             <!-- Contact Info Sidebar -->
             <div class="lg:col-span-5 animate-slide">
-                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2.5rem;box-shadow:var(--shadow-md);">
+                <div class="service-contact-card" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2.5rem;box-shadow:var(--shadow-md);">
                     <h3 style="font-size:1.25rem;font-weight:800;color:var(--text-primary);margin-bottom:1.5rem;" data-i18n="footer.contact_title">معلومات الاتصال</h3>
                     
                     <div style="display:flex;flex-direction:column;gap:1.5rem;">
@@ -315,12 +335,9 @@
 </footer>
 
 <!-- Firebase compat scripts -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js"></script>
+<script src="./firebase-loader.js"></script>
 
 <script src="./app.js"></script>
-<script src="./analytics.js"></script>
 
 <script>
 (function() {
