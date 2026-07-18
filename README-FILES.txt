@@ -1,11 +1,12 @@
-Performance optimisation patch
-==============================
-Copy all root files over the matching files in your project.
-Copy img/eco-environment-hero.webp into your project's img folder.
+Performance + mobile language-direction patch
+==============================================
+Copy all root files over matching files in your project.
+Copy img/eco-environment-hero.webp and the entire img/partners-webp folder into your img folder.
 
-Key performance changes:
-- Replaced Tailwind CDN with utilities.css
-- Deferred public Firebase / analytics through firebase-loader.js
-- WebP hero image preload and image fallback
-- Lazy partner-logo image decoding
-- Cache headers in firebase.json
+Includes:
+- Fixed LTR mobile pop-up menu positioning
+- Local utilities.css replacing Tailwind CDN
+- Deferred Firebase / analytics loader
+- Optimised WebP Hero and partner logo images
+- Accessibility improvements (main landmark, footer tap targets, map title)
+- Vercel/Firebase cache configuration updates

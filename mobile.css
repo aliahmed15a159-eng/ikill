@@ -264,3 +264,24 @@
   .ikill-footer [style*="justify-content:space-between"] { gap:.6rem !important; }
   .developer-credit { margin-top:.65rem !important; padding-top:.65rem !important; font-size:.68rem !important; }
 }
+
+/* Mobile pop-up is viewport-anchored in both directions; it can never open outside the screen. */
+@media screen and (max-width:767px) {
+  .ikill-navbar .site-menu-wrap .site-menu-popover,
+  html[dir="ltr"] .ikill-navbar .site-menu-wrap .site-menu-popover {
+    position:fixed !important;
+    top:68px !important;
+    left:.55rem !important;
+    right:.55rem !important;
+    width:auto !important;
+    max-width:calc(100vw - 1.1rem) !important;
+    max-height:calc(100svh - 82px) !important;
+    overflow-y:auto;
+    transform:translate(0,-10px) scale(.98) !important;
+    transform-origin:top center !important;
+  }
+  .ikill-navbar .site-menu-wrap .site-menu-popover.open,
+  html[dir="ltr"] .ikill-navbar .site-menu-wrap .site-menu-popover.open {
+    transform:translate(0,0) scale(1) !important;
+  }
+}
