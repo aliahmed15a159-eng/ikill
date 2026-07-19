@@ -1,2 +1,2 @@
-Copy app.js and styles.css over the matching files in your project.
-Fix: popup menu is portaled to the viewport so it stays inside the phone screen in both Arabic and English.
+Copy contact.html, styles.css and app.js over the matching project files.
+Includes the elevated professional service-request form and iKILL logo at the top.

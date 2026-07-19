@@ -371,6 +371,7 @@ const STATIC_EN_TRANSLATIONS = Object.freeze({
   'سنستخدمها للتواصل معك بخصوص طلبك': 'We will use these details to contact you about your request.',
   'أخبرنا بالموقع ونوع الخدمة المطلوبة': 'Tell us the location and the service you need.',
   'نلتزم بالحفاظ على خصوصية بياناتك وسنتواصل معك في أقرب وقت.': 'We protect your privacy and will contact you as soon as possible.',
+  'طلب خدمة آمن وسريع': 'Secure, Fast Service Request', 'متابعة سريعة': 'Fast Follow-up',
   'جاري الإرسال...': 'Sending…', 'شارع الملك فيصل الجيزة': 'King Faisal St., Giza, Egypt',
   'سياسة الخصوصية': 'Privacy Policy', 'شروط الاستخدام': 'Terms of Use'
 });

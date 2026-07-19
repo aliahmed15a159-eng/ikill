@@ -2022,3 +2022,26 @@ html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:au
     transform-origin:top center !important;
   }
 }
+
+/* Elevated service form brand treatment. */
+.service-form-brand {
+  position:relative; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  margin:-.15rem 0 1.35rem; padding:0 0 1rem; border-bottom:1px solid #e2efe5;
+}
+.service-form-brand img { width:142px; height:48px; object-fit:contain; object-position:right center; }
+.service-form-brand span { display:inline-flex; align-items:center; gap:.35rem; padding:.32rem .65rem; border:1px solid #cfead6; border-radius:999px; color:var(--green-700); background:var(--green-50); font-size:.68rem; font-weight:800; white-space:nowrap; }
+.service-form-brand span i { color:var(--green-500); }
+.service-response-chip { margin-right:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.08rem; min-width:70px; padding:.45rem .5rem; border:1px solid #d6ecdc; border-radius:13px; color:var(--green-800); background:rgba(239,250,241,.88); font-size:.66rem; font-weight:800; text-align:center; }
+.service-response-chip > i { color:#e7a93d; font-size:.8rem; }
+.service-response-chip small { color:var(--text-muted); font:700 .61rem 'Inter',sans-serif; letter-spacing:.04em; }
+[data-theme="dark"] .service-form-brand { border-color:var(--border-color); }
+[data-theme="dark"] .service-form-brand span,[data-theme="dark"] .service-response-chip { background:rgba(76,175,80,.08); border-color:rgba(120,220,140,.18); }
+@media(max-width:767px) {
+  .service-form-brand { align-items:flex-start; flex-direction:column; gap:.55rem; margin-bottom:1rem; }
+  .service-form-brand img { width:126px; height:43px; }
+  .service-form-brand span { font-size:.64rem; }
+  .service-request-header { flex-wrap:wrap; }
+  .service-response-chip { margin-right:0; margin-left:auto; min-width:62px; }
+}
+[dir="ltr"] .service-form-brand img { object-position:left center; }
+[dir="ltr"] .service-response-chip { margin-right:0; margin-left:auto; }
