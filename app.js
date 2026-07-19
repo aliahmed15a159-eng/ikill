@@ -1013,7 +1013,33 @@ const SiteMenu = {
     const close = document.getElementById('site-menu-close');
     if (!toggle || !popover) return;
 
+    // The navbar uses blur effects, which can create a positioning container.
+    // Move the popover to body so it is always positioned against the viewport,
+    // not clipped or pushed off-screen in RTL/LTR mobile layouts.
+    document.body.appendChild(popover);
+    popover.classList.add('portal-popover');
+
+    const positionPopover = () => {
+      const rect = toggle.getBoundingClientRect();
+      const isPhone = window.matchMedia('(max-width: 767px)').matches;
+      if (isPhone) {
+        popover.style.top = `${Math.max(8, rect.bottom + 8)}px`;
+        popover.style.left = '10px';
+        popover.style.right = '10px';
+        popover.style.width = 'auto';
+        popover.style.maxWidth = 'none';
+      } else {
+        const width = Math.min(820, window.innerWidth - 24);
+        popover.style.top = `${rect.bottom + 12}px`;
+        popover.style.left = `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`;
+        popover.style.right = 'auto';
+        popover.style.width = `${width}px`;
+        popover.style.maxWidth = `${width}px`;
+      }
+    };
+
     const setOpen = (open) => {
+      if (open) positionPopover();
       popover.classList.toggle('open', open);
       popover.setAttribute('aria-hidden', String(!open));
       toggle.setAttribute('aria-expanded', String(open));
@@ -1026,11 +1052,14 @@ const SiteMenu = {
     close && close.addEventListener('click', () => setOpen(false));
     popover.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setOpen(false)));
     document.addEventListener('click', (event) => {
-      if (!event.target.closest('.site-menu-wrap')) setOpen(false);
+      if (!event.target.closest('.site-menu-wrap') && !event.target.closest('#site-menu-popover')) setOpen(false);
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setOpen(false);
     });
+    window.addEventListener('resize', () => {
+      if (popover.classList.contains('open')) positionPopover();
+    }, { passive: true });
   }
 };
 

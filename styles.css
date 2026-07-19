@@ -2004,3 +2004,21 @@ html[dir="ltr"] .ikill-navbar > div > div > div:last-child { left:48px; right:au
 @supports (content-visibility:auto) {
   main > section:not(.hero-section):not(#partners) { content-visibility:auto; contain-intrinsic-size:auto 620px; }
 }
+
+/* Popover portal: body-level fixed overlay prevents RTL/LTR mobile clipping. */
+.site-menu-popover.portal-popover {
+  position:fixed !important;
+  z-index:1200;
+  max-height:calc(100svh - 90px);
+  overflow-y:auto;
+  transform:translateY(-10px) scale(.98) !important;
+  transform-origin:top left !important;
+}
+.site-menu-popover.portal-popover.open { transform:translateY(0) scale(1) !important; }
+@media(max-width:767px) {
+  .site-menu-popover.portal-popover {
+    border-radius:18px;
+    max-height:calc(100svh - 86px) !important;
+    transform-origin:top center !important;
+  }
+}
