@@ -50,7 +50,11 @@ void main(){
     await tester.scrollUntilVisible(find.byType(TextField).first,300,scrollable:find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     expect(find.text('Bait 10 g'),findsOneWidget);
-    expect((await store.load('visit'))!['materials'],'Bait 10 g');
+    await tester.enterText(find.byType(TextField).first,'No chemicals used');
+    await tester.pumpAndSettle();
+    expect(store.value['materials'],'No chemicals used');
+    expect(store.value['strokes'],isNotEmpty);
+    expect((await store.load('visit'))!['materials'],'No chemicals used');
     expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());await tester.pumpAndSettle();
 

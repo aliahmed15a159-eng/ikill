@@ -29,6 +29,7 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
   final materials=TextEditingController(), notes=TextEditingController(), signer=TextEditingController();
   final strokes=<List<Offset>>[];
   Future<void> saving=Future.value();
+  int saveRevision=0;
   bool busy=false, cameraBusy=false, saveFailed=false, saved=false, loadFailed=false, consent=false, completed=false;
   bool get sealed => draft?['sealed'] == true;
   String tr(String ar,String en)=>widget.english?en:ar;
@@ -42,6 +43,12 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
       materials.text=d['materials'] as String;notes.text=d['notes'] as String;signer.text=d['signer'] as String;
       for(final stroke in d['strokes'] as List){strokes.add([for(final p in stroke as List) Offset((p[0] as num).toDouble(),(p[1] as num).toDouble())]);}
       setState(()=>draft=d);
+      await persist();
+      await recoverCamera();
+    } catch(_){if(mounted)setState(()=>loadFailed=true);}
+  }
+  Future<void> recoverCamera() async {
+    try {
       if(!Platform.isAndroid)return;
       final pending=await widget.store.readJson('camera.json');
       if(pending is! Map || pending['visit']!=widget.visit)return;
@@ -49,7 +56,7 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
       if(lost.exception!=null) throw StateError('Camera recovery failed');
       if(lost.files!=null){for(final photo in lost.files!){await keepPhoto(photo.path);}}
       await widget.store.writeJson('camera.json',<String,dynamic>{});
-    } catch(_){if(mounted)setState(()=>loadFailed=true);}
+    } catch(_){if(mounted)message(tr('تعذّر استرجاع آخر صورة للكاميرا. المسودة متاحة؛ تحقق من الصور وأعد التقاط المفقود.', 'Last camera image could not be recovered. Draft is available; review photos and retake any missing image.'));}
   }
   Map<String,dynamic> snapshot()=>{...draft!, 'materials':materials.text,'notes':notes.text,'signer':signer.text,
     'actions':List<String>.from(draft!['actions'] as List),'photos':List<String>.from(draft!['photos'] as List),
@@ -57,10 +64,11 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
   Future<void> persist(){
     if(draft==null)return Future.value();
     final copy=snapshot();
+    final revision=++saveRevision;
     if(mounted)setState(()=>saved=false);
     saving=saving.then((_) async {
-      try{await widget.store.save(widget.visit,copy);if(mounted)setState((){saveFailed=false;saved=true;});}
-      catch(_){if(mounted)setState((){saveFailed=true;saved=false;});}
+      try{await widget.store.save(widget.visit,copy);if(mounted&&revision==saveRevision)setState((){saveFailed=false;saved=true;});}
+      catch(_){if(mounted&&revision==saveRevision)setState((){saveFailed=true;saved=false;});}
     });
     return saving;
   }

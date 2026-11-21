@@ -52,6 +52,17 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   assert.equal((await db.query('SELECT status FROM visits WHERE id=$1',[u(30)])).rows[0].status,'in_progress');checks++;
   assert.equal((await db.query('SELECT count(*) n FROM visit_reports')).rows[0].n,0);checks++;
   await db.query("INSERT INTO storage.objects(bucket_id,name) VALUES('visit-images',$1),('visit-signatures',$2)",[prefix+'photo-1.jpg',prefix+'signature.png']);
+  await db.exec(`CREATE FUNCTION public.test_completion_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.status='completed' THEN RAISE EXCEPTION 'injected failure'; END IF;RETURN NEW;END;$$;
+    CREATE TRIGGER injected_failure BEFORE UPDATE ON visits FOR EACH ROW EXECUTE FUNCTION public.test_completion_failure();`);
+  await role(2,()=>fail(()=>scalar('submit_field_report',payload)));
+  assert.equal((await db.query('SELECT count(*) n FROM visit_reports')).rows[0].n,0);checks++;
+  assert.equal((await db.query('SELECT status FROM visits WHERE id=$1',[u(30)])).rows[0].status,'in_progress');checks++;
+  await db.exec('DROP TRIGGER injected_failure ON visits;DROP FUNCTION public.test_completion_failure();');
+  await db.exec(`INSERT INTO auth.users(id) VALUES('${u(5)}');INSERT INTO profiles(id,tenant_id,role,full_name) VALUES('${u(5)}','${company}','technician','Other tech');`);
+  await role(5,async()=>{assert.equal((await db.query('SELECT * FROM get_my_field_visits(0)')).rows.length,0);checks++;await fail(()=>scalar('submit_field_report',payload));});
+  await db.exec(`UPDATE profiles SET is_active=false WHERE id='${u(2)}'`);
+  await role(2,()=>fail(()=>scalar('submit_field_report',payload)));
+  await db.exec(`UPDATE profiles SET is_active=true WHERE id='${u(2)}'`);
   await role(2,async()=>{
     await fail(()=>scalar('submit_field_report',[...payload.slice(0,2),JSON.stringify({pest:'invalid',severity:'low',actions:['inspection'],signature_consent:true}),...payload.slice(3)]));
     await fail(()=>scalar('submit_field_report',[...payload.slice(0,5),['other-tenant/photo.jpg'],...payload.slice(6)]));
