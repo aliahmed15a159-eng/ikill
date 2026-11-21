@@ -5,7 +5,9 @@
   'use strict';
   const env = window.IKILL_SUPABASE_ENV;
   if (!env?.SUPABASE_URL || !env?.SUPABASE_ANON_KEY) return;
-  const client = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+  const client = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+    auth: { storage: window.sessionStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+  });
   window.supabaseClient = client;
   const slug = env.BRAND_SLUG || 'ikill';
   const unwrap = ({ data, error }) => { if (error) throw error; return data; };

@@ -17,6 +17,7 @@ publishable/anon client key is used; no service key is stored in app/repository.
 ## Live database changes
 
 Migration: `phase2_supabase_integration_storage` (applied via Supabase connector).
+Recorded migration version: `20261121101844`.
 
 - Added requested_service/request_message to clients for the existing form.
 - Added tenant-scoped company_branches and page_events for existing website/app
@@ -41,7 +42,17 @@ former provider do not authenticate automatically with Supabase.
 - Local PostgreSQL/PGlite: 57 phase-1 + 25 phase-2 assertions passed.
 - Website: 35 syntax/asset/view-model assertions passed with mocked SDK.
 - Flutter role/portal/public-key unit tests added.
-- Flutter analyze/test/Android build: CI result will be recorded after completion.
+- CI succeeded on commit `66a13f3`:
+  - `flutter pub get` succeeded.
+  - `flutter analyze --fatal-infos --fatal-warnings` succeeded without issues.
+  - `flutter test --timeout 60s --reporter expanded` succeeded.
+  - `flutter build apk --debug --dart-define-from-file=supabase_build.json` succeeded.
+  - Post-resolution dependency scan found no removed backend SDK dependencies.
+- Successful run: https://github.com/aliahmed15a159-eng/ikill/actions/runs/44894137876
+- Artifact: `ikill-android-supabase-debug` (ID `14702744212`), downloadable ZIP
+  containing `app-debug.apk`; the artifact is a debug build, not a store release.
+- Website tab-session storage preservation was checked by the local Node suite
+  after this build; it does not affect Flutter code or the APK.
 - No live mobile Auth, real user binary uploads, or iOS build tested yet.
 
 The existing screens have no upload/report editing UI. Storage methods/policies
