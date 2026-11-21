@@ -1,3 +1,4 @@
+import 'portal_admin.dart';
 import 'package:flutter/material.dart';
 import 'client_repository.dart';
 import 'lifecycle_forms.dart';
@@ -151,6 +152,7 @@ class _ClientDetailState extends State<ClientDetail> {
       final activeSites = sites.where((s) => s['is_active'] == true).toList();
       return ListView(padding: const EdgeInsets.all(16), children: [
         Text('${customer['display_name']} — ${customer['status']}', style: Theme.of(context).textTheme.titleLarge),
+        PortalAdminCard(key: ValueKey('portal-${widget.clientId}'), client: widget.clientId, english: widget.english),
         SelectableText('${customer['phone'] ?? ''}\n${customer['email'] ?? ''}'),
         if (customer['request_message'] != null) SelectableText('${tr('الطلب الأصلي', 'Original request')}: ${customer['request_message']}'),
         const Divider(), Text(tr('المواقع والفروع', 'Sites and branches'), style: Theme.of(context).textTheme.titleLarge),

@@ -12,7 +12,11 @@ class FieldReportRepository {
       throw const AccessDenied('Assigned technician required');
     }
     final key = draft['submission'] as String;
-    if (await supabaseClient.rpc('my_field_report_receipt', params: {'target_visit':visit,'submission':key}) != null) return;
+    final receipt = await supabaseClient.rpc('my_field_report_receipt', params: {'target_visit':visit,'submission':key});
+    if (receipt != null) {
+      try { await supabaseClient.functions.invoke('app-documents', body: {'report_id': receipt}); } catch (_) { /* Durable server job remains retryable. */ }
+      return;
+    }
     final prefix = '$tenant/$visit/$key';
     final photos = <String>[];
     for (final name in List<String>.from(draft['photos'] as List)) {
@@ -24,10 +28,10 @@ class FieldReportRepository {
     }
     final path = '$prefix/signature.png';
     await supabaseClient.storage.from('visit-signatures').uploadBinary(path, signature, fileOptions: const FileOptions(contentType:'image/png',upsert:true));
-    await supabaseClient.rpc('submit_field_report', params: {
+    await supabaseClient.functions.invoke('app-documents', body: {'action': 'submit-report', 'params': {
       'target_visit':visit,'submission':key,
       'checklist':{'pest':draft['pest'],'severity':draft['severity'],'actions':draft['actions'],'materials':draft['materials'],'signature_consent':true},
       'materials':draft['materials'],'notes':draft['notes'],'photos':photos,'signature_path':path,'signer':draft['signer'],
-    });
+    }});
   }
 }

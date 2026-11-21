@@ -9,6 +9,7 @@ import 'content.dart';
 import 'request_form.dart';
 import 'admin.dart';
 import 'technician_tasks.dart';
+import 'documents_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -118,6 +119,8 @@ class _SiteShellState extends State<SiteShell> {
           onTap: () { Navigator.pop(context); go(i); },
         ),
         const Divider(),
+        ListTile(leading: const Icon(Icons.account_circle_outlined), title: Text(tr('بوابة العميل', 'Client portal')),
+          onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientPortalPage(english: widget.english))); }),
         ListTile(leading: const Icon(Icons.engineering_outlined), title: Text(tr('مهام الفني', 'Technician tasks')),
           onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute<void>(builder: (_) => TechnicianPage(english: widget.english))); }),
         ListTile(leading: const Icon(Icons.admin_panel_settings_outlined), title: Text(tr('لوحة الإدارة', 'Administration')),
