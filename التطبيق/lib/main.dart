@@ -191,7 +191,7 @@ class _SiteShellState extends State<SiteShell> {
       bottomNavigationBar: DecoratedBox(decoration:BoxDecoration(color:Theme.of(context).colorScheme.surface,border:Border(top:BorderSide(color:Theme.of(context).colorScheme.outlineVariant))),child: NavigationBar(
         selectedIndex: primary.contains(selected) ? primary.indexOf(selected) : 0,
         onDestinationSelected: (i) {if(primary[i]==8){Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>AccountPage(english:widget.english)));}else{go(primary[i]);}},
-        destinations: [for (final index in primary) NavigationDestination(icon:Icon(index==8?Icons.person_outline:icons[index]),selectedIcon:Icon(index==8?Icons.person:icons[index]),label:index==8?tr('حسابي','Account'):title(index))],
+        destinations: [for (final index in primary) NavigationDestination(icon:Icon(index==8?Icons.person_outline:icons[index]),selectedIcon:Icon(index==8?Icons.person:icons[index]),label:index==8?tr('حسابي','Account'):index==5?tr('طلب خدمة','Book'):title(index))],
       )),
     );
   }
