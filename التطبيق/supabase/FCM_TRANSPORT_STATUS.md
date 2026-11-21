@@ -32,7 +32,7 @@ Admin bell → settings separately checks the protected Edge `status` action: se
 
 - `phase10_fcm_transport.sql`: live migration applied. Renames `profiles.push_subscription_id` to `fcm_token`, clears incompatible old IDs, renames private device-binding token column, drops previous-provider App ID/settings/RPCs, installs FCM registration and cleanup RPCs, preserves notification/payment tables and RLS. Sets external sending **off** until server credentials are configured.
 - `phase10a_fcm_webhook_timeout.sql`: live migration applied; raises database webhook timeout to 60s for OAuth/signing and one 401 token refresh.
-- Existing `push-notification` Edge Function updated to **FCM HTTP v1**, ACTIVE v2. Same notifications-insert database webhook/outbox, per-delivery random token and service-only claim/finish. No legacy FCM API/server-key endpoint.
+- Existing `push-notification` Edge Function updated to **FCM HTTP v1**, ACTIVE v3. Same notifications-insert database webhook/outbox, per-delivery random token and service-only claim/finish. No legacy FCM API/server-key endpoint.
 - Reads **FIREBASE_SERVICE_ACCOUNT** only from Supabase Edge Secrets. Validates service-account type, expected project, key and pinned Google OAuth URL. Signs RS256 JWT with messaging-only scope, exchanges it at Google's OAuth endpoint, caches the short-lived access token and refreshes once after 401.
 - Sends to `https://fcm.googleapis.com/v1/projects/{project_id}/messages:send`. Uses brand_config company name and generic notification text, never private customer/payment/report details. Canonical type/reference IDs accompany the opaque notification ID in data.
 - Handles `UNREGISTERED` by clearing only the still-matching recipient token, never a newly refreshed token. Disabled-account checks remain at delivery time.
@@ -51,7 +51,7 @@ Supabase secret metadata was checked: **FIREBASE_SERVICE_ACCOUNT is not present*
 ## Verification
 
 - Local SQL regression suite: previous 381 assertions plus **36 FCM migration/token/role/refresh/logout checks**.
-- Sender tests: **81 assertions**, including real ephemeral RSA JWT signing/verification, messaging-only scope, pinned OAuth audience/URL, access-token caching and 401 refresh, HTTP-v1 payload, status authentication, project mismatch, no-configuration, UNREGISTERED cleanup and failure handling. All external services are mocked; no real push is sent by tests.
+- Sender tests: **87 assertions**, including real ephemeral RSA JWT signing/verification, messaging-only scope, pinned OAuth audience/URL, access-token caching and 401 refresh, HTTP-v1 payload, status authentication, project mismatch, no-configuration, UNREGISTERED cleanup and failure handling. All external services are mocked; no real push is sent by tests.
 - Flutter tests added for push readiness and canonical-ID validation, alongside existing notification/payment tests. Final analyze/tests/APK result: pending final CI.
 - No real service-account OAuth exchange or Android/iOS physical-device push has been tested. No live test accounts, notifications, orders or payments are created by this work.
 - No website edits. No merge. Submit offline field-report drafts before reinstall/uninstall/clearing app data.

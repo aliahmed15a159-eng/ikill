@@ -44,6 +44,8 @@ class PushService {
     _started=true;
     if(!supported){status.value=const PushState('FCM متاح على Android وiOS فقط / Mobile only');return;}
     try {
+      final preferences=await SharedPreferences.getInstance();
+      for(final key in ['push_app','push_consent','push_installation_secret']){await preferences.remove(key);}
       await Firebase.initializeApp();
       _initialized=true;
       FirebaseMessaging.onBackgroundMessage(fcmBackgroundHandler);

@@ -45,7 +45,7 @@ export function fcmMessage(delivery:any,id:string){
   return {message:{token:delivery.fcm_token,
     notification:{title:delivery.company_name,body:'لديك إشعار جديد. افتح التطبيق للاطلاع عليه. / You have a new notification.'},
     data:{notification_id:id,type:delivery.type,reference_id:delivery.reference_id,reference_kind:delivery.reference_kind},
-    android:{priority:'high',notification:{tag:id}},
+    android:{priority:'HIGH',notification:{tag:id}},
     apns:{headers:{'apns-collapse-id':id,'apns-push-type':'alert','apns-priority':'10'},payload:{aps:{sound:'default'}}},
   }};
 }

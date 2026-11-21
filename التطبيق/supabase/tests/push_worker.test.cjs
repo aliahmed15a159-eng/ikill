@@ -25,7 +25,7 @@ global.fetch=async(url,options)=>{
  sends++;
  eq(url,'https://fcm.googleapis.com/v1/projects/ikill-4e337/messages:send');
  assert.match(options.headers.Authorization,/^Bearer mock-access-/);checks++;
- const body=JSON.parse(options.body);eq(body.message.token,'test-fcm-token');eq(body.message.data,{notification_id:id,type:'visit_assigned',reference_id:token,reference_kind:'visit'});eq(body.message.notification.title,'Test brand');
+ const body=JSON.parse(options.body);eq(body.message.token,'test-fcm-token');eq(body.message.android.priority,'HIGH');eq(body.message.data,{notification_id:id,type:'visit_assigned',reference_id:token,reference_kind:'visit'});eq(body.message.notification.title,'Test brand');
  eq(body.message.notification.body.includes('customer'),false);
  if(provider==='401'){provider='ok';return Response.json({error:{status:'UNAUTHENTICATED'}},{status:401});}
  if(provider==='unregistered')return Response.json({error:{details:[{'@type':'type.googleapis.com/google.firebase.fcm.v1.FcmError',errorCode:'UNREGISTERED'}]}},{status:404});
