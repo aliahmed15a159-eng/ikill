@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'dart:async';
@@ -75,7 +76,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
   @override
   Widget build(BuildContext context)=>Column(children:[if(busy)const LinearProgressIndicator(),Row(children:[Expanded(child:Padding(padding:const EdgeInsets.all(12),child:Text(tr('التقارير والفواتير','Reports and invoices'),style:Theme.of(context).textTheme.titleLarge))),IconButton(onPressed:busy?null:(){attempted.clear();refresh();},icon:const Icon(Icons.refresh))]),Expanded(child:FutureBuilder<Map<String,dynamic>>(future:data,builder:(context,snapshot){
     if(snapshot.hasError)return Center(child:Text(tr('تعذّر التحميل أو أُلغيت صلاحية البوابة. استخدم التحديث أو تواصل مع الإدارة.','Load failed or portal access was disabled. Refresh or contact administration.')));
-    if(!snapshot.hasData)return const Center(child:CircularProgressIndicator());
+    if(!snapshot.hasData)return const SkeletonLoader();
     final d=snapshot.data!,invoices=List<Map<String,dynamic>>.from(d['invoices'] as List),reports=List<Map<String,dynamic>>.from(d['reports'] as List);
     return ListView(padding:const EdgeInsets.all(12),children:[
       if(widget.portal)...[
@@ -104,6 +105,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
       const Divider(),Text(tr('فواتيري','Invoices'),style:Theme.of(context).textTheme.titleLarge),
       for(final i in invoices)Card(child:Padding(padding:const EdgeInsets.all(12),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         SelectableText('${i['invoice_number']}\n${i['total']} ${i['currency']} — ${i['payment_status']}\n${tr('المحصّل','Collected')}: ${i['amount_paid']} — ${tr('الاستحقاق','Due')}: ${i['due_on']}'),
+        StatusBadge(label:'${i['payment_status']}',tone:StatusBadge.forStatus('${i['payment_status']}')),
         if(i['billing_period']!=null)Text('${i['billing_period']} — ${i['period_end']}'),
         Wrap(spacing:8,children:[
           OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>NotificationReference(kind:'invoice',id:i['id'] as String))),child:Text(tr('الدفع وإثبات التحويل','Payment and transfer proof'))),

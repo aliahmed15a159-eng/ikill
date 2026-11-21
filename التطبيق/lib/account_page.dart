@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -36,12 +37,12 @@ class _AccountPageState extends State<AccountPage>{
   @override
   Widget build(BuildContext context){
     final flow=AuthFlow.instance;
-    if(flow.handlingLink)return const Scaffold(body:Center(child:CircularProgressIndicator()));
+    if(flow.handlingLink)return const Scaffold(body:SkeletonLoader());
     if(flow.recovering)return ResetPasswordScreen(english:widget.english);
     if(flow.credentialsBusy||!Backend.ready||supabaseClient.auth.currentSession==null)return AuthScreen(english:widget.english,onComplete:changed);
     return FutureBuilder<ProfileAccess>(future:data,builder:(context,snapshot){
       if(snapshot.hasError)return AuthFrame(english:widget.english,title:widget.english?'Account access':'صلاحية الحساب',subtitle:snapshot.error is AccessDenied?snapshot.error.toString():friendlyAuthError(snapshot.error!,english:widget.english),child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[OutlinedButton(onPressed:changed,child:Text(widget.english?'Retry':'إعادة المحاولة')),FilledButton(onPressed:()=>PushService.signOut(),child:Text(widget.english?'Sign out':'تسجيل الخروج'))]));
-      if(!snapshot.hasData)return const Scaffold(body:Center(child:CircularProgressIndicator()));
+      if(!snapshot.hasData)return const Scaffold(body:SkeletonLoader());
       final profile=snapshot.data!;
       if(profile.incomplete)return CompleteProfileScreen(profile:profile,english:widget.english,onComplete:changed);
       switch(profile.role){

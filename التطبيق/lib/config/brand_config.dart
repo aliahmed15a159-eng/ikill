@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// White-label build configuration only. Not wired into existing screens yet.
+/// White-label offline defaults, overridden by validated public brand_config.
 /// Branding is NOT a tenant authorization boundary; Supabase membership/RLS is.
 @immutable
 class BrandConfig {
@@ -35,9 +35,9 @@ class BrandConfig {
     darkLogoAsset: String.fromEnvironment('BRAND_DARK_LOGO',
         defaultValue: 'assets/images/ikill-logo-dark.png'),
     primaryColor: Color(int.fromEnvironment('BRAND_PRIMARY_ARGB',
-        defaultValue: 0xFF15803D)),
+        defaultValue: 0xFF0A4D3C)),
     secondaryColor: Color(int.fromEnvironment('BRAND_SECONDARY_ARGB',
-        defaultValue: 0xFF052E16)),
+        defaultValue: 0xFF052015)),
     emergencyPhone: String.fromEnvironment('BRAND_EMERGENCY_PHONE',
         defaultValue: '01020019042'),
     email: String.fromEnvironment('BRAND_EMAIL', defaultValue: 'info@ikill.net'),

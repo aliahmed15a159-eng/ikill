@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'auth_service.dart';
 import 'account_page.dart';
 import 'notifications_screen.dart';
@@ -124,12 +125,14 @@ class _TechnicianTasksState extends State<TechnicianTasks> with WidgetsBindingOb
     IconButton(onPressed: refresh, icon: const Icon(Icons.refresh)), IconButton(onPressed: () => PushService.signOut(scope: SignOutScope.local), icon: const Icon(Icons.logout)),
   ]), body: Column(children: [if (busy) const LinearProgressIndicator(), Expanded(child: FutureBuilder<List<Map<String, dynamic>>>(future: data, builder: (context, snapshot) {
     if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Load failed. Retry.')));
-    if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    if (!snapshot.hasData) return const SkeletonLoader();
     if (snapshot.data!.isEmpty) return Center(child: Text(tr('لا توجد مهام مفتوحة', 'No open tasks')));
     return ListView(children: [
       if(offline) Padding(padding:const EdgeInsets.all(12),child:Text(tr('وضع دون اتصال: قائمة محفوظة قديمة. يمكنك متابعة مسودة زيارة بدأت سابقاً؛ بدء الزيارة والإرسال يحتاجان اتصالاً.', 'Offline: cached list may be stale. Continue a previously started report; starting/submitting needs internet.'))),
       for (final row in snapshot.data!.where((row)=>widget.visitId==null||row['id']==widget.visitId)) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('${row['client_name']} / ${(row['site'] as Map?)?['name']} — ${visitStatusLabel(row['status'] as String, widget.english)}'),
+      StatusBadge(label:visitStatusLabel(row['status'] as String,widget.english),tone:StatusBadge.forStatus(row['status'] as String)),
+      const SizedBox(height:8),
       Text('${row['local_day'] == row['today'] ? tr('اليوم', 'Today') : row['status'] == 'in_progress' ? tr('قيد التنفيذ', 'In progress') : tr('قادمة', 'Upcoming')} — ${row['timezone']}'),
       Text(tr('الموعد التالي بتوقيت الجهاز:', 'Time below uses device timezone:')),
       Text('${row['scheduled_start'] == null ? tr('لم تُجدول', 'Unscheduled') : DateTime.parse(row['scheduled_start'] as String).toLocal()}'),

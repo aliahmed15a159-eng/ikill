@@ -1,3 +1,5 @@
+import 'design/brand_controller.dart';
+import 'design/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -65,7 +67,7 @@ class _DocumentBrandSettingsState extends State<DocumentBrandSettings>{
   Future<void> load()async{try{final a=await AuthService.requireAdmin();final b=await supabaseClient.from('brand_config').select().eq('tenant_id',a.tenantId).single();if(!mounted)return;for(final e in fields.entries){e.value.text='${b[e.key]??''}';}setState((){tenant=a.tenantId;logo=b['logo_path'] as String?;loaded=true;});}catch(_){if(mounted)setState(()=>error=tr('تعذّر تحميل إعدادات المستندات','Could not load document branding'));}}
   Future<void> save()async{
     if(fields['company_name']!.text.trim().isEmpty||!RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(fields['primary_hex']!.text.trim())){setState(()=>error=tr('يلزم اسم الشركة ولون HEX من 6 خانات دون #','Company name and six-digit HEX color without # required'));return;}
-    setState((){busy=true;error=null;});try{await AuthService.requireAdmin();await supabaseClient.from('brand_config').update({for(final e in fields.entries)e.key:e.value.text.trim(),'logo_path':logo}).eq('tenant_id',tenant!);if(mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(tr('تم الحفظ. تُستخدم البيانات في ملفات PDF الجديدة؛ المستندات المرسلة سابقاً لا تتغير تلقائياً.','Saved for new PDFs; previously published documents are not automatically rewritten.'))));}catch(_){if(mounted)setState(()=>error=tr('فشل الحفظ؛ تحقق من طول الحقول والصلاحيات','Save failed; check field lengths and access'));}finally{if(mounted)setState(()=>busy=false);}
+    setState((){busy=true;error=null;});try{await AuthService.requireAdmin();await supabaseClient.from('brand_config').update({for(final e in fields.entries)e.key:e.value.text.trim(),'logo_path':logo}).eq('tenant_id',tenant!);await BrandController.instance.refresh();if(mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(tr('تم الحفظ. تُستخدم البيانات في ملفات PDF الجديدة؛ المستندات المرسلة سابقاً لا تتغير تلقائياً.','Saved for new PDFs; previously published documents are not automatically rewritten.'))));}catch(_){if(mounted)setState(()=>error=tr('فشل الحفظ؛ تحقق من طول الحقول والصلاحيات','Save failed; check field lengths and access'));}finally{if(mounted)setState(()=>busy=false);}
   }
   Future<void> upload({bool defaultLogo=false})async{
     setState(()=>busy=true);try{
@@ -80,12 +82,12 @@ class _DocumentBrandSettingsState extends State<DocumentBrandSettings>{
   }
   @override
   Widget build(BuildContext context)=>ListView(padding:const EdgeInsets.all(16),children:[
-    Text(tr('هوية الشركة على PDF — brand_config','PDF company identity — brand_config'),style:Theme.of(context).textTheme.titleLarge),
+    Text(tr('هوية التطبيق والمستندات — brand_config','App and document identity — brand_config'),style:Theme.of(context).textTheme.titleLarge),
     if(error!=null)Text(error!,style:const TextStyle(color:Colors.red)),if(!loaded||busy)const LinearProgressIndicator(),
     for(final e in fields.entries)Padding(padding:const EdgeInsets.only(bottom:10),child:TextField(controller:e.value,enabled:loaded&&!busy,maxLength:e.key=='address'?600:e.key=='company_name'?160:e.key=='email'?254:e.key=='phone'?40:e.key=='tax_number'?80:6,decoration:InputDecoration(labelText:{'company_name':tr('اسم الشركة','Company name'),'address':tr('العنوان','Address'),'phone':tr('الهاتف','Phone'),'email':'Email','tax_number':tr('الرقم الضريبي (اختياري)','Tax number (optional)'),'primary_hex':tr('لون الهوية HEX','Brand HEX color')}[e.key]))),
     Text('${tr('مسار الشعار','Logo path')}: ${logo??'—'}'),
     OutlinedButton(onPressed:loaded&&!busy?upload:null,child:Text(tr('رفع شعار من الصور','Upload logo from photos'))),
     OutlinedButton(onPressed:loaded&&!busy?()=>upload(defaultLogo:true):null,child:Text(tr('استخدام شعار التطبيق الحالي','Use current app logo'))),
-    FilledButton(onPressed:loaded&&!busy?save:null,child:Text(tr('حفظ هوية المستندات','Save document branding'))),
+    LoadingButton(onPressed:loaded?save:null,busy:busy,label:tr('حفظ هوية التطبيق','Save app branding')),
   ]);
 }

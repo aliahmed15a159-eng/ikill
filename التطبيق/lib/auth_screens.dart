@@ -1,3 +1,6 @@
+import 'design/brand_controller.dart';
+import 'design/components.dart';
+import 'design/app_theme.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,17 +24,14 @@ class AuthFrame extends StatefulWidget {
   State<AuthFrame> createState()=>_AuthFrameState();
 }
 class _AuthFrameState extends State<AuthFrame> {
-  late final brand=AuthBrand.load();
   @override
   Widget build(BuildContext context)=>Scaffold(
     appBar:AppBar(backgroundColor:Colors.transparent,elevation:0),
-    body:SafeArea(child:Center(child:ConstrainedBox(constraints:const BoxConstraints(maxWidth:520),child:SingleChildScrollView(padding:const EdgeInsets.fromLTRB(24,4,24,32),child:FutureBuilder<AuthBrand>(future:brand,builder:(context,snapshot){
-      final config=snapshot.data??const AuthBrand();
-      final color=Color(config.color);
-      final fallback=Image.asset('assets/images/ikill-logo-transparent.png',height:64,fit:BoxFit.contain);
+    body:SafeArea(child:Center(child:ConstrainedBox(constraints:const BoxConstraints(maxWidth:520),child:SingleChildScrollView(padding:const EdgeInsets.fromLTRB(24,4,24,32),child:ListenableBuilder(listenable:BrandController.instance,builder:(context,child){
+      final config=BrandController.instance;
       return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-        Container(padding:const EdgeInsets.all(22),decoration:BoxDecoration(gradient:LinearGradient(colors:[color,color.withValues(alpha:.75)]),borderRadius:BorderRadius.circular(28)),child:Column(children:[
-          Container(padding:const EdgeInsets.symmetric(horizontal:20,vertical:12),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(20)),child:config.logoUrl==null?fallback:Image.network(config.logoUrl!,height:64,fit:BoxFit.contain,errorBuilder:(_,error,stack)=>fallback)),
+        Container(padding:const EdgeInsets.all(22),decoration:BoxDecoration(gradient:AppTheme.hero(context),borderRadius:BorderRadius.circular(28)),child:Column(children:[
+          Container(padding:const EdgeInsets.symmetric(horizontal:20,vertical:12),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(20)),child:const BrandLogo(height:64)),
           const SizedBox(height:12),Text(config.name,textAlign:TextAlign.center,style:const TextStyle(color:Colors.white,fontSize:23,fontWeight:FontWeight.w800)),
           const SizedBox(height:6),Text(widget.english?'Professional care. One secure account.':'رعاية احترافية تبدأ بحساب آمن',textAlign:TextAlign.center,style:const TextStyle(color:Colors.white,fontSize:14)),
         ])),
@@ -124,7 +124,7 @@ class _AuthScreenState extends State<AuthScreen>{
     if(error!=null)Padding(padding:const EdgeInsets.symmetric(vertical:12),child:Text(error!,semanticsLabel:error,style:TextStyle(color:Theme.of(context).colorScheme.error))),
     if(AuthFlow.instance.callbackError!=null)Padding(padding:const EdgeInsets.symmetric(vertical:8),child:Text(AuthFlow.instance.callbackError!,style:TextStyle(color:Theme.of(context).colorScheme.error))),
     if(notice!=null||AuthFlow.instance.notice!=null)Padding(padding:const EdgeInsets.symmetric(vertical:12),child:Text(notice??AuthFlow.instance.notice!,style:TextStyle(color:Theme.of(context).colorScheme.primary))),
-    const SizedBox(height:16),FilledButton(onPressed:enabled&&!(forgot&&resetCoolingDown)?submit:null,child:busy?const SizedBox(width:22,height:22,child:CircularProgressIndicator(strokeWidth:2)):Text(forgot?tr('إرسال رابط الاستعادة','Send reset link'):signup?tr('إنشاء الحساب','Create account'):tr('دخول آمن','Sign in securely'))),
+    const SizedBox(height:16),LoadingButton(onPressed:enabled&&!(forgot&&resetCoolingDown)?submit:null,busy:busy,label:forgot?tr('إرسال رابط الاستعادة','Send reset link'):signup?tr('إنشاء الحساب','Create account'):tr('دخول آمن','Sign in securely')),
     if(forgot)TextButton(onPressed:busy?null:()=>setState((){forgot=false;error=null;notice=null;}),child:Text(tr('العودة لتسجيل الدخول','Back to sign in'))),
     if(!forgot)Padding(padding:const EdgeInsets.only(top:16),child:Text(tr('تُنشأ الحسابات الجديدة كعملاء خدمات فقط. صلاحيات الإدارة والفنيين والبوابة التعاقدية تُمنح بواسطة الإدارة.','New accounts are service customers only. Staff and contract portal permissions are granted by administration.'),textAlign:TextAlign.center,style:Theme.of(context).textTheme.bodySmall)),
   ]))));}
@@ -154,7 +154,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen>{
   }
   @override
   Widget build(BuildContext context)=>PopScope(canPop:false,child:AuthFrame(english:widget.english,title:tr('خطوة صغيرة ونبدأ','One last step'),subtitle:tr('أهلاً ${widget.profile.fullName}، أضف رقم واتساب للتواصل الميداني وتنسيق الزيارات. ستظهر هذه الخطوة مرة واحدة.','Welcome ${widget.profile.fullName}. Add your WhatsApp number for field coordination. This step appears once.'),child:Form(key:form,child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-    TextFormField(controller:phone,enabled:!busy,keyboardType:TextInputType.phone,autofillHints:const [AutofillHints.telephoneNumber],autovalidateMode:AutovalidateMode.onUserInteraction,decoration:InputDecoration(labelText:tr('رقم الموبايل (واتساب)','Mobile / WhatsApp'),prefixIcon:const Icon(Icons.phone_outlined),hintText:'010… / +20…'),validator:(v)=>normalizedWhatsapp(v??'')==null?tr('أدخل رقماً مصرياً صحيحاً أو رقماً دولياً يبدأ بـ +.','Enter a valid Egyptian mobile or international + number.'):null),
+    AppInput(controller:phone,enabled:!busy,keyboardType:TextInputType.phone,autofillHints:const [AutofillHints.telephoneNumber],label:tr('رقم الموبايل (واتساب)','Mobile / WhatsApp'),icon:Icons.phone_outlined,hint:'010… / +20…',validator:(v)=>normalizedWhatsapp(v??'')==null?tr('أدخل رقماً مصرياً صحيحاً أو رقماً دولياً يبدأ بـ +.','Enter a valid Egyptian mobile or international + number.'):null),
     if(error!=null)Padding(padding:const EdgeInsets.all(12),child:Text(error!,style:TextStyle(color:Theme.of(context).colorScheme.error))),const SizedBox(height:20),FilledButton(onPressed:busy?null:save,child:Text(busy?'…':tr('حفظ ومتابعة','Save and continue'))),TextButton(onPressed:busy?null:()=>PushService.signOut(),child:Text(tr('تسجيل الخروج','Sign out'))),
   ]))));
 }

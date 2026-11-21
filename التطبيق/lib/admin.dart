@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'push_service.dart';
@@ -69,7 +70,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget records() {
     return FutureBuilder<List<Map<String, dynamic>>>(future: Backend.records(tab), builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر تحميل البيانات. تحقق من الصلاحيات والاتصال.', 'Cannot load data. Check permissions and connection.')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+      if (!snapshot.hasData) return const SkeletonLoader();
       final docs = snapshot.data!.where((d) => query.isEmpty || d.values.join(' ').toLowerCase().contains(query)).toList();
       if (docs.isEmpty) return Center(child: Text(tr('لا توجد بيانات', 'No records')));
       return ListView.builder(padding: const EdgeInsets.all(12), itemCount: docs.length + 1, itemBuilder: (context, i) {
@@ -106,7 +107,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     future: Backend.adminSettings(),
     builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر تحميل الإعدادات', 'Cannot load settings')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+      if (!snapshot.hasData) return const SkeletonLoader();
       final data = snapshot.data!;
       final keys = ['phone', 'emergency', 'address', for (var i = 1; i <= 4; i++) ...['stat${i}Value', 'stat${i}Label']];
       return ListView(padding: const EdgeInsets.all(20), children: [

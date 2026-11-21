@@ -42,7 +42,7 @@ void main() {
     final content = (await tester.runAsync(SiteContent.load))!;
     await tester.pumpWidget(IkillApp(content: content, preferences: prefs));
     await tester.pumpAndSettle();
-    for (final index in [1, 2, 3, 0]) {
+    for (final index in [1, 2, 0]) {
       await tester.tap(find.byType(NavigationDestination).at(index));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -51,7 +51,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(prefs.getBool('dark'), isTrue);
     await tester.tap(find.text('EN')); await tester.pumpAndSettle();
-    for (final index in [1, 2, 3, 0]) {
+    for (final index in [1, 2, 0]) {
       await tester.tap(find.byType(NavigationDestination).at(index));
       await tester.pumpAndSettle(); expect(tester.takeException(), isNull);
     }

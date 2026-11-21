@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'package:flutter/material.dart';
 import 'request_models.dart';
 import 'request_repository.dart';
@@ -95,7 +96,7 @@ class _RequestAdminState extends State<RequestAdmin> {
     if (busy) const LinearProgressIndicator(),
     Expanded(child: FutureBuilder<List<Map<String, dynamic>>>(future: data, builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Could not load. Retry.')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+      if (!snapshot.hasData) return const SkeletonLoader();
       final rows = snapshot.data!.where((row)=>widget.referenceId==null||row['id']==widget.referenceId).toList();
       if (widget.mode == 0) { return ListView(children: [
         Padding(padding: const EdgeInsets.all(16), child: Text(tr('الأسعار الفعلية فقط؛ لا يمكن الطلب حتى تفعيل السعر. لا تشمل هذه الشاشة أسعار العقود.', 'Set actual prices. Requests require an enabled price. Contract pricing is not included.'))),
