@@ -1,0 +1,38 @@
+[
+  {
+    "title": "مكافحة الجرذان",
+    "subtitle": "Rats Control",
+    "description": "نقوم بتحديد أماكن الجرذان واستخدام تقنيات متقدمة للقضاء عليها بطرق آمنة وفعالة مع ضمان عدم عودتها.",
+    "image": "assets/images/pests/rodent.svg"
+  },
+  {
+    "title": "مكافحة الفئران",
+    "subtitle": "Mice Control",
+    "description": "خدمات متكاملة للكشف عن الفئران وإزالتها باستخدام أحدث الطرق والمواد الآمنة.",
+    "image": "assets/images/pests/rodent.svg"
+  },
+  {
+    "title": "مكافحة الصراصير",
+    "subtitle": "Cockroach Control",
+    "description": "علاجات متخصصة للقضاء على الصراصير باستخدام مواد آمنة وفعالة طويلة الأمد.",
+    "image": "assets/images/pests/cockroach.svg"
+  },
+  {
+    "title": "مكافحة البعوض",
+    "subtitle": "Mosquito Control",
+    "description": "برامج متكاملة لمكافحة البعوض والبعوض الناقل للأمراض باستخدام تقنيات متقدمة.",
+    "image": "assets/images/pests/mosquito.svg"
+  },
+  {
+    "title": "مكافحة الذباب",
+    "subtitle": "Fly Control",
+    "description": "حلول فعالة لمكافحة الذباب في المنازل والمنشآت التجارية والصناعية.",
+    "image": "assets/images/pests/fly.svg"
+  },
+  {
+    "title": "مكافحة البق",
+    "subtitle": "Bed Bug Control",
+    "description": "خدمات شاملة للقضاء على البق باستخدام تقنيات حديثة وآمنة.",
+    "image": "assets/images/pests/bedbug.svg"
+  }
+]
