@@ -37,7 +37,7 @@ class _AuthFrameState extends State<AuthFrame> {
         ])),
         const SizedBox(height:26),Text(widget.title,style:Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight:FontWeight.w800)),
         const SizedBox(height:8),Text(widget.subtitle,style:Theme.of(context).textTheme.bodyMedium?.copyWith(color:Theme.of(context).colorScheme.onSurfaceVariant)),
-        const SizedBox(height:24),widget.child,
+        const SizedBox(height:24),AnimatedSize(duration:const Duration(milliseconds:260),curve:Curves.easeInOut,alignment:Alignment.topCenter,child:widget.child),
         const SizedBox(height:24),Row(mainAxisAlignment:MainAxisAlignment.center,children:[const Icon(Icons.lock_outline,size:16),const SizedBox(width:6),Flexible(child:Text(widget.english?'Your account is secured by Supabase':'بيانات حسابك محمية عبر Supabase',textAlign:TextAlign.center,style:Theme.of(context).textTheme.bodySmall))]),
       ]);
     }))))),
