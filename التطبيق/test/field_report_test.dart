@@ -5,6 +5,16 @@ import 'package:ikill_native/field_report_store.dart';
 import 'package:ikill_native/field_report_form.dart';
 
 Map<String,dynamic> exampleDraft()=>{'submission':reportSubmissionKey(),'pest':'rodents','severity':'low','actions':['inspection'],'materials':'Bait 10 g','notes':'Checked','signer':'Site representative','photos':<String>[],'strokes':[[[0.1,0.2],[0.6,0.8]]]};
+class MemoryFieldStore extends FieldReportStore {
+  Map<String,dynamic> value=exampleDraft();
+  MemoryFieldStore():super(Directory('/unused'));
+  @override
+  Future<Map<String,dynamic>?> load(String visit) async => value;
+  @override
+  Future<dynamic> readJson(String name) async => null;
+  @override
+  Future<void> save(String visit,Map<String,dynamic> draft) async {value=draft;}
+}
 void main(){
   test('Offline draft survives store recreation, isolates users and persists media',()async{
     final root=await Directory.systemTemp.createTemp('field-report-test-');
@@ -32,20 +42,17 @@ void main(){
     expect(reportSubmissionKey(),matches(RegExp(r'^[a-f0-9]{32}$')));
   });
   testWidgets('Report restores persisted offline fields and signature on a narrow phone',(tester)async{
-    final root=(await tester.runAsync(()=>Directory.systemTemp.createTemp('report-widget-')))!;
-    final store=FieldReportStore(root);
-    await tester.runAsync(()=>store.save('visit',exampleDraft()));
+    final store=MemoryFieldStore();
     tester.view.physicalSize=const Size(320,800);tester.view.devicePixelRatio=1;
     addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(MaterialApp(home:FieldReportForm(tenant:'tenant',user:'user',visit:'visit',english:true,store:store)));
-    await tester.runAsync(()=>Future<void>.delayed(const Duration(milliseconds:150)));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.byType(TextField).first,300,scrollable:find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     expect(find.text('Bait 10 g'),findsOneWidget);
-    expect((await tester.runAsync(()=>store.load('visit')))!['materials'],'Bait 10 g');
+    expect((await store.load('visit'))!['materials'],'Bait 10 g');
     expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());await tester.pumpAndSettle();
-    await tester.runAsync(()=>root.delete(recursive:true));
+
   });
 }
