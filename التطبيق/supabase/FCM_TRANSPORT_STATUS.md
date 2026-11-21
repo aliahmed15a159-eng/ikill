@@ -30,9 +30,9 @@ Admin bell → settings separately checks the protected Edge `status` action: se
 
 ## Supabase migration and sender
 
-- `phase10_fcm_transport.sql`: live migration applied. Renames `profiles.push_subscription_id` to `fcm_token`, clears incompatible old IDs, renames private device-binding token column, drops previous-provider App ID/settings/RPCs, installs FCM registration and cleanup RPCs, preserves notification/payment tables and RLS. Sets external sending **off** until server credentials are configured.
-- `phase10a_fcm_webhook_timeout.sql`: live migration applied; raises database webhook timeout to 60s for OAuth/signing and one 401 token refresh.
-- Existing `push-notification` Edge Function updated to **FCM HTTP v1**, ACTIVE v3. Same notifications-insert database webhook/outbox, per-delivery random token and service-only claim/finish. No legacy FCM API/server-key endpoint.
+- `phase10_fcm_transport.sql`: live migration `20261121143400` applied. Renames `profiles.push_subscription_id` to `fcm_token`, clears incompatible old IDs, renames private device-binding token column, drops previous-provider App ID/settings/RPCs, installs FCM registration and cleanup RPCs, preserves notification/payment tables and RLS. Sets external sending **off** until server credentials are configured.
+- `phase10a_fcm_webhook_timeout.sql`: live migration `20261121143555` applied; raises database webhook timeout to 60s for OAuth/signing and one 401 token refresh.
+- Existing `push-notification` Edge Function updated to **FCM HTTP v1**, ACTIVE v3. Same notifications-insert database webhook/outbox, per-delivery random token and service-only claim/finish. Database webhook deployment deliberately uses `verify_jwt=false`; never remove the in-handler delivery-token checks. The separate status action requires an authenticated, active Supabase account. No legacy FCM API/server-key endpoint.
 - Reads **FIREBASE_SERVICE_ACCOUNT** only from Supabase Edge Secrets. Validates service-account type, expected project, key and pinned Google OAuth URL. Signs RS256 JWT with messaging-only scope, exchanges it at Google's OAuth endpoint, caches the short-lived access token and refreshes once after 401.
 - Sends to `https://fcm.googleapis.com/v1/projects/{project_id}/messages:send`. Uses brand_config company name and generic notification text, never private customer/payment/report details. Canonical type/reference IDs accompany the opaque notification ID in data.
 - Handles `UNREGISTERED` by clearing only the still-matching recipient token, never a newly refreshed token. Disabled-account checks remain at delivery time.
@@ -52,6 +52,15 @@ Supabase secret metadata was checked: **FIREBASE_SERVICE_ACCOUNT is not present*
 
 - Local SQL regression suite: previous 381 assertions plus **36 FCM migration/token/role/refresh/logout checks**.
 - Sender tests: **87 assertions**, including real ephemeral RSA JWT signing/verification, messaging-only scope, pinned OAuth audience/URL, access-token caching and 401 refresh, HTTP-v1 payload, status authentication, project mismatch, no-configuration, UNREGISTERED cleanup and failure handling. All external services are mocked; no real push is sent by tests.
-- Flutter tests added for push readiness and canonical-ID validation, alongside existing notification/payment tests. Final analyze/tests/APK result: pending final CI.
+- Flutter tests added for push readiness and canonical-ID validation, alongside existing notification/payment tests. Final analyze/tests/APK and resolved-native dependency audit: **SUCCESS** on commit `fd74aa56fd5b8060f4dda3be45bca1160edf5cda`, [run 44915777030](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44915777030).
 - No real service-account OAuth exchange or Android/iOS physical-device push has been tested. No live test accounts, notifications, orders or payments are created by this work.
 - No website edits. No merge. Submit offline field-report drafts before reinstall/uninstall/clearing app data.
+
+## Verified Android artifact and live checks
+
+- [Download FCM Android APK artifact ZIP](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44915777030/artifacts/14712132494).
+- Artifact `ikill-android-supabase-debug`: **89,826,887 bytes**; GitHub artifact ZIP digest **sha256:8a29b2dc37b7307e5897f58987e6714440aba71f1323d6590d060c7c31d3dd6e**. Extract and install `app-debug.apk`. GitHub sign-in and artifact retention apply. No local APK/device checksum is claimed; artifact metadata and all CI steps were verified through GitHub API.
+- Live metadata: `profiles.fcm_token` exists; old public provider columns count is zero; notification-insert webhook is enabled; authenticated users cannot execute the delivery-claim RPC; external sending remains off pending real server credentials.
+- Live unauthenticated `status` probe through pg_net returned **HTTP 401 UNAUTHORIZED**, no timeout. This verifies deployment/connectivity/auth rejection, not FCM provider or device delivery.
+- Initial CI attempts correctly rejected the required native Core Kotlin support module under the overly narrow transport audit. The final explicit allowlist includes Core Kotlin and required Messaging interoperability/encoding/transport modules only, and the final actual resolved-dependency audit passed. Local negative fixtures also reject native Auth, Firestore, Storage, realtime DB and analytics SDKs.
+- Work stops for testing. No merge and no website edits. Adding the real server service-account secret and iOS configuration remains an account-owner action; no private credentials should be posted to chat.
