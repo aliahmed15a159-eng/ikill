@@ -107,7 +107,7 @@ class _RequestFormState extends State<RequestForm> {
     const SizedBox(height: 24),
     choice(kind, const {'residential': ['خدمة سكنية لمرة واحدة', 'One-off residential service'], 'contract': ['تعاقد منشأة — طلب معاينة', 'Business contract — survey request']}, tr('نوع الخدمة', 'Service type'), (v) { kind = v; quote = null; paymentStep = false; }),
     for (final key in fields.keys.where((k) => k != 'facility' && k != 'payment_reference' || k == 'facility' && kind == 'contract' || k == 'payment_reference' && paymentStep)) Padding(padding: const EdgeInsets.only(bottom: 16), child: TextFormField(
-      controller: fields[key], enabled: !sending && !loadingQuote && retryPayload == null && (!paymentStep || key == 'payment_reference'),
+      key: ValueKey(key), controller: fields[key], enabled: !sending && !loadingQuote && retryPayload == null && (!paymentStep || key == 'payment_reference'),
       maxLength: switch (key) { 'name' => 100, 'phone' => 20, 'email' => 150, 'address' => 200, 'facility' => 150, 'payment_reference' => 100, _ => 2000 },
       maxLines: key == 'message' ? 5 : 1,
       keyboardType: switch (key) { 'email' => TextInputType.emailAddress, 'phone' => TextInputType.phone, 'message' => TextInputType.multiline, _ => TextInputType.text },

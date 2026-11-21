@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'request_models.dart';
 import 'request_repository.dart';
 import 'auth_service.dart';
+import 'admin_dialogs.dart';
 import 'supabase_client.dart';
 
 class RequestAdmin extends StatefulWidget {
   final bool english;
   final int mode;
-  const RequestAdmin({super.key, required this.english, required this.mode});
+  final RequestRepository repository;
+  const RequestAdmin({super.key, required this.english, required this.mode, this.repository = const RequestRepository()});
   @override
   State<RequestAdmin> createState() => _RequestAdminState();
 }
 
 class _RequestAdminState extends State<RequestAdmin> {
-  final repository = const RequestRepository();
+  RequestRepository get repository => widget.repository;
   late Future<List<Map<String, dynamic>>> data;
   bool busy = false;
   String tr(String ar, String en) => widget.english ? en : ar;
@@ -21,6 +23,7 @@ class _RequestAdminState extends State<RequestAdmin> {
   void initState() { super.initState(); reload(); }
   void reload() { data = widget.mode == 0 ? repository.prices() : repository.pending(widget.mode == 2); }
   Future<void> action(Future<void> Function() operation) async {
+    if (!mounted || busy) return;
     setState(() => busy = true);
     try {
       await operation();
@@ -31,22 +34,10 @@ class _RequestAdminState extends State<RequestAdmin> {
   }
 
   Future<void> editPrice(String property, String problem, Map<String, dynamic>? row) async {
-    final controller = TextEditingController(text: row?['fixed_price']?.toString() ?? '');
-    final form = GlobalKey<FormState>();
-    var enabled = row?['is_active'] != false;
-    final saved = await showDialog<bool>(context: context, builder: (ctx) => StatefulBuilder(builder: (ctx, update) => AlertDialog(
-      title: Text('${optionLabel(propertyOptions, property, widget.english)} / ${optionLabel(problemOptions, problem, widget.english)}'),
-      content: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextFormField(controller: controller, keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(labelText: tr('السعر بعملة الشركة', 'Price in company currency')),
-          validator: (v) => validPriceInput(v ?? '') == null ? tr('أدخل سعراً موجباً بمنزلتين عشريتين كحد أقصى', 'Enter a positive price with at most two decimals') : null),
-        SwitchListTile(title: Text(tr('متاح للطلب', 'Available to order')), value: enabled, onChanged: (v) => update(() => enabled = v)),
-      ])), actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('إلغاء', 'Cancel'))),
-        FilledButton(onPressed: () { if (form.currentState!.validate()) { Navigator.pop(ctx, true); } }, child: Text(tr('حفظ', 'Save')))],
-    )));
-    final amount = validPriceInput(controller.text);
-    controller.dispose();
-    if (saved == true && amount != null) await action(() => repository.savePrice(property, problem, amount, enabled));
+    final result = await showDialog<Map<String, dynamic>>(context: context,
+      builder: (_) => PriceEditor(english: widget.english, property: property, problem: problem, initial: row));
+    if (!mounted || result == null) return;
+    await action(() => repository.savePrice(property, problem, result['amount'] as String, result['enabled'] as bool));
   }
 
   Future<void> schedule(Map<String, dynamic> row, bool survey) async {
@@ -72,7 +63,12 @@ class _RequestAdminState extends State<RequestAdmin> {
         FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('تأكيد', 'Confirm')))],
     ));
     if (confirmed != true) return;
-    await action(() async {
+    if (!mounted) return;
+    if (!start.isAfter(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('اختر موعداً في المستقبل.', 'Choose a future appointment.'))));
+      return;
+    }
+    {
       if (survey) {
         final account = await AuthService.requireAdmin();
         final result = await supabaseClient.from('surveys').update({'scheduled_at': start.toUtc().toIso8601String(), 'surveyor_id': technician, 'status': 'scheduled'})
@@ -81,7 +77,7 @@ class _RequestAdminState extends State<RequestAdmin> {
       } else {
         await repository.schedule(row['id'] as String, start, start.add(const Duration(hours: 1)), technician);
       }
-    });
+    }
   }
 
   Future<void> review(Map<String, dynamic> row, bool approved) async {
@@ -90,7 +86,7 @@ class _RequestAdminState extends State<RequestAdmin> {
       content: Text(approved ? tr('هل تحققت فعلياً من استلام المبلغ؟ هذا ليس تحققاً إلكترونياً.', 'Have you independently verified receipt of funds? This is not electronic verification.') : tr('رفض تأكيد الدفع؟ يلزم التواصل مع العميل.', 'Reject confirmation? Contact the customer to resolve it.')),
       actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('إلغاء', 'Cancel'))), FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('تأكيد', 'Confirm')))],
     ));
-    if (confirm == true) await action(() => repository.reviewPayment(row['id'] as String, approved));
+    if (confirm == true && mounted) await action(() => repository.reviewPayment(row['id'] as String, approved));
   }
 
   @override

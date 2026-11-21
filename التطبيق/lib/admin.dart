@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
+import 'admin_dialogs.dart';
 import 'request_admin.dart';
 import 'instapay_admin.dart';
 
@@ -148,7 +149,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final keys = ['nameAr', 'nameEn', 'countryAr', 'countryEn', 'phone'];
     final initial = doc ?? <String, dynamic>{};
     final values = await editFields(tr('بيانات الفرع', 'Branch details'), keys, initial, includeStatus: true);
-    if (values == null) return;
+    if (values == null || !mounted) return;
     await action(() => Backend.saveBranch(values, id: doc?['id'] as String?));
   }
 
@@ -163,43 +164,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
         for (final key in keys) ListTile(title: Text(key), subtitle: Text('${data[key] ?? ''}')),
         FilledButton(onPressed: () async {
           final values = await editFields(tr('إعدادات الموقع', 'Site settings'), keys, data);
-          if (values == null) return;
-          await action(() => Backend.saveSettings({...values, 'email': 'info@ikill.net', 'stat1Value': '15'}));
+          if (values == null || !mounted) return;
+          await action(() => Backend.saveSettings(values));
           if (mounted) setState(() {});
         }, child: Text(tr('تعديل الإعدادات', 'Edit settings'))),
       ]);
     });
 
   Future<Map<String, String>?> editFields(String title, List<String> keys, Map<String, dynamic> data, {bool includeStatus = false, Set<String> secret = const {}}) async {
-    final controllers = {for (final key in keys) key: TextEditingController(text: '${data[key] ?? ''}')};
-    var status = '${data['status'] ?? 'active'}';
-    if (!['active', 'inactive'].contains(status)) status = 'inactive';
-    final formKey = GlobalKey<FormState>();
-    final result = await showDialog<Map<String, String>>(context: context, builder: (context) => StatefulBuilder(builder: (context, update) => AlertDialog(
-      title: Text(title), content: SizedBox(width: 500, child: SingleChildScrollView(child: Form(key: formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
-        for (final key in keys) Padding(padding: const EdgeInsets.only(bottom: 12), child: TextFormField(
-          controller: controllers[key], obscureText: secret.contains(key), decoration: InputDecoration(labelText: key),
-          validator: (v) => key != 'phone' && (v?.trim().isEmpty ?? true) ? tr('مطلوب', 'Required') : null)),
-        if (includeStatus) DropdownButtonFormField<String>(value: status,
-          items: ['active', 'inactive'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-          onChanged: (s) => update(() => status = s ?? status)),
-      ])))) , actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(tr('إلغاء', 'Cancel'))),
-        FilledButton(onPressed: () {
-          if (!(formKey.currentState?.validate() ?? false)) return;
-          Navigator.pop(context, {for (final e in controllers.entries) e.key: secret.contains(e.key) ? e.value.text : e.value.text.trim(), if (includeStatus) 'status': status});
-        }, child: Text(tr('حفظ', 'Save'))),
-      ],
-    )));
-    // Controllers are kept until the dialog's reverse transition is complete.
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-    for (final c in controllers.values) { c.dispose(); }
-    return result;
+    return showDialog<Map<String, String>>(context: context, builder: (_) => AdminFieldsEditor(
+      english: widget.english, title: title, fields: keys, initial: data, includeStatus: includeStatus, secret: secret));
   }
 
   Future<void> changePassword() async {
     final values = await editFields(tr('تغيير كلمة المرور', 'Change password'), ['currentPassword', 'newPassword', 'confirmPassword'], {}, secret: {'currentPassword', 'newPassword', 'confirmPassword'});
-    if (values == null) return;
+    if (values == null || !mounted) return;
     if (values['newPassword'] != values['confirmPassword'] || values['newPassword']!.length < 8) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('استخدم كلمة مرور متطابقة من 8 أحرف على الأقل.', 'Use matching passwords of at least 8 characters.'))));
       return;
