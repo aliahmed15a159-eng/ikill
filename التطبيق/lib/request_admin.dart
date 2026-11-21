@@ -118,7 +118,10 @@ class _RequestAdminState extends State<RequestAdmin> {
             if (row['payment_review'] == 'pending_review') TextButton(onPressed: busy ? null : () => review(row, false), child: Text(tr('رفض', 'Reject'))),
           ]),
         ] else ...[SelectableText('${row['assessment']}'),
-          TextButton(onPressed: busy ? null : () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientDetail(english: widget.english, clientId: row['client_id'] as String))), child: Text(tr('ملف العميل والمعاينة والعقد', 'Client, survey and contract'))),
+          TextButton(onPressed: busy ? null : () async {
+            await Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientDetail(english: widget.english, clientId: row['client_id'] as String)));
+            if (mounted) setState(reload);
+          }, child: Text(tr('ملف العميل والمعاينة والعقد', 'Client, survey and contract'))),
         ],
         FilledButton(onPressed: busy || widget.mode == 1 && row['payment_review'] != 'verified' ? null : () => action(() => schedule(row, widget.mode == 2)), child: Text(tr('جدولة مع فني', 'Schedule with technician'))),
       ]))) ]);

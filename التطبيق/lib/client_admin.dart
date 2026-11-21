@@ -152,6 +152,7 @@ class _ClientDetailState extends State<ClientDetail> {
       return ListView(padding: const EdgeInsets.all(16), children: [
         Text('${customer['display_name']} — ${customer['status']}', style: Theme.of(context).textTheme.titleLarge),
         SelectableText('${customer['phone'] ?? ''}\n${customer['email'] ?? ''}'),
+        if (customer['request_message'] != null) SelectableText('${tr('الطلب الأصلي', 'Original request')}: ${customer['request_message']}'),
         const Divider(), Text(tr('المواقع والفروع', 'Sites and branches'), style: Theme.of(context).textTheme.titleLarge),
         OutlinedButton.icon(onPressed: busy ? null : () => site(), icon: const Icon(Icons.add_location_alt_outlined), label: Text(tr('إضافة موقع', 'Add site'))),
         for (final s in sites) Card(child: Padding(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
