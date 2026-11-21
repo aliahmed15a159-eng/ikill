@@ -117,7 +117,7 @@ class _ClientDetailState extends State<ClientDetail> {
     final id = existing?['id'] as String? ?? newContractId;
     await action(() async { await widget.repository.saveContract(id, widget.clientId, values); newContractId = newRequestId(); });
   }
-  Future<void> activate(Map<String, dynamic> contract) async {
+  Future<void> activateContract(Map<String, dynamic> contract) async {
     final values = await edit('signature', tr('توقيع وتفعيل العقد', 'Sign and activate contract'), {
       'signer': LifecycleField(tr('اسم ممثل العميل الذي وقّع', 'Signing customer representative')),
       'reference': LifecycleField(tr('رقم/مرجع العقد الموقّع خارج التطبيق', 'Reference to externally signed agreement')),
@@ -168,7 +168,7 @@ class _ClientDetailState extends State<ClientDetail> {
           for (final p in plans.where((p) => p['contract_id'] == c['id'])) Text('${sites.where((s) => s['id'] == p['site_id']).map((s) => s['name']).join()} — ${p['visits_per_month']} ${tr('زيارة / شهر', 'visits / month')}'),
           if (c['status'] == 'draft' && c['app_managed'] == true) ...[
             TextButton(onPressed: busy ? null : () => contract(activeSites, plans.where((p) => p['contract_id'] == c['id']).toList(), c), child: Text(tr('تعديل المسودة', 'Edit draft'))),
-            FilledButton(onPressed: busy ? null : () => activate(c), child: Text(tr('توقيع وتفعيل العقد', 'Sign and activate contract'))),
+            FilledButton(onPressed: busy ? null : () => activateContract(c), child: Text(tr('توقيع وتفعيل العقد', 'Sign and activate contract'))),
           ],
           if (c['signed_at'] != null) SelectableText('${c['signed_by_name']} — ${c['signature_reference']}\n${c['signed_at']} — ${c['generated_visit_count']} ${tr('زيارة', 'visits')}'),
         ]))),
