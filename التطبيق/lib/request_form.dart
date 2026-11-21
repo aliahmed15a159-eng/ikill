@@ -1,3 +1,4 @@
+import 'design/components.dart';
 import 'package:flutter/material.dart';
 import 'request_repository.dart';
 import 'request_models.dart';
@@ -81,7 +82,7 @@ class _RequestFormState extends State<RequestForm> {
       if (!mounted) return;
       for (final c in fields.values) { c.clear(); }
       setState(() { consent = false; paymentStep = false; quote = null; retryPayload = null; requestId = newRequestId(); });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('تم تسجيل الطلب. التأكيد المالي والموعد بمعرفة الإدارة.', 'Request recorded. Payment and scheduling require administration review.'))));
+      AppToast.show(context,tr('تم تسجيل الطلب. التأكيد المالي والموعد بمعرفة الإدارة.', 'Request recorded. Payment and scheduling require administration review.'));
     } catch (_) {
       if (mounted) {
         setState(() => error = tr(
@@ -150,9 +151,9 @@ class _RequestFormState extends State<RequestForm> {
     TextButton(onPressed: widget.onPrivacy, child: Text(tr('قراءة سياسة الخصوصية', 'Read privacy policy'))),
     if (error != null) Padding(padding: const EdgeInsets.only(bottom: 16), child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
     if (retryPayload != null) TextButton(onPressed: sending ? null : () => setState(() { retryPayload = null; requestId = newRequestId(); paymentStep = false; quote = null; }), child: Text(tr('بدء طلب جديد (تحقق أولاً من عدم تسجيل السابق)', 'Start a new request (first check the previous one was not recorded)'))),
-    FilledButton.icon(onPressed: sending || loadingQuote || !repository.ready ? null : kind == 'residential' && !paymentStep ? loadQuote : submit,
-      icon: sending ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.send_outlined),
-      label: Text(sending ? tr('جاري الإرسال…', 'Sending…') : kind == 'residential' && !paymentStep ? tr('عرض السعر والمتابعة للدفع', 'Get price and continue to payment') : tr('مراجعة وإرسال', 'Review and send'))),
+    LoadingButton(onPressed:!repository.ready?null:kind=='residential'&&!paymentStep?loadQuote:submit,
+      busy:sending||loadingQuote,icon:Icons.send_outlined,
+      label:sending?tr('جاري الإرسال…','Sending…'):kind=='residential'&&!paymentStep?tr('عرض السعر والمتابعة للدفع','Get price and continue to payment'):tr('مراجعة وإرسال','Review and send')),
     if (!repository.ready) Padding(padding: const EdgeInsets.only(top: 12), child: Text(tr('الإرسال غير متاح حتى إعداد Supabase الأصلي للتطبيق. يمكنك الاتصال هاتفياً أو عبر البريد.', 'Submission is unavailable until native Supabase is configured. You can still call or email us.'))),
   ])));
 }

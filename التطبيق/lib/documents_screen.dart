@@ -105,7 +105,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
       const Divider(),Text(tr('فواتيري','Invoices'),style:Theme.of(context).textTheme.titleLarge),
       for(final i in invoices)Card(child:Padding(padding:const EdgeInsets.all(12),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         SelectableText('${i['invoice_number']}\n${i['total']} ${i['currency']} — ${i['payment_status']}\n${tr('المحصّل','Collected')}: ${i['amount_paid']} — ${tr('الاستحقاق','Due')}: ${i['due_on']}'),
-        StatusBadge(label:'${i['payment_status']}',tone:StatusBadge.forStatus('${i['payment_status']}')),
+        StatusBadge(label:StatusBadge.localized('${i['payment_status']}',widget.english),tone:StatusBadge.forStatus('${i['payment_status']}')),
         if(i['billing_period']!=null)Text('${i['billing_period']} — ${i['period_end']}'),
         Wrap(spacing:8,children:[
           OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>NotificationReference(kind:'invoice',id:i['id'] as String))),child:Text(tr('الدفع وإثبات التحويل','Payment and transfer proof'))),

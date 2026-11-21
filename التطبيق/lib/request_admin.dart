@@ -112,6 +112,8 @@ class _RequestAdminState extends State<RequestAdmin> {
       if (rows.isEmpty) return Center(child: Text(tr('لا توجد طلبات معلقة', 'No pending requests')));
       return ListView(children: [for (final row in rows) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         SelectableText('${(row['clients'] as Map?)?['display_name'] ?? ''}\n${(row['clients'] as Map?)?['phone'] ?? ''}\n${(row['clients'] as Map?)?['email'] ?? ''}\n${(row['client_sites'] as Map?)?['address'] ?? ''}'),
+        StatusBadge(label:StatusBadge.localized('${row[widget.mode==1?'payment_review':'status']??'survey_pending'}',widget.english),tone:StatusBadge.forStatus('${row[widget.mode==1?'payment_review':'status']??'survey_pending'}')),
+        const SizedBox(height:12),
         if (widget.mode == 1) ...[
           Text('${optionLabel(propertyOptions, row['property_type'] as String, widget.english)} / ${optionLabel(problemOptions, row['problem_code'] as String, widget.english)}'),
           SelectableText('${row['quoted_amount']} ${row['quoted_currency']}\n${row['payment_reference']}\n${row['payment_review']}\n${row['instructions'] ?? ''}'),

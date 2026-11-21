@@ -38,9 +38,20 @@ class StatusBadge extends StatelessWidget {
   final String label;
   final StatusTone tone;
   const StatusBadge({super.key,required this.label,this.tone=StatusTone.neutral});
+  static String localized(String status,bool english){
+    const labels={
+      'paid':['مدفوعة','Paid'],'unpaid':['غير مدفوعة','Unpaid'],'partial':['مدفوعة جزئياً','Partially paid'],
+      'pending_review':['بانتظار المراجعة','Pending review'],'pending_confirmation':['بانتظار التأكيد','Pending confirmation'],
+      'pending_schedule':['بانتظار الجدولة','Pending scheduling'],'survey_pending':['بانتظار المعاينة','Survey pending'],
+      'approved':['معتمد','Approved'],'rejected':['مرفوض','Rejected'],'in_progress':['قيد التنفيذ','In progress'],
+      'completed':['مكتمل','Completed'],'ready':['جاهز','Ready'],'scheduled':['مجدول','Scheduled'],
+      'failed':['تعذّر الإكمال','Failed'],'cancelled':['ملغي','Cancelled'],'overdue':['متأخرة','Overdue'],
+    };
+    return labels[status]?[english?1:0]??status;
+  }
   static StatusTone forStatus(String status)=>switch(status){
     'paid'||'completed'||'ready'||'approved'||'active'=>StatusTone.success,
-    'pending'||'survey_pending'||'pending_review'||'partial'||'unpaid'=>StatusTone.warning,
+    'pending'||'survey_pending'||'pending_review'||'pending_schedule'||'pending_confirmation'||'partial'||'unpaid'=>StatusTone.warning,
     'rejected'||'cancelled'||'failed'||'overdue'=>StatusTone.error,
     'in_progress'||'scheduled'||'processing'=>StatusTone.info,
     _=>StatusTone.neutral,

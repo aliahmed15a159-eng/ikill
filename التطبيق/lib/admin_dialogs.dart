@@ -64,7 +64,7 @@ class _AdminFieldsEditorState extends State<AdminFieldsEditor> {
         key: ValueKey(key), controller: controllers[key], obscureText: widget.secret.contains(key),
         decoration: InputDecoration(labelText: key),
         validator: (v) => key != 'phone' && (v?.trim().isEmpty ?? true) ? tr('مطلوب', 'Required') : null)),
-      if (widget.includeStatus) DropdownButtonFormField<String>(value: status,
+      if (widget.includeStatus) DropdownButtonFormField<String>(isExpanded:true,value: status,
         items: ['active', 'inactive'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
         onChanged: (v) => setState(() => status = v!)),
     ])))), actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(tr('إلغاء', 'Cancel'))),

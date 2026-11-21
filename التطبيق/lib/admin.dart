@@ -1,3 +1,4 @@
+import 'design/brand_controller.dart';
 import 'design/components.dart';
 import 'account_page.dart';
 import 'notifications_screen.dart';
@@ -52,14 +53,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(tr('لوحة إدارة iKILL', 'iKILL administration')), actions: [
+    appBar: AppBar(title: Text(tr('لوحة الإدارة — ${BrandController.instance.name}', '${BrandController.instance.name} administration')), actions: [
       const NotificationBell(),
       IconButton(tooltip: tr('تغيير كلمة المرور', 'Change password'), onPressed: changePassword, icon: const Icon(Icons.lock_outline)),
       IconButton(tooltip: tr('خروج', 'Sign out'), onPressed: () => action(() => PushService.signOut()), icon: const Icon(Icons.logout)),
     ]),
     body: Column(children: [
-      Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(value: tab,
-        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings'), tr('لوحة التشغيل والتقويم', 'Operations and calendar'), tr('التقارير والفواتير والتحصيل', 'Documents and collection'), tr('هوية الشركة للمستندات', 'Document branding')]
+      Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(isExpanded:true,value: tab,
+        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings'), tr('لوحة التشغيل والتقويم', 'Operations and calendar'), tr('التقارير والفواتير والتحصيل', 'Documents and collection'), tr('هوية التطبيق والمستندات','App and document branding')]
           .asMap().entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
         onChanged: (v) => setState(() { tab = v ?? 0; query = ''; }))),
       Expanded(child: tab == 10 ? DocumentBrandSettings(english: widget.english) : tab == 9 ? DocumentsScreen(english: widget.english) : tab == 8 ? OperationsDashboard(english: widget.english) : tab == 0 ? ClientAdmin(english: widget.english) : tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),

@@ -19,10 +19,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
 }
 
 abstract final class AppTheme {
-  static const forest=Color(0xff0a4d3c), ink=Color(0xff0d1a15);
+  static const forest=Color(0xff075a3c), ink=Color(0xff123427);
   static double contrast(Color a,Color b){final x=a.computeLuminance(),y=b.computeLuminance();return (x>y?x+.05:y+.05)/(x>y?y+.05:x+.05);}
   static Color onColor(Color color)=>contrast(color,Colors.white)>=contrast(color,Colors.black)?Colors.white:Colors.black;
-  static LinearGradient hero(BuildContext context){final s=Theme.of(context).colorScheme;return LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:[Color.lerp(s.primary,Colors.black,.68)!,Color.lerp(s.primary,Colors.black,.22)!]);}
+  static Color whiteReadable(Color color){var result=color;while(contrast(result,Colors.white)<4.5){result=Color.lerp(result,Colors.black,.12)!;}return result;}
+  static LinearGradient hero(BuildContext context){final s=Theme.of(context).colorScheme;return LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:[Color.lerp(s.primary,Colors.black,.68)!,whiteReadable(Color.lerp(s.primary,Colors.black,.22)!)]);}
 
   static ThemeData build({required Color primary,required Brightness brightness,bool english=false}) {
     final dark=brightness==Brightness.dark;
@@ -31,11 +32,11 @@ abstract final class AppTheme {
       // Keep exact brand colour for identity; guarantee readable foreground.
       primary:primary,onPrimary:onColor(primary),
       secondary:HSLColor.fromColor(primary).withLightness(dark?.72:.23).toColor(),
-      surface:dark?const Color(0xff101d14):Colors.white,
-      onSurface:dark?const Color(0xffe4f4e9):ink,
-      onSurfaceVariant:dark?const Color(0xffb3c9bd):const Color(0xff3d5247),
+      surface:dark?const Color(0xff102f20):Colors.white,
+      onSurface:dark?const Color(0xffeffcf0):ink,
+      onSurfaceVariant:dark?const Color(0xffb8d7bf):const Color(0xff466557),
       outline:dark?const Color(0xff779385):const Color(0xff6b8275),
-      outlineVariant:dark?const Color(0xff294334):const Color(0xffd8ede4),
+      outlineVariant:dark?const Color(0xff294334):const Color(0xffdceee2),
       error:dark?const Color(0xffffb4ab):const Color(0xffb3261e),
     );
     final theme=ThemeData(useMaterial3:true,colorScheme:scheme,brightness:brightness,fontFamily:english?'Inter':'Cairo',fontFamilyFallback:const ['Cairo','Inter']);
@@ -53,8 +54,8 @@ abstract final class AppTheme {
     ).apply(fontFamily:english?'Inter':'Cairo');
     final shape=RoundedRectangleBorder(borderRadius:BorderRadius.circular(20));
     return theme.copyWith(
-      textTheme:text,scaffoldBackgroundColor:dark?const Color(0xff080e0c):const Color(0xfff5faf7),
-      extensions:[AppPalette(success:dark?const Color(0xff81d79b):const Color(0xff18663c),warning:dark?const Color(0xffffd180):const Color(0xff875500),info:dark?const Color(0xff99caff):const Color(0xff195f99),accent:HSLColor.fromColor(primary).withLightness(dark?.72:.38).toColor())],
+      textTheme:text,scaffoldBackgroundColor:dark?const Color(0xff081c13):const Color(0xfff5faf5),
+      extensions:[AppPalette(success:dark?const Color(0xff81d79b):const Color(0xff18663c),warning:dark?const Color(0xffffd180):const Color(0xff875500),info:dark?const Color(0xff99caff):const Color(0xff195f99),accent:HSLColor.fromColor(primary).withHue((HSLColor.fromColor(primary).hue+287)%360).withSaturation(.86).withLightness(.69).toColor())],
       visualDensity:VisualDensity.standard,materialTapTargetSize:MaterialTapTargetSize.padded,
       appBarTheme:AppBarTheme(backgroundColor:scheme.surface,foregroundColor:scheme.onSurface,elevation:0,scrolledUnderElevation:1,centerTitle:false,titleTextStyle:text.titleLarge,toolbarHeight:68,surfaceTintColor:Colors.transparent),
       cardTheme:CardTheme(color:scheme.surface,surfaceTintColor:Colors.transparent,elevation:1,shadowColor:primary.withValues(alpha:.12),margin:const EdgeInsets.symmetric(vertical:8),shape:shape.copyWith(side:BorderSide(color:scheme.outlineVariant.withValues(alpha:.7)))),

@@ -84,7 +84,7 @@ class _ContractEditorState extends State<ContractEditor> {
             if (entry.key == end && DateTime.parse(normalizeDigits(end.text)).isBefore(DateTime.tryParse(normalizeDigits(start.text)) ?? DateTime.now())) return tr('النهاية قبل البداية', 'End is before start');
             return null;
           })),
-      DropdownButtonFormField<String>(value: cycle, decoration: InputDecoration(labelText: tr('نظام الفوترة', 'Billing cycle')),
+      DropdownButtonFormField<String>(isExpanded:true,value: cycle, decoration: InputDecoration(labelText: tr('نظام الفوترة', 'Billing cycle')),
         items: [for (final e in {'monthly': tr('شهري', 'Monthly'), 'quarterly': tr('ربع سنوي', 'Quarterly'), 'annual': tr('سنوي', 'Annual')}.entries) DropdownMenuItem(value: e.key, child: Text(e.value))], onChanged: (v) => setState(() => cycle = v!)),
       for (final site in widget.sites) DropdownButtonFormField<int>(value: frequencies[site['id']], isExpanded: true,
         decoration: InputDecoration(labelText: '${site['name']} — ${tr('زيارات شهرياً', 'visits/month')}'),

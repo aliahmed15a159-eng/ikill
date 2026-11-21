@@ -33,19 +33,3 @@ class SupabaseAuthGateway implements AuthGateway {
   @override
   Future<void> reset(String email)=>supabaseClient.auth.resetPasswordForEmail(email,redirectTo:AuthFlow.recoveryCallback);
 }
-class AuthBrand {
-  final String name;
-  final String? logoUrl;
-  final int color;
-  const AuthBrand({this.name='iKILL',this.logoUrl,this.color=0xff15803d});
-  static Future<AuthBrand> load() async {
-    if(!Backend.ready)return const AuthBrand();
-    try {
-      final raw=await supabaseClient.rpc('get_auth_brand',params:{'brand_slug':SupabaseConnection.brandSlug});
-      final row=Map<String,dynamic>.from(raw as Map);
-      String? logo;
-      if(row['logo_path'] is String){try{logo=await supabaseClient.storage.from('brand-assets').createSignedUrl(row['logo_path'] as String,3600);}catch(_){/* Published logo may not be uploaded yet. */}}
-      return AuthBrand(name:row['company_name'] as String? ?? 'iKILL',logoUrl:logo,color:int.tryParse('ff${row['primary_hex']}',radix:16)??0xff15803d);
-    }catch(_){return const AuthBrand();}
-  }
-}
