@@ -16,7 +16,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
     CREATE TABLE storage.objects(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),bucket_id text,name text);
     ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
     GRANT USAGE ON SCHEMA storage TO authenticated,anon;
-    GRANT SELECT,INSERT,UPDATE,DELETE ON storage.objects TO authenticated;`);
+    GRANT SELECT,INSERT,UPDATE,DELETE ON storage.objects TO authenticated; GRANT SELECT ON storage.objects TO anon;`);
   for (const file of ['phase1_schema.sql','phase2_integration.sql','phase3_requests.sql','phase4_instapay_qr.sql']) {
     await db.exec(fs.readFileSync(path.join(__dirname, '..', file), 'utf8')); checks++;
   }

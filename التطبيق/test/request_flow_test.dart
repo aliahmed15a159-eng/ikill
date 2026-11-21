@@ -9,8 +9,9 @@ import 'package:ikill_native/request_models.dart';
 
 class FakeRequests extends RequestRepository {
   Map<String, dynamic>? submitted;
+  bool paymentEnabled = true;
   @override
-  Future<InstapayDestination?> paymentDestination() async => InstapayDestination('qr.png', 'Test beneficiary', base64Decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a7WQAAAAASUVORK5CYII='));
+  Future<InstapayDestination?> paymentDestination() async => !paymentEnabled ? null : InstapayDestination('qr.png', 'Test beneficiary', base64Decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a7WQAAAAASUVORK5CYII='));
   @override
   bool get ready => true;
   @override
@@ -24,6 +25,25 @@ class FakeRequests extends RequestRepository {
 }
 
 void main() {
+  testWidgets('Missing administrator QR blocks payment without blocking business requests', (tester) async {
+    final content = (await tester.runAsync(SiteContent.load))!;
+    final repository = FakeRequests()..paymentEnabled = false;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(
+      child: RequestForm(english: true, content: content, onPrivacy: () {}, repository: repository),
+    ))));
+    final fields = find.byType(TextFormField);
+    for (var i = 0; i < 4; i++) {
+      await tester.enterText(fields.at(i), ['Customer', '01020019042', 'test@example.com', 'Assiut address'][i]);
+    }
+    final price = find.text('Get price and continue to payment');
+    await tester.ensureVisible(price);
+    await tester.tap(price);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('InstaPay is unavailable'), findsOneWidget);
+    expect(find.text('250.00 EGP'), findsNothing);
+    expect(repository.submitted, isNull);
+  });
+
   testWidgets('Residential price step requires confirmation and never marks payment paid', (tester) async {
     final content = (await tester.runAsync(SiteContent.load))!;
     final repository = FakeRequests();
