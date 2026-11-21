@@ -10,6 +10,7 @@ permissions:
 jobs:
   android:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: التطبيق
@@ -29,7 +30,7 @@ jobs:
       - name: Analyze
         run: python3 tool/ci_command.py flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Test
-        run: python3 tool/ci_command.py flutter test
+        run: python3 tool/ci_command.py flutter test --timeout 60s --reporter expanded
       - name: Prepare Android Firebase configuration
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}

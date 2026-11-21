@@ -19,7 +19,7 @@ void main() {
   testWidgets('Arabic native home renders offline and language can switch', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    final content = await SiteContent.load();
+    final content = (await tester.runAsync(SiteContent.load))!;
     await tester.pumpWidget(IkillApp(content: content, preferences: prefs));
     await tester.pumpAndSettle();
     expect(find.text('EN'), findsOneWidget);
@@ -33,7 +33,7 @@ void main() {
   });
 
   testWidgets('Form validates required fields without a backend', (tester) async {
-    final content = await SiteContent.load();
+    final content = (await tester.runAsync(SiteContent.load))!;
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(
       child: RequestForm(english: true, content: content, onPrivacy: () {}),
     ))));
