@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
+import 'operations_dashboard.dart';
 import 'client_admin.dart';
 import 'admin_dialogs.dart';
 import 'request_admin.dart';
@@ -37,7 +38,8 @@ class AdminPage extends StatelessWidget {
 
 class AdminLogin extends StatefulWidget {
   final bool english;
-  const AdminLogin({super.key, required this.english});
+  final bool technician;
+  const AdminLogin({super.key, required this.english, this.technician = false});
   @override
   State<AdminLogin> createState() => _AdminLoginState();
 }
@@ -59,7 +61,7 @@ class _AdminLoginState extends State<AdminLogin> {
     } finally { if (mounted) setState(() => busy = false); }
   }
   @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(tr('دخول الإدارة', 'Administrator sign-in'))),
+  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(widget.technician ? tr('دخول الفني', 'Technician sign-in') : tr('دخول الإدارة', 'Administrator sign-in'))),
     body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Form(key: form, child: Column(children: [
       const Icon(Icons.verified_user_outlined, size: 64), const SizedBox(height: 24),
       TextFormField(controller: email, enabled: !busy, keyboardType: TextInputType.emailAddress,
@@ -84,7 +86,7 @@ class AdminDashboard extends StatefulWidget {
 }
 class _AdminDashboardState extends State<AdminDashboard> {
   String tr(String ar, String en) => widget.english ? en : ar;
-  int tab = 0;
+  int tab = 8;
   String query = '';
   Future<void> action(Future<void> Function() fn) async {
     try { await fn(); if (mounted) setState(() {}); }
@@ -107,10 +109,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     ]),
     body: Column(children: [
       Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(value: tab,
-        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings')]
+        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings'), tr('لوحة التشغيل والتقويم', 'Operations and calendar')]
           .asMap().entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
         onChanged: (v) => setState(() { tab = v ?? 0; query = ''; }))),
-      Expanded(child: tab == 0 ? ClientAdmin(english: widget.english) : tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
+      Expanded(child: tab == 8 ? OperationsDashboard(english: widget.english) : tab == 0 ? ClientAdmin(english: widget.english) : tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
     ]),
     floatingActionButton: tab == 1 ? FloatingActionButton(onPressed: () => editBranch(), child: const Icon(Icons.add)) : null,
   );
