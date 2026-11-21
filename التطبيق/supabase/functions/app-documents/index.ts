@@ -30,7 +30,8 @@ export async function renderPdf(kind:'report'|'invoice',data:any,fontBytes:Uint8
   const logo=await pdf.embedPng(logoBytes).catch(()=>pdf.embedJpg(logoBytes));
   const hex=data.brand.primary_hex;const color=rgb(parseInt(hex.slice(0,2),16)/255,parseInt(hex.slice(2,4),16)/255,parseInt(hex.slice(4,6),16)/255);
   let page:any,y=0;let count=0;
-  const next=()=>{page=pdf.addPage([595,842]);count++;y=728;page.drawRectangle({x:0,y:824,width:595,height:18,color});page.drawImage(logo,{x:42,y:755,width:95,height:43});draw(clean(data.brand.company_name),160,779,17,color);draw(`${kind==='invoice'?'INVOICE / فاتورة':'VISIT REPORT / تقرير زيارة'} — ${count}`,160,751,12,color);};
+  const shorten=(text:string,max:number,size:number)=>{if(width(text,size)<=max)return text;while(text&&width(text+'...',size)>max)text=text.slice(0,-1);return text+'...';};
+  const next=()=>{page=pdf.addPage([595,842]);count++;y=728;page.drawRectangle({x:0,y:824,width:595,height:18,color});const scale=logo.scaleToFit(105,48);page.drawImage(logo,{x:42,y:755,width:scale.width,height:scale.height});draw(shorten(clean(data.brand.company_name),390,17),160,779,17,color);draw(`${kind==='invoice'?'INVOICE / فاتورة':'VISIT REPORT / تقرير زيارة'} — ${count}`,160,751,12,color);};
   const line=(text:unknown,size=11)=>{
     const words=clean(text).split(/\s+/);let current='';
     const flushLine=()=>{if(y<65)next();const measured=width(current,size);draw(current,runs(current).rtl?Math.max(42,553-measured):42,y,size,rgb(.1,.15,.12));y-=size+8;};
@@ -40,7 +41,7 @@ export async function renderPdf(kind:'report'|'invoice',data:any,fontBytes:Uint8
     if(current)flushLine();
   };
   next();
-  line(data.brand.address);line(`${data.brand.phone} | ${data.brand.email}`);if(data.brand.tax_number)line(`الرقم الضريبي / Tax ID: ${data.brand.tax_number}`);
+  line(data.brand.company_name,13);line(data.brand.address);line(`${data.brand.phone} | ${data.brand.email}`);if(data.brand.tax_number)line(`الرقم الضريبي / Tax ID: ${data.brand.tax_number}`);
   line(`العميل / Client: ${data.client.display_name}`,13);
   if(kind==='report'){
     line(`الموقع / Site: ${data.site.name}`);line(data.site.address);line(`Report ID: ${data.report.id}`);line(`Start UTC: ${data.visit.started_at} | End UTC: ${data.visit.completed_at}`);
@@ -65,7 +66,7 @@ export async function renderPdf(kind:'report'|'invoice',data:any,fontBytes:Uint8
     line(`حالة السداد / Payment: ${i.payment_status==='paid'?'مدفوعة / PAID':i.payment_status==='partial'?'مدفوعة جزئياً / PARTIAL':'غير مدفوعة / UNPAID'}`,14);
     line('فاتورة خدمة وليست إقراراً بالتكامل مع منظومة الفاتورة الضريبية الإلكترونية. / No tax-authority e-invoice integration is claimed.',9);
   }
-  for(const p of pdf.getPages()){page=p;draw(`${data.brand.company_name} | ${kind} | ${pdf.getPages().indexOf(p)+1}/${pdf.getPageCount()}`,42,30,8,rgb(.35,.35,.35));}
+  for(const p of pdf.getPages()){page=p;draw(`${shorten(data.brand.company_name,300,8)} | ${kind} | ${pdf.getPages().indexOf(p)+1}/${pdf.getPageCount()}`,42,30,8,rgb(.35,.35,.35));}
   return pdf.save();
 }
 
@@ -74,7 +75,7 @@ async function fontAsset(service:any,latin=false){
   const filename=latin?'NotoSans-Regular.ttf':'NotoSansArabic-Regular.ttf';
   const cached=await service.storage.from('document-assets').download(filename);
   if(!cached.error)return new Uint8Array(await cached.data.arrayBuffer());
-  const response=await fetch(`https://api.github.com/repos/notofonts/noto-fonts/contents/hinted/ttf/${latin?'NotoSans':'NotoSansArabic'}/${filename}?ref=main`,{headers:{'Accept':'application/vnd.github+json'}});
+  const response=await fetch(`https://api.github.com/repos/notofonts/noto-fonts/contents/hinted/ttf/${latin?'NotoSans':'NotoSansArabic'}/${filename}?ref=ffebf8c1ee449e544955a7e813c54f9b73848eac`,{headers:{'Accept':'application/vnd.github+json'}});
   if(!response.ok)throw new Error('FONT_DOWNLOAD_FAILED');const value=await response.json();const bytes=decode(value.content);
   required(await service.storage.from('document-assets').upload(filename,bytes,{contentType:'font/ttf',upsert:true}));return bytes;
 }

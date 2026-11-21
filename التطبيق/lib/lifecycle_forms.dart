@@ -75,7 +75,7 @@ class _ContractEditorState extends State<ContractEditor> {
   @override
   Widget build(BuildContext context) => AlertDialog(title: Text(tr('مسودة العقد', 'Contract draft')),
     content: SizedBox(width: 500, child: SingleChildScrollView(child: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(tr('القيمة إجمالي العقد، وليست قيمة الفاتورة الدورية. التوليد الساعة ١٠ صباحاً بتوقيت الشركة، لمدة ساعة. البداية من الغد؛ حد أقصى ٣٦ شهراً. لكل شهر جزئي نفس عدد الزيارات.', 'Amount is the total contract value, not a periodic invoice. Visits at 10 AM company time, one hour. Start tomorrow or later; under 36 months. Partial months receive the full monthly frequency.')),
+      Text(tr('القيمة إجمالي العقد وتوزّع على دوراته مع ضبط فرق القروش في الدورة الأخيرة؛ فاتورة واحدة لكل دورة عند أول زيارة مكتملة. التوليد الساعة ١٠ صباحاً بتوقيت الشركة، لمدة ساعة. البداية من الغد؛ حد أقصى ٣٦ شهراً. لكل شهر جزئي نفس عدد الزيارات.', 'Total contract value is allocated across billing cycles, with final-cycle cent adjustment; one invoice per cycle on its first completed visit. Visits at 10 AM company time, one hour. Start tomorrow or later; under 36 months. Partial months receive the full monthly frequency.')),
       for (final entry in {start: tr('بداية العقد YYYY-MM-DD', 'Start YYYY-MM-DD'), end: tr('نهاية العقد YYYY-MM-DD', 'End YYYY-MM-DD'), total: tr('إجمالي قيمة العقد', 'Total contract value')}.entries)
         Padding(padding: const EdgeInsets.only(top: 12), child: TextFormField(controller: entry.key, decoration: InputDecoration(labelText: entry.value),
           validator: (v) {
