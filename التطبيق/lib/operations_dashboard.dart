@@ -93,7 +93,7 @@ class _OperationsDashboardState extends State<OperationsDashboard> with WidgetsB
     if (bulk && selectedSite == null) return;
     final people = list('technicians').where((p) => p['is_active'] != false).toList();
     final result = await showDialog<String>(context: context, builder: (_) => TechnicianAssignmentDialog(english: widget.english,
-      technicians: people, initial: bulk ? list('sites').where((s) => s['id'] == selectedSite).firstOrNull?['default_technician_id'] as String? : visit?['technician_id'] as String?, bulk: bulk));
+      technicians: people, initial: (bulk ? list('sites').where((s) => s['id'] == selectedSite).firstOrNull?['default_technician_id'] : visit?['technician_id']) as String?, bulk: bulk));
     if (result == null || !mounted) return;
     setState(() => busy = true);
     try {
@@ -102,7 +102,7 @@ class _OperationsDashboardState extends State<OperationsDashboard> with WidgetsB
         final count = await widget.repository.assignSite(selectedSite!, tech);
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${tr('تم تحديث الزيارات', 'Updated visits')}: $count')));
       } else {
-        await widget.repository.assign(visit!['id'] as String, tech);
+        await widget.repository.assign(visit['id'] as String, tech);
       }
       await reload();
     } catch (_) {
