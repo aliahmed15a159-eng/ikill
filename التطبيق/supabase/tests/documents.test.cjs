@@ -80,6 +80,8 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   const provisioned=(await db.query('SELECT * FROM profiles WHERE id=$1',[u(5)])).rows[0];assert.equal(provisioned.role,'client');assert.equal(provisioned.portal_enabled,false);checks+=2;
   await fail(()=>scalar('attach_portal_profile',[company,u(11),u(6)]));
   await role(5,async()=>{assert.equal((await db.query('SELECT * FROM invoices')).rows.length,0);checks++;await fail(()=>scalar('claim_document_job',[r1]));});
+  await role(1,()=>scalar('set_client_portal',[u(11),true]));
+  await role(5,async()=>{assert.equal((await db.query('SELECT * FROM invoices')).rows.length,0);assert.equal((await db.query('SELECT * FROM visits')).rows.length,0);assert.equal((await db.query('SELECT * FROM document_jobs')).rows.length,0);checks+=3;await fail(()=>scalar('claim_document_job',[r1]));});
   let job=await role(2,()=>scalar('claim_document_job',[r1]));assert.ok(job.lease);checks++;
   await role(2,()=>fail(()=>scalar('claim_document_job',[r1])));
   await role(2,()=>fail(()=>scalar('finish_document_job',[r1,job.lease,'bad','bad',null])));
