@@ -1,3 +1,4 @@
+import 'push_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 
@@ -50,7 +51,7 @@ class AuthService {
       return await profile();
     } catch (e) {
       if (e is AccessDenied) lastDenial = e.message;
-      await supabaseClient.auth.signOut(scope: SignOutScope.local);
+      await PushService.signOut(scope: SignOutScope.local);
       rethrow;
     }
   }

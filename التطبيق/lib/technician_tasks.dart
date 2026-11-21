@@ -1,3 +1,5 @@
+import 'notifications_screen.dart';
+import 'push_service.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,7 +43,7 @@ class TechnicianPage extends StatelessWidget {
         if (profile.hasError || profile.hasData && profile.data!.role != 'technician') {
           return Scaffold(appBar: AppBar(title: Text(english ? 'Technician tasks' : 'مهام الفني')), body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text(english ? 'An active technician account is required.' : 'يلزم حساب فني نشط؛ حساب الأدمن يستخدم لوحة الإدارة.'),
-            TextButton(onPressed: () => supabaseClient.auth.signOut(scope: SignOutScope.local), child: Text(english ? 'Sign out' : 'خروج')),
+            TextButton(onPressed: () => PushService.signOut(scope: SignOutScope.local), child: Text(english ? 'Sign out' : 'خروج')),
           ])));
         }
         if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -53,7 +55,8 @@ class TechnicianPage extends StatelessWidget {
 class TechnicianTasks extends StatefulWidget {
   final bool english;
   final String tenant;
-  const TechnicianTasks({super.key, required this.english, required this.tenant});
+  final String? visitId;
+  const TechnicianTasks({super.key, required this.english, required this.tenant,this.visitId});
   @override
   State<TechnicianTasks> createState() => _TechnicianTasksState();
 }
@@ -131,14 +134,15 @@ class _TechnicianTasksState extends State<TechnicianTasks> with WidgetsBindingOb
   }
   @override
   Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(tr('زياراتي الميدانية', 'My field visits')), actions: [
-    IconButton(onPressed: refresh, icon: const Icon(Icons.refresh)), IconButton(onPressed: () => supabaseClient.auth.signOut(scope: SignOutScope.local), icon: const Icon(Icons.logout)),
+    const NotificationBell(),
+    IconButton(onPressed: refresh, icon: const Icon(Icons.refresh)), IconButton(onPressed: () => PushService.signOut(scope: SignOutScope.local), icon: const Icon(Icons.logout)),
   ]), body: Column(children: [if (busy) const LinearProgressIndicator(), Expanded(child: FutureBuilder<List<Map<String, dynamic>>>(future: data, builder: (context, snapshot) {
     if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Load failed. Retry.')));
     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
     if (snapshot.data!.isEmpty) return Center(child: Text(tr('لا توجد مهام مفتوحة', 'No open tasks')));
     return ListView(children: [
       if(offline) Padding(padding:const EdgeInsets.all(12),child:Text(tr('وضع دون اتصال: قائمة محفوظة قديمة. يمكنك متابعة مسودة زيارة بدأت سابقاً؛ بدء الزيارة والإرسال يحتاجان اتصالاً.', 'Offline: cached list may be stale. Continue a previously started report; starting/submitting needs internet.'))),
-      for (final row in snapshot.data!) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      for (final row in snapshot.data!.where((row)=>widget.visitId==null||row['id']==widget.visitId)) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('${row['client_name']} / ${(row['site'] as Map?)?['name']} — ${visitStatusLabel(row['status'] as String, widget.english)}'),
       Text('${row['local_day'] == row['today'] ? tr('اليوم', 'Today') : row['status'] == 'in_progress' ? tr('قيد التنفيذ', 'In progress') : tr('قادمة', 'Upcoming')} — ${row['timezone']}'),
       Text(tr('الموعد التالي بتوقيت الجهاز:', 'Time below uses device timezone:')),

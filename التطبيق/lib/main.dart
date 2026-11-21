@@ -1,3 +1,4 @@
+import 'push_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
   final content = await SiteContent.load();
   final preferences = await SharedPreferences.getInstance();
   await Backend.initialize();
+  if (Backend.ready) await PushService.start();
   runApp(IkillApp(content: content, preferences: preferences));
 }
 

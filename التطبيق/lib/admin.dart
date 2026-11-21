@@ -1,3 +1,5 @@
+import 'notifications_screen.dart';
+import 'push_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
@@ -28,7 +30,7 @@ class AdminPage extends StatelessWidget {
             return Scaffold(appBar: AppBar(title: const Text('Administration')),
               body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text(profile.error is AccessDenied ? profile.error.toString() : (english ? 'Could not verify account access. Retry by signing in again.' : 'تعذّر التحقق من صلاحيات الحساب. سجّل الدخول مرة أخرى.')),
-                TextButton(onPressed: () => supabaseClient.auth.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
+                TextButton(onPressed: () => PushService.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
               ]))));
           }
           if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -107,8 +109,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(tr('لوحة إدارة iKILL', 'iKILL administration')), actions: [
+      const NotificationBell(),
       IconButton(tooltip: tr('تغيير كلمة المرور', 'Change password'), onPressed: changePassword, icon: const Icon(Icons.lock_outline)),
-      IconButton(tooltip: tr('خروج', 'Sign out'), onPressed: () => action(() => supabaseClient.auth.signOut()), icon: const Icon(Icons.logout)),
+      IconButton(tooltip: tr('خروج', 'Sign out'), onPressed: () => action(() => PushService.signOut()), icon: const Icon(Icons.logout)),
     ]),
     body: Column(children: [
       Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(value: tab,

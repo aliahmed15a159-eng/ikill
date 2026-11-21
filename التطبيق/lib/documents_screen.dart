@@ -1,3 +1,5 @@
+import 'notifications_screen.dart';
+import 'push_service.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,9 +19,9 @@ class ClientPortalPage extends StatelessWidget {
     return StreamBuilder<AuthState>(stream:supabaseClient.auth.onAuthStateChange,builder:(context,state){
       if(supabaseClient.auth.currentSession==null)return AdminLogin(english:english,client:true);
       return FutureBuilder<ProfileAccess>(future:AuthService.profile(),builder:(context,profile){
-        if(profile.hasError||profile.hasData&&profile.data!.role!='client')return Scaffold(appBar:AppBar(title:Text(english?'Client portal':'بوابة العميل')),body:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[Text(english?'An enabled client account is required.':'يلزم حساب عميل فعّال ومصرح له بالبوابة.'),TextButton(onPressed:()=>supabaseClient.auth.signOut(),child:Text(english?'Sign out':'خروج'))])));
+        if(profile.hasError||profile.hasData&&profile.data!.role!='client')return Scaffold(appBar:AppBar(title:Text(english?'Client portal':'بوابة العميل')),body:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[Text(english?'An enabled client account is required.':'يلزم حساب عميل فعّال ومصرح له بالبوابة.'),TextButton(onPressed:()=>PushService.signOut(),child:Text(english?'Sign out':'خروج'))])));
         if(!profile.hasData)return const Scaffold(body:Center(child:CircularProgressIndicator()));
-        return Scaffold(appBar:AppBar(title:Text(english?'My sites, visits and documents':'فروعي وزياراتي ومستنداتي'),actions:[IconButton(onPressed:()=>supabaseClient.auth.signOut(),icon:const Icon(Icons.logout))]),body:DocumentsScreen(english:english,portal:true));
+        return Scaffold(appBar:AppBar(title:Text(english?'My sites, visits and documents':'فروعي وزياراتي ومستنداتي'),actions:[const NotificationBell(),IconButton(onPressed:()=>PushService.signOut(),icon:const Icon(Icons.logout))]),body:DocumentsScreen(english:english,portal:true));
       });
     });
   }
@@ -117,6 +119,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
         SelectableText('${i['invoice_number']}\n${i['total']} ${i['currency']} — ${i['payment_status']}\n${tr('المحصّل','Collected')}: ${i['amount_paid']} — ${tr('الاستحقاق','Due')}: ${i['due_on']}'),
         if(i['billing_period']!=null)Text('${i['billing_period']} — ${i['period_end']}'),
         Wrap(spacing:8,children:[
+          OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>NotificationReference(kind:'invoice',id:i['id'] as String))),child:Text(tr('الدفع وإثبات التحويل','Payment and transfer proof'))),
           if(i['pdf_path']!=null)OutlinedButton(onPressed:busy?null:()=>action(()=>download('invoice-pdfs',i['pdf_path'] as String)),child:Text(tr('تحميل فاتورة PDF','Download invoice PDF'))),
           if(!widget.portal&&i['payment_status']!='paid')FilledButton(onPressed:busy?null:()=>collect(i),child:Text(tr('تسجيل التحصيل بالكامل','Record full collection'))),
         ]),
