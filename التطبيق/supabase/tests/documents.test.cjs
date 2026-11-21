@@ -17,7 +17,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
     ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
     GRANT USAGE ON SCHEMA storage TO authenticated,anon;
     GRANT SELECT,INSERT,UPDATE,DELETE ON storage.objects TO authenticated;`);
-  for (const file of ['phase1_schema.sql','phase2_integration.sql','phase3_requests.sql','phase4_instapay_qr.sql','phase5_client_contract_lifecycle.sql','phase6_operations.sql','phase7_field_reports.sql','phase8_billing_documents_portal.sql']) {
+  for (const file of ['phase1_schema.sql','phase2_integration.sql','phase3_requests.sql','phase4_instapay_qr.sql','phase5_client_contract_lifecycle.sql','phase6_operations.sql','phase7_field_reports.sql','phase8_billing_documents_portal.sql','phase8b_document_integrity.sql']) {
     await db.exec(fs.readFileSync(path.join(__dirname, '..', file), 'utf8')); checks++;
   }
   const company = (await db.query("SELECT id FROM public.tenants WHERE slug='ikill'")).rows[0].id;
@@ -68,6 +68,18 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   await contract(90,'annual','2025-02-15','2027-12-31',9000);
   await visit(91,90,'2025-05-03T10:00:00Z');await visit(92,90,'2026-01-03T10:00:00Z');await visit(93,90,'2026-03-03T10:00:00Z');
   assert.equal((await db.query('SELECT * FROM invoices WHERE contract_id=$1',[u(90)])).rows.length,2);checks++;
+  await db.query("INSERT INTO contracts(id,tenant_id,client_id,contract_number,starts_on,ends_on,visits_per_month,billing_cycle,billing_amount,status,app_managed) VALUES($1,$2,$3,'native-total','2026-01-01','2026-03-31',1,'monthly',100,'draft',true)",[u(100),company,u(10)]);
+  await visit(101,100,'2026-01-02T10:00:00Z');await visit(102,100,'2026-02-02T10:00:00Z');await visit(103,100,'2026-03-02T10:00:00Z');
+  const allocations=(await db.query('SELECT subtotal FROM invoices WHERE contract_id=$1 ORDER BY billing_period',[u(100)])).rows.map(i=>Number(i.subtotal));
+  assert.deepEqual(allocations,[33.33,33.33,33.34]);assert.equal(allocations.reduce((a,b)=>a+b,0),100);checks+=2;
+  await fail(()=>db.query("UPDATE contracts SET billing_amount=.01 WHERE id=$1",[u(100)]));
+  await role(1,()=>fail(()=>db.query("UPDATE brand_config SET logo_path='other-tenant/logo.png' WHERE tenant_id=$1",[company])));
+  await db.exec(`INSERT INTO auth.users(id) VALUES('${u(5)}'),('${u(6)}');INSERT INTO clients(id,tenant_id,client_code,display_name) VALUES('${u(11)}','${company}','new','New customer');`);
+  await role(1,()=>fail(()=>scalar('attach_portal_profile',[company,u(11),u(5)])));
+  await scalar('attach_portal_profile',[company,u(11),u(5)]);checks++;
+  const provisioned=(await db.query('SELECT * FROM profiles WHERE id=$1',[u(5)])).rows[0];assert.equal(provisioned.role,'client');assert.equal(provisioned.portal_enabled,false);checks+=2;
+  await fail(()=>scalar('attach_portal_profile',[company,u(11),u(6)]));
+  await role(5,async()=>{assert.equal((await db.query('SELECT * FROM invoices')).rows.length,0);checks++;await fail(()=>scalar('claim_document_job',[r1]));});
   let job=await role(2,()=>scalar('claim_document_job',[r1]));assert.ok(job.lease);checks++;
   await role(2,()=>fail(()=>scalar('claim_document_job',[r1])));
   await role(2,()=>fail(()=>scalar('finish_document_job',[r1,job.lease,'bad','bad',null])));

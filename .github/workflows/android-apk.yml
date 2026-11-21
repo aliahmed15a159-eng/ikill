@@ -32,6 +32,13 @@ jobs:
         run: python3 tool/check_backend.py
       - name: Check existing website controllers
         run: node tool/web_backend.test.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test database permissions, billing and PDF worker
+        run: |
+          npm ci --prefix supabase/tests --ignore-scripts --no-audit --no-fund
+          npm test --prefix supabase/tests
       - name: Install dependencies
         run: flutter pub get
       - name: Analyze
