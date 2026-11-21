@@ -34,3 +34,11 @@ Public submission RPC accepts only whitelisted fields, validates tenant/price/co
 7. Confirm non-admin login cannot open administration and cross-tenant data remains inaccessible.
 
 Local automated results: 57 phase1 + 25 phase2 + 40 phase3 PostgreSQL/PGlite assertions passed (mock Auth/Storage). Flutter analysis/tests/APK run through Android CI; see linked build in handoff. Real-device Supabase/Auth/payment operations and iOS builds are not represented by local mocks.
+
+## Verified Android handoff
+
+CI [44896073472](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44896073472) completed successfully for code commit `39e4cd9`: strict Flutter analysis, all Flutter tests, dependency checks and Supabase-configured debug APK.
+
+Download [ikill-android-supabase-debug](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44896073472/artifacts/14704151649). Extract ZIP and install `app-debug.apk` on Android (debug/test build, not store release). Artifact ZIP SHA-256: `e4f44f10a5ce086e21e80d7c7a66e69ec04d4ddc47c35680c7eecb91e6039b28`.
+
+Implementation is paused for user testing. No merge, real customer submission, production price configuration, administrator creation, live charge, or iOS build was performed.
