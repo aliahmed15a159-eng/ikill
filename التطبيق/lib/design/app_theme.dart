@@ -31,7 +31,7 @@ abstract final class AppTheme {
     final scheme=base.copyWith(
       // Keep exact brand colour for identity; guarantee readable foreground.
       primary:primary,onPrimary:onColor(primary),
-      secondary:HSLColor.fromColor(primary).withLightness(dark?.72:.23).toColor(),
+      secondary:HSLColor.fromColor(primary).withLightness(dark ? 0.72 : 0.23).toColor(),
       surface:dark?const Color(0xff102f20):Colors.white,
       onSurface:dark?const Color(0xffeffcf0):ink,
       onSurfaceVariant:dark?const Color(0xffb8d7bf):const Color(0xff466557),
