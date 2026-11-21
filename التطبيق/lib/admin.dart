@@ -2,7 +2,6 @@ import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'push_service.dart';
 import 'package:flutter/material.dart';
-import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
 import 'documents_screen.dart';
