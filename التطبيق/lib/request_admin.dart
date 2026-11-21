@@ -101,7 +101,7 @@ class _RequestAdminState extends State<RequestAdmin> {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Could not load. Retry.')));
       if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
       final rows = snapshot.data!;
-      if (widget.mode == 0) return ListView(children: [
+      if (widget.mode == 0) { return ListView(children: [
         Padding(padding: const EdgeInsets.all(16), child: Text(tr('الأسعار الفعلية فقط؛ لا يمكن الطلب حتى تفعيل السعر. لا تشمل هذه الشاشة أسعار العقود.', 'Set actual prices. Requests require an enabled price. Contract pricing is not included.'))),
         for (final property in propertyOptions.keys) for (final problem in problemOptions.keys)
           Builder(builder: (context) {
@@ -111,7 +111,7 @@ class _RequestAdminState extends State<RequestAdmin> {
               subtitle: Text(row == null ? tr('غير محدد', 'Not configured') : '${row['fixed_price']} ${row['currency']} — ${row['is_active'] == true ? tr('متاح', 'Enabled') : tr('معطل', 'Disabled')}'),
               trailing: const Icon(Icons.edit_outlined), onTap: busy ? null : () => editPrice(property, problem, row));
           }),
-      ]);
+      ]); }
       if (rows.isEmpty) return Center(child: Text(tr('لا توجد طلبات معلقة', 'No pending requests')));
       return ListView(children: [for (final row in rows) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         SelectableText('${(row['clients'] as Map?)?['display_name'] ?? ''}\n${(row['clients'] as Map?)?['phone'] ?? ''}\n${(row['clients'] as Map?)?['email'] ?? ''}\n${(row['client_sites'] as Map?)?['address'] ?? ''}'),
