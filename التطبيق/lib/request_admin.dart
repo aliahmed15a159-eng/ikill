@@ -42,7 +42,7 @@ class _RequestAdminState extends State<RequestAdmin> {
           validator: (v) => validPriceInput(v ?? '') == null ? tr('أدخل سعراً موجباً بمنزلتين عشريتين كحد أقصى', 'Enter a positive price with at most two decimals') : null),
         SwitchListTile(title: Text(tr('متاح للطلب', 'Available to order')), value: enabled, onChanged: (v) => update(() => enabled = v)),
       ])), actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('إلغاء', 'Cancel'))),
-        FilledButton(onPressed: () { if (form.currentState!.validate()) Navigator.pop(ctx, true); }, child: Text(tr('حفظ', 'Save')))],
+        FilledButton(onPressed: () { if (form.currentState!.validate()) { Navigator.pop(ctx, true); } }, child: Text(tr('حفظ', 'Save')))],
     )));
     final amount = validPriceInput(controller.text);
     controller.dispose();

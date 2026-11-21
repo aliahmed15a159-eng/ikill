@@ -5,11 +5,12 @@ import 'content.dart';
 
 class RequestForm extends StatefulWidget {
   final bool english;
+  final RequestRepository repository;
   final SiteContent content;
   final String initialMessage;
   final VoidCallback onPrivacy;
   const RequestForm({super.key, required this.english, required this.content,
-    required this.onPrivacy, this.initialMessage = ''});
+    required this.onPrivacy, this.initialMessage = '', this.repository = const RequestRepository()});
   @override
   State<RequestForm> createState() => _RequestFormState();
 }
@@ -19,7 +20,7 @@ class _RequestFormState extends State<RequestForm> {
   final fields = <String, TextEditingController>{
     for (final key in ['name', 'phone', 'email', 'address', 'message', 'facility', 'payment_reference']) key: TextEditingController(),
   };
-  final repository = const RequestRepository();
+  RequestRepository get repository => widget.repository;
   String kind = 'residential', property = 'apartment', problem = 'cockroaches', sector = 'factory';
   ResidentialQuote? quote;
   bool loadingQuote = false, paymentStep = false;
@@ -63,7 +64,7 @@ class _RequestFormState extends State<RequestForm> {
     setState(() { sending = true; error = null; });
     try {
       retryPayload ??= {
-        for (final key in ['name', 'phone', 'email', 'address', 'message']) key: fields[key]!.text.trim(),
+        for (final key in ['name', 'phone', 'email', 'address', 'message']) key: key == 'phone' ? normalizeDigits(fields[key]!.text) : fields[key]!.text.trim(),
         'kind': kind, 'consent': true,
         if (kind == 'residential') ...{
           'property': property, 'problem': problem, 'price_id': quote!.id,
@@ -103,13 +104,14 @@ class _RequestFormState extends State<RequestForm> {
     choice(kind, const {'residential': ['خدمة سكنية لمرة واحدة', 'One-off residential service'], 'contract': ['تعاقد منشأة — طلب معاينة', 'Business contract — survey request']}, tr('نوع الخدمة', 'Service type'), (v) { kind = v; quote = null; paymentStep = false; }),
     for (final key in fields.keys.where((k) => k != 'facility' && k != 'payment_reference' || k == 'facility' && kind == 'contract' || k == 'payment_reference' && paymentStep)) Padding(padding: const EdgeInsets.only(bottom: 16), child: TextFormField(
       controller: fields[key], enabled: !sending && !loadingQuote && retryPayload == null && (!paymentStep || key == 'payment_reference'),
-      maxLength: switch (key) { 'name' => 100, 'phone' => 20, 'email' => 150, 'address' => 200, _ => 2000 },
+      maxLength: switch (key) { 'name' => 100, 'phone' => 20, 'email' => 150, 'address' => 200, 'facility' => 150, 'payment_reference' => 100, _ => 2000 },
       maxLines: key == 'message' ? 5 : 1,
       keyboardType: switch (key) { 'email' => TextInputType.emailAddress, 'phone' => TextInputType.phone, 'message' => TextInputType.multiline, _ => TextInputType.text },
       autofillHints: switch (key) { 'name' => [AutofillHints.name], 'email' => [AutofillHints.email], 'phone' => [AutofillHints.telephoneNumber], 'address' => [AutofillHints.streetAddressLine1], _ => null },
       decoration: InputDecoration(labelText: key == 'facility' ? tr('اسم المنشأة', 'Facility name') : key == 'payment_reference' ? tr('مرجع أو تفاصيل تأكيد الدفع', 'Payment reference or confirmation details') : widget.content.t('contact.form.$key', widget.english, key)),
       validator: (raw) {
-        final value = raw?.trim() ?? '';
+        final value = key == 'phone' ? normalizeDigits(raw ?? '') : raw?.trim() ?? '';
+        if (key == 'payment_reference' && value.length < 3) return tr('أدخل تأكيد الدفع (٣ أحرف على الأقل)', 'Enter payment confirmation (at least 3 characters)');
         if (key != 'message' && value.isEmpty) return tr('هذا الحقل مطلوب', 'This field is required');
         if (key == 'email' && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value)) return tr('أدخل بريداً إلكترونياً صحيحاً', 'Enter a valid email');
         if (key == 'phone' && value.isNotEmpty && !RegExp(r'^\+?[\d\s()\-]{7,20}$').hasMatch(value)) return tr('أدخل رقم هاتف صحيحاً', 'Enter a valid phone number');
