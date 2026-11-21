@@ -56,11 +56,11 @@ for name in tracked:
 if len(sys.argv) == 2:
     # Messaging transitive infrastructure (including an optional analytics connector,
     # NOT the analytics SDK); no Auth/document DB/Storage SDK is allowed.
-    native_allowed = {'firebase-bom', 'firebase-common', 'firebase-components', 'firebase-annotations',
+    native_allowed = {'firebase-bom', 'firebase-common', 'firebase-common-ktx', 'firebase-components', 'firebase-annotations',
                       'firebase-messaging', 'firebase-datatransport', 'firebase-measurement-connector', 'firebase-installations', 'firebase-installations-interop',
                       'firebase-iid-interop', 'firebase-encoders', 'firebase-encoders-json', 'firebase-encoders-proto'}
     report = Path(sys.argv[1]).read_text()
-    if re.search('com\.' + 'one' + 'signal', report, re.I):
+    if re.search(r'com\.' + 'one' + 'signal', report, re.I):
         errors.append('Removed provider in native dependencies')
     for artifact in re.findall(r'com\.google\.firebase:([a-z0-9-]+):', report):
         if artifact not in native_allowed:

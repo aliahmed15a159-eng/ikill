@@ -2,7 +2,7 @@
 
 ## Backend boundary (strict)
 
-Supabase remains the only PostgreSQL, Auth, Storage and in-app notification/Realtime backend. The only direct Flutter Firebase dependencies are **firebase_core 3.12.1** and **firebase_messaging 15.2.4**. No Firebase Auth, Firestore, Firebase Storage, realtime database or analytics SDK/API was added. Native Messaging brings required installation/encoding/data-transport/interoperability components; these are narrowly allowlisted by the resolved-Android dependency audit, not extra application backends.
+Supabase remains the only PostgreSQL, Auth, Storage and in-app notification/Realtime backend. The only direct Flutter Firebase dependencies are **firebase_core 3.12.1** and **firebase_messaging 15.2.4**. No Firebase Auth, Firestore, Firebase Storage, realtime database or analytics SDK/API was added. Native Core/Messaging bring required Core Kotlin extensions, installation/encoding/data-transport/interoperability components; these are narrowly allowlisted by the resolved-Android dependency audit, not extra application backends.
 
 The previous external provider SDK, runtime API requests, app settings and live database registration/settings functions have been removed. Historical applied SQL migrations and their historical regression tests remain for reproducibility; `phase10_fcm_transport.sql` removes the old column/settings and invalidates incompatible old device IDs. Historical documentation is marked superseded.
 
