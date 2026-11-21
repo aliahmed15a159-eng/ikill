@@ -59,6 +59,23 @@ void main() {
     });
   }
 
+  testWidgets('Price editor remains usable on a small phone with keyboard open', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpWidget(host(Builder(builder: (context) => TextButton(onPressed: () => showDialog<Map<String, dynamic>>(
+      context: context, builder: (_) => const PriceEditor(english: true, property: 'apartment', problem: 'cockroaches')),
+      child: const Text('Open')))));
+    await tester.tap(find.text('Open')); await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), '200');
+    await tester.tap(find.text('Save')); await tester.pumpAndSettle();
+    expect(find.byType(PriceEditor), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Price save failure leaves a usable retryable dashboard', (tester) async {
     final repository = MemoryRequests()..failSave = true;
     await tester.pumpWidget(host(RequestAdmin(english: true, mode: 0, repository: repository)));

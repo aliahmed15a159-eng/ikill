@@ -68,15 +68,13 @@ class _RequestAdminState extends State<RequestAdmin> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('اختر موعداً في المستقبل.', 'Choose a future appointment.'))));
       return;
     }
-    {
-      if (survey) {
+    if (survey) {
         final account = await AuthService.requireAdmin();
         final result = await supabaseClient.from('surveys').update({'scheduled_at': start.toUtc().toIso8601String(), 'surveyor_id': technician, 'status': 'scheduled'})
           .eq('tenant_id', account.tenantId).eq('id', row['id']).eq('status', 'survey_pending').select('id');
         if (result.isEmpty) throw StateError('Request changed');
-      } else {
-        await repository.schedule(row['id'] as String, start, start.add(const Duration(hours: 1)), technician);
-      }
+    } else {
+      await repository.schedule(row['id'] as String, start, start.add(const Duration(hours: 1)), technician);
     }
   }
 
