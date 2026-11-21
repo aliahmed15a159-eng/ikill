@@ -15,43 +15,62 @@
   const branch = r => ({ ...r, nameAr: r.name_ar, nameEn: r.name_en, countryAr: r.country_ar, countryEn: r.country_en });
   const branchRow = r => ({ name_ar: r.nameAr, name_en: r.nameEn, country_ar: r.countryAr, country_en: r.countryEn, phone: r.phone || '', status: r.status });
   const request = r => ({ ...r, name: r.display_name, address: r.billing_address, service: r.requested_service, message: r.request_message, timestamp: r.created_at });
+  const accessDenied = message => Object.assign(new Error(message), { code: 'ADMIN_ACCESS_DENIED' });
   const account = async () => {
     const p = await rpc('get_my_profile');
-    if (!p) throw new Error('لم تُنشأ صلاحيات حسابك بعد. تواصل مع الإدارة.');
-    if (!p.is_active || !p.tenant_active) throw new Error('الحساب أو الشركة غير مفعّل.');
-    if (p.role === 'client' && !p.portal_enabled) throw new Error('بوابة العميل غير مفعّلة لحسابك. تواصل مع الإدارة.');
-    if (p.role !== 'admin') throw new Error('هذه الشاشة للإدارة فقط.');
+    if (!p) throw accessDenied('لم تُنشأ صلاحيات حسابك بعد. تواصل مع الإدارة.');
+    if (!p.is_active || !p.tenant_active) throw accessDenied('الحساب أو الشركة غير مفعّل.');
+    if (p.role === 'client' && !p.portal_enabled) throw accessDenied('بوابة العميل غير مفعّلة لحسابك. تواصل مع الإدارة.');
+    if (p.role !== 'admin') throw accessDenied('هذه الشاشة للإدارة فقط.');
     return p;
   };
+  const verificationMessage = 'تعذّر التحقق من الجلسة بسبب الاتصال أو الخدمة. لم يتم تغيير كلمة المرور. أعد المحاولة.';
   window.auth = {
     get currentUser() { return this.user || null; },
     user: null,
     async signIn(email, password) {
-      unwrap(await client.auth.signInWithPassword({ email, password }));
+      const result = unwrap(await client.auth.signInWithPassword({ email, password }));
       try { await account(); }
-      catch (e) { await client.auth.signOut({ scope: 'local' }); throw e; }
-      this.user = unwrap(await client.auth.getUser()).user;
+      catch (e) {
+        // A temporary RPC/network error is NOT invalid credentials and must not
+        // destroy a successfully established session.
+        if (e.code === 'ADMIN_ACCESS_DENIED') await client.auth.signOut({ scope: 'local' });
+        throw e;
+      }
+      this.user = result.user || unwrap(await client.auth.getUser()).user;
     },
-    async signOut() { unwrap(await client.auth.signOut()); this.user = null; },
-    onSessionChanged(callback) {
-      let stopped = false;
+    async signOut() { unwrap(await client.auth.signOut({ scope: 'local' })); this.user = null; },
+    onSessionChanged(callback, onError = () => {}) {
+      let stopped = false, generation = 0, retryTimer;
       const update = async () => {
+        const current = ++generation;
+        clearTimeout(retryTimer);
+        const active = () => !stopped && current === generation;
         try {
           const { session } = unwrap(await client.auth.getSession());
-          if (!session) { this.user = null; if (!stopped) callback(null); return; }
+          if (!active()) return;
+          if (!session) { this.user = null; callback(null); return; }
           await account();
+          if (!active()) return;
           this.user = session.user;
-          if (!stopped) callback(session.user);
+          callback(session.user);
         } catch (e) {
+          if (!active()) return;
           this.user = null;
-          const errorNode = document.getElementById('error-message') || document.getElementById('error-text');
-          if (errorNode) errorNode.textContent = e.message;
-          if (!stopped) callback(null);
+          if (e.code === 'ADMIN_ACCESS_DENIED') { onError(e.message); callback(null); return; }
+          // Fail closed in the UI, but don't redirect to login or mislabel a
+          // temporary verification failure as a password failure.
+          onError(verificationMessage);
+          retryTimer = setTimeout(update, 5000);
         }
       };
-      const { data: { subscription } } = client.auth.onAuthStateChange(() => { setTimeout(update, 0); });
+      const { data: { subscription } } = client.auth.onAuthStateChange(() => {
+        // Invalidate in-flight reads immediately; run outside the SDK auth lock.
+        ++generation;
+        setTimeout(() => { if (!stopped) update(); }, 0);
+      });
       update();
-      return () => { stopped = true; subscription.unsubscribe(); };
+      return () => { stopped = true; ++generation; clearTimeout(retryTimer); subscription.unsubscribe(); };
     },
     async changePassword(current, next) {
       await account();

@@ -451,6 +451,10 @@
                 authCheck.style.display = 'none';
                 loginCard.style.display = 'block';
                 setTimeout(() => emailInput && emailInput.focus(), 100);
+            }, (message) => {
+                authCheck.style.display = 'none';
+                loginCard.style.display = 'block';
+                showError(message);
             });
         }
     }, 50);
@@ -507,10 +511,13 @@
             await window.auth.signIn(email, password);
             window.location.replace('./admin.html');
         } catch (err) {
-            // SECURITY: never expose raw Supabase error messages
-            console.warn('[Auth] Login failed', err);
+            // Distinguish rejected credentials from rate limits/network/RPC failures.
             setLoading(false);
-            showError(err.message?.includes('بوابة') || err.message?.includes('صلاحيات') || err.message?.includes('للإدارة') || err.message?.includes('غير مفعّل') ? err.message : 'بيانات الدخول غير صحيحة أو الخدمة غير متاحة.');
+            const message = err.code === 'ADMIN_ACCESS_DENIED' ? err.message
+                : err.code === 'invalid_credentials' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'
+                : err.status === 429 || err.code === 'over_request_rate_limit' ? 'محاولات كثيرة خلال وقت قصير. انتظر قليلاً ثم أعد المحاولة.'
+                : 'تعذّر إكمال تسجيل الدخول أو التحقق من الصلاحيات. تحقق من الاتصال وأعد المحاولة؛ لا يعني ذلك أن كلمة المرور خاطئة.';
+            showError(message);
             if (passwordInput) { passwordInput.value = ''; passwordInput.focus(); }
         }
     });
