@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
+import 'client_admin.dart';
 import 'admin_dialogs.dart';
 import 'request_admin.dart';
 import 'instapay_admin.dart';
@@ -106,13 +107,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     ]),
     body: Column(children: [
       Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(value: tab,
-        items: [tr('طلبات التواصل', 'Contact requests'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings')]
+        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings')]
           .asMap().entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
         onChanged: (v) => setState(() { tab = v ?? 0; query = ''; }))),
-      if (tab == 0) Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: TextField(
-        decoration: InputDecoration(labelText: tr('بحث بالاسم أو الهاتف أو البريد', 'Search name, phone or email'), prefixIcon: const Icon(Icons.search)),
-        onChanged: (v) => setState(() => query = v.toLowerCase()))),
-      Expanded(child: tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
+      Expanded(child: tab == 0 ? ClientAdmin(english: widget.english) : tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
     ]),
     floatingActionButton: tab == 1 ? FloatingActionButton(onPressed: () => editBranch(), child: const Icon(Icons.add)) : null,
   );
