@@ -610,6 +610,8 @@
         const submissionModalClose = document.getElementById('submission-modal-close');
         const submissionModalDismiss = document.getElementById('submission-modal-dismiss');
 
+        // Initialize dashboard listeners once, even after token refresh/recovery.
+        let listenersStarted = false;
         // Wait until window.auth is initialized
         const checkInterval = setInterval(() => {
             if (window.auth && window.db) {
@@ -629,7 +631,17 @@
                     document.getElementById('admin-current-email').value = user.email;
 
                     // Initialize data listeners
-                    initRealtimeListeners();
+                    if (!listenersStarted) { initRealtimeListeners(); listenersStarted = true; }
+                }, (message) => {
+                    // Do not bounce a valid session to login on a transient RPC failure.
+                    authGate.style.display = 'flex';
+                    authGate.replaceChildren();
+                    const notice = document.createElement('p');
+                    notice.textContent = message;
+                    const retry = document.createElement('button');
+                    retry.textContent = 'إعادة المحاولة';
+                    retry.onclick = () => window.location.reload();
+                    authGate.append(notice, retry);
                 });
             }
         }, 50);
