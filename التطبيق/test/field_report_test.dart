@@ -47,10 +47,10 @@ void main(){
     addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(MaterialApp(home:FieldReportForm(tenant:'tenant',user:'user',visit:'visit',english:true,store:store)));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.byType(TextField).first,300,scrollable:find.byType(Scrollable).first);
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('report-materials')),300,scrollable:find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     expect(find.text('Bait 10 g'),findsOneWidget);
-    await tester.enterText(find.byType(TextField).first,'No chemicals used');
+    await tester.enterText(find.byKey(const ValueKey('report-materials')),'No chemicals used');
     await tester.pumpAndSettle();
     expect(store.value['materials'],'No chemicals used');
     expect(store.value['strokes'],isNotEmpty);
