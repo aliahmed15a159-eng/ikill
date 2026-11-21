@@ -92,8 +92,12 @@ class _OperationsDashboardState extends State<OperationsDashboard> with WidgetsB
     final selectedSite = site;
     if (bulk && selectedSite == null) return;
     final people = list('technicians').where((p) => p['is_active'] != false).toList();
+    final matchedSites = list('sites').where((s) => s['id'] == selectedSite).toList();
+    final String? initial = bulk
+        ? (matchedSites.isEmpty ? null : matchedSites.first['default_technician_id'] as String?)
+        : visit?['technician_id'] as String?;
     final result = await showDialog<String>(context: context, builder: (_) => TechnicianAssignmentDialog(english: widget.english,
-      technicians: people, initial: (bulk ? list('sites').where((s) => s['id'] == selectedSite).firstOrNull?['default_technician_id'] : visit?['technician_id']) as String?, bulk: bulk));
+      technicians: people, initial: initial, bulk: bulk));
     if (result == null || !mounted) return;
     setState(() => busy = true);
     try {
