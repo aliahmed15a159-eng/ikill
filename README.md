@@ -1,147 +1,51 @@
-# iKILL Pest Control Services
+# iKILL website and native Flutter app
 
-موقع iKILL لخدمات مكافحة الآفات وحلول الصحة العامة في مصر.
+- Public website: static HTML/CSS/JavaScript in the repository root.
+- Native Android/iOS app: `التطبيق/` (Flutter/Dart, not a WebView).
+- Backend: Supabase Auth, PostgreSQL and private Storage.
 
-**النطاق الرسمي:** [https://ikill.net](https://ikill.net)  
-**بريد التواصل الرسمي:** [info@ikill.net](mailto:info@ikill.net)
+## Website local preview
 
----
+Serve this directory with any static server; do not open authenticated pages via file://.
 
-## أهم المزايا
-
-- واجهة عربية وإنجليزية مع تبديل اتجاه الصفحة تلقائياً RTL / LTR.
-- تصميم أخضر وأبيض متجاوب مع وضع داكن.
-- ملف `mobile.css` مستقل لضبط المقاسات والتخطيطات على الهواتف والشاشات الصغيرة.
-- خلفية بيئية متحركة في الصفحة الرئيسية.
-- شعار شفاف ونسخة مخصصة للوضع الداكن، بما فيها أيقونة المتصفح.
-- قسم شركاء النجاح بحركة بطيئة ومتكررة، مع أزرار تنقّل والسحب بالماوس أو الهاتف.
-- قائمة تنقل منبثقة تضم قوائم فرعية لكل صفحة رئيسية.
-- نموذج تواصل متصل بـ Firebase Firestore.
-- لوحة إدارة محمية بـ Firebase Authentication.
-- بطاقة تفاصيل كاملة لكل طلب تواصل داخل لوحة الإدارة.
-- صفحات سياسة الخصوصية وشروط الاستخدام.
-- إعدادات SEO تشمل: Canonical URLs، Open Graph، Twitter Cards، Schema.org، `robots.txt`، و`sitemap.xml`.
-- تحسينات أداء للصفحات العامة: CSS Utilities محلية بدلاً من Tailwind CDN، Firebase مؤجل، صورة Hero بصيغة WebP، وتحميل كسول للشعارات.
-
----
-
-## تشغيل الموقع محلياً
-
-لا تفتح ملفات الموقع مباشرة عبر `file://` عند اختبار Firebase. استخدم Live Server أو خادماً محلياً:
-
-```bash
-npx serve .
+```sh
+python3 -m http.server 3000 --bind 0.0.0.0
 ```
 
-أو افتح مجلد المشروع بواسطة إضافة **Live Server** في VS Code.
+`supabase-config.js` contains PUBLIC browser connection settings. Override
+`window.IKILL_SUPABASE_ENV` before loading it for another deployment. Never use a
+service key. `supabase-backend.js` exposes a view-model bridge for the existing
+pages using the official, locally vendored Supabase JS SDK (2.49.4). Its license
+is in `vendor/supabase/LICENSE`. Public pages load it after interaction/idle;
+admin pages load it before their existing controllers.
 
-بعدها افتح:
+## Current data mapping
 
-```text
-http://localhost:3000
-```
+- Contact requests → clients (lead), through a validated RPC only.
+- Company branches → company_branches; these are NOT private client_sites.
+- Site settings → tenants.branding, with a narrow public projection.
+- Existing website page analytics → page_events.
+- Company/profile/business records → the phase-1 tenant-scoped schema.
 
-> رقم المنفذ قد يختلف حسب أداة التشغيل.
+No historical users or data are automatically imported. There is no public
+sign-up-to-admin path. Create a Supabase Auth account and deliberately provision
+an admin profile using `التطبيق/supabase/BOOTSTRAP.md`.
 
----
+## Native app
 
-## النشر على Firebase Hosting
+See `التطبيق/README.md` for environment configuration, test/build commands and
+private Storage rules. SQL migrations and deployment records are in
+`التطبيق/supabase/`.
 
-من داخل مجلد المشروع:
+## Hosting / security
 
-```bash
-firebase login
-firebase use ikill-4e337
-firebase deploy
-```
+This phase removes the old hosting-specific configuration; it does not publish
+or move the production domain. Deploy the static website with your chosen host.
+Do NOT publish `التطبيق/`, `.git/`, test folders, local environment JSON, build
+artifacts, or deployment tooling in the public website. Configure CSP to allow
+only the actual Supabase HTTPS/WSS endpoint used by this deployment, plus the
+site's existing fonts/icons/maps providers. Auth and sensitive tables remain
+protected by RLS; a browser key is intentionally public.
 
-قبل النشر على النطاق الرسمي، أضف النطاقين التاليين في:
-
-`Firebase Console → Authentication → Settings → Authorized domains`
-
-```text
-ikill.net
-www.ikill.net
-```
-
-ثم اربط إعدادات DNS الخاصة بالنطاق مع Firebase Hosting من Firebase Console.
-
----
-
-## إعداد محركات البحث
-
-بعد نشر الموقع على `https://ikill.net`:
-
-1. أضف الموقع إلى **Google Search Console**.
-2. أرسل ملف خريطة الموقع التالي:
-
-```text
-https://ikill.net/sitemap.xml
-```
-
-3. تأكد أن الرابط التالي متاح للعامة:
-
-```text
-https://ikill.net/robots.txt
-```
-
----
-
-## لوحة الإدارة
-
-- الوصول إلى صفحة الإدارة من خلال البحث في الموقع عن:
-
-```text
-info@ikill.net
-```
-
-- البحث يعرض رابطاً إلى `admin-login.html`.
-- تسجيل الدخول الفعلي يتطلب حساباً صالحاً في **Firebase Authentication**؛ البحث لا يتجاوز الحماية.
-- في قسم **طلبات التواصل**، اضغط على أي طلب أو زر العين لفتح بطاقة تفاصيل الطلب والتواصل مع العميل.
-
----
-
-## هيكل الملفات الأساسي
-
-```text
-.
-├── index.html                  # الصفحة الرئيسية
-├── services.html               # الخدمات
-├── sectors.html                # القطاعات
-├── about.html                  # من نحن
-├── locations.html              # الفروع والعنوان
-├── contact.html                # نموذج التواصل
-├── privacy-policy.html         # سياسة الخصوصية
-├── terms.html                  # شروط الاستخدام
-├── admin-login.html            # تسجيل دخول الإدارة
-├── admin.html                  # لوحة التحكم
-├── styles.css                  # التصميم العام
-├── mobile.css                  # طبقة مقاسات الهواتف والشاشات الصغيرة
-├── app.js                      # اللغة، الوضع الداكن، البحث، والواجهة العامة
-├── admin-theme.css             # تصميم لوحة الإدارة
-├── admin-login-theme.css       # تصميم صفحة دخول الإدارة
-├── firebase-config.js          # تهيئة Firebase
-├── firebase.json               # إعدادات Firebase Hosting
-├── firestore.rules             # قواعد حماية Firestore
-├── robots.txt                  # تعليمات محركات البحث
-├── sitemap.xml                 # خريطة الموقع
-├── site.webmanifest            # إعدادات التطبيق/المتصفح
-└── img/
-    ├── ikill-logo.png          # الشعار الافتراضي
-    ├── ikill-logo-dark.png     # شعار الوضع الداكن وأيقونة التبويب
-    ├── eco-environment-hero.jpg
-    └── partners-clean/         # شعارات شركاء النجاح بخلفيات شفافة
-```
-
----
-
-## ملاحظات مهمة
-
-- لا تحذف مجلد `img/partners-clean` لأنه يحتوي على شعارات سابقة الأعمال المستخدمة في الصفحة الرئيسية وصفحة «من نحن».
-- لا تحذف `firestore.rules` عند النشر باستخدام Firebase، لأنه مرتبط بملف `firebase.json`.
-- في حال عدم تحديث أيقونة التبويب بعد تفعيل الوضع الداكن، نفّذ تحديثاً إجبارياً للصفحة (`Ctrl + F5`).
-- البريد الرسمي المستخدم في الموقع وSEO وبيانات التواصل هو: `info@ikill.net`.
-
----
-
-تم التطوير بواسطة [علي أحمد](https://ali-ahmed-portfollio.vercel.app/).
+Full schema creation must not be rerun on the connected project. Apply future
+changes as separate migrations and check `التطبيق/supabase/PHASE2_STATUS.md`.

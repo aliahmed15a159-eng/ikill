@@ -723,9 +723,9 @@ const MobileMenu = {
 };
 
 /* =============================================
-   FIREBASE INIT (shared)
+   SUPABASE CLIENT (shared)
    ============================================= */
-const FirebaseManager = {
+const BackendManager = {
   db: null,
   initialized: false,
 
@@ -749,10 +749,10 @@ const FirebaseManager = {
    ============================================= */
 const SettingsLoader = {
   async init() {
-    const db = await FirebaseManager.waitForDb();
+    const db = await BackendManager.waitForDb();
     if (!db) return;
 
-    db.collection('site_settings').doc('global').onSnapshot((doc) => {
+    db.table('brand_settings').record('global').subscribe((doc) => {
       if (!doc.exists) return;
       const data = doc.data();
 
@@ -793,13 +793,13 @@ const BranchesLoader = {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const db = await FirebaseManager.waitForDb();
+    const db = await BackendManager.waitForDb();
     if (!db) {
       container.innerHTML = '<div class="col-span-full text-center py-10" style="color:var(--text-muted)">تعذّر الاتصال بقاعدة البيانات.</div>';
       return;
     }
 
-    db.collection('branches').where('status', '==', 'active').onSnapshot(snapshot => {
+    db.table('company_branches').where('status', '==', 'active').subscribe(snapshot => {
       container.innerHTML = '';
       const docs = [];
       snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
@@ -921,7 +921,7 @@ const SearchManager = {
   ],
 
   // These keywords and the official company email only expose the login route;
-  // they do not bypass Firebase authentication in any way.
+  // they do not bypass Supabase authentication in any way.
   ADMIN_TRIGGERS: ['admin', 'ادمن', 'لوحة التحكم', 'dashboard', 'panel', 'دخول', 'login', 'تسجيل'],
   ADMIN_EMAILS: [COMPANY_EMAIL],
 
@@ -1197,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => LangManager.set(btn.dataset.lang));
   });
 
-  // Firebase-dependent loaders (only on pages that need them)
+  // Supabase-dependent loaders (only on pages that need them)
   if (document.getElementById('stat1-val')) {
     SettingsLoader.init();
   }

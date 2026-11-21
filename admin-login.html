@@ -413,13 +413,13 @@
 
     <div class="card-footer">
         <i class="fas fa-shield-alt"></i>
-        محمي بـ Firebase Authentication — جلسة محدودة المدة
+        محمي بـ Supabase Authentication — جلسة محدودة المدة
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="./firebase-config.js"></script>
+<script src="./vendor/supabase/supabase.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./supabase-backend.js"></script>
 
 <script>
 (function() {
@@ -441,7 +441,7 @@
             clearInterval(checkInterval);
             
             // Check if already authenticated
-            window.auth.onAuthStateChanged((user) => {
+            window.auth.onSessionChanged((user) => {
                 if (user) {
                     // Already logged in — go to dashboard
                     window.location.replace('./admin.html');
@@ -504,14 +504,13 @@
         setLoading(true);
 
         try {
-            await window.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-            await window.auth.signInWithEmailAndPassword(email, password);
+            await window.auth.signIn(email, password);
             window.location.replace('./admin.html');
         } catch (err) {
-            // SECURITY: never expose raw Firebase error messages
+            // SECURITY: never expose raw Supabase error messages
             console.warn('[Auth] Login failed', err);
             setLoading(false);
-            showError('بيانات الدخول غير صحيحة. تحقق من البريد وكلمة المرور وحاول مجدداً.');
+            showError(err.message?.includes('بوابة') || err.message?.includes('صلاحيات') || err.message?.includes('للإدارة') || err.message?.includes('غير مفعّل') ? err.message : 'بيانات الدخول غير صحيحة أو الخدمة غير متاحة.');
             if (passwordInput) { passwordInput.value = ''; passwordInput.focus(); }
         }
     });
@@ -524,7 +523,7 @@
             
             // Show a helpful warning if running locally via file://
             if (window.location.protocol === 'file:') {
-                showError('تنبيه: يرجى فتح الموقع عبر Firebase Hosting أو Live Server وليس مباشرة من الملف.');
+                showError('تنبيه: يرجى فتح الموقع عبر Supabase Hosting أو Live Server وليس مباشرة من الملف.');
             }
         }
     }, 3000);

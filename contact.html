@@ -342,8 +342,8 @@
         <div class="developer-credit">تم التطوير بواسطة <a href="https://ali-ahmed-portfollio.vercel.app/" target="_blank" rel="noopener noreferrer">علي أحمد</a></div>
 </footer>
 
-<!-- Firebase compat scripts -->
-<script src="./firebase-loader.js"></script>
+<!-- Supabase compat scripts -->
+<script src="./supabase-loader.js"></script>
 
 <script src="./app.js"></script>
 
@@ -417,7 +417,7 @@
 
         setLoading(true);
 
-        // Wait for Firebase to fully initialize
+        // Wait for Supabase to fully initialize
         if (!window.db) {
             await new Promise((resolve) => {
                 let waited = 0;
@@ -438,14 +438,14 @@
         }
 
         try {
-            await window.db.collection('contact_submissions').add({
+            await window.db.table('requests').add({
                 name,
                 phone,
                 email,
                 address,
                 service,
                 message,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                timestamp: new Date().toISOString()
             });
             
             alert(document.documentElement.lang === 'en' ? 'Your message has been sent successfully! We will contact you soon.' : 'تم إرسال رسالتك بنجاح! سنتصل بك في أقرب وقت.');

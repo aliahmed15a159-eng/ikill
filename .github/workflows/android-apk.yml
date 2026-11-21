@@ -1,0 +1,51 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'التطبيق/**'
+      - '.github/workflows/android-apk.yml'
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: التطبيق
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://xflvmcdkxfloiovrrpwa.supabase.co' }}
+      SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_99HrwTOHjsHLmWkTbo8R1Q_oHbL-KEi' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: stable
+          cache: true
+      - name: Check removed SDK dependencies
+        run: python3 tool/check_backend.py
+      - name: Check existing website controllers
+        run: node tool/web_backend.test.cjs
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: python3 tool/ci_command.py flutter analyze --fatal-infos --fatal-warnings
+      - name: Test
+        run: python3 tool/ci_command.py flutter test --timeout 60s --reporter expanded
+      - name: Prepare public Supabase build environment
+        run: python3 tool/configure_supabase.py
+      - name: Build Android APK with Supabase
+        run: python3 tool/ci_command.py flutter build apk --debug --dart-define-from-file=supabase_build.json
+      - name: Verify resolved dependencies
+        run: python3 tool/check_backend.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ikill-android-supabase-debug
+          path: التطبيق/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
