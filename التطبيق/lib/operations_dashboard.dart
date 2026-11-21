@@ -95,7 +95,7 @@ class _OperationsDashboardState extends State<OperationsDashboard> with WidgetsB
     final matchedSites = list('sites').where((s) => s['id'] == selectedSite).toList();
     final String? initial = bulk
         ? (matchedSites.isEmpty ? null : matchedSites.first['default_technician_id'] as String?)
-        : visit?['technician_id'] as String?;
+        : visit['technician_id'] as String?;
     final result = await showDialog<String>(context: context, builder: (_) => TechnicianAssignmentDialog(english: widget.english,
       technicians: people, initial: initial, bulk: bulk));
     if (result == null || !mounted) return;
