@@ -32,6 +32,31 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Phone navigation, theme and language remain usable offline', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final content = (await tester.runAsync(SiteContent.load))!;
+    await tester.pumpWidget(IkillApp(content: content, preferences: prefs));
+    await tester.pumpAndSettle();
+    for (final index in [1, 2, 3, 0]) {
+      await tester.tap(find.byType(NavigationDestination).at(index));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+    await tester.tap(find.byIcon(Icons.dark_mode_outlined));
+    await tester.pumpAndSettle();
+    expect(prefs.getBool('dark'), isTrue);
+    await tester.tap(find.text('EN')); await tester.pumpAndSettle();
+    for (final index in [1, 2, 3, 0]) {
+      await tester.tap(find.byType(NavigationDestination).at(index));
+      await tester.pumpAndSettle(); expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets('Form validates required fields without a backend', (tester) async {
     final content = (await tester.runAsync(SiteContent.load))!;
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(
