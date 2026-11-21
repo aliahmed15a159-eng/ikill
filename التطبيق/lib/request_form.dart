@@ -49,9 +49,11 @@ class _RequestFormState extends State<RequestForm> {
       setState(() { consent = false; service = 'مكافحة الآفات'; });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('تم إرسال طلبك بنجاح. سنتواصل معك قريباً.', 'Your request has been sent. We will contact you soon.'))));
     } catch (_) {
-      if (mounted) setState(() => error = tr(
-        'تعذّر تأكيد إرسال الطلب. تحقق من اتصالك وإعداد Firebase. بياناتك محفوظة في النموذج؛ تحقق قبل إعادة الإرسال لتفادي التكرار.',
-        'Could not confirm submission. Check your connection and Firebase configuration. Your form is preserved; check before retrying to avoid duplicates.'));
+      if (mounted) {
+        setState(() => error = tr(
+        'تعذّر تأكيد إرسال الطلب. تحقق من اتصالك وإعداد Supabase. بياناتك محفوظة في النموذج؛ تحقق قبل إعادة الإرسال لتفادي التكرار.',
+        'Could not confirm submission. Check your connection and Supabase configuration. Your form is preserved; check before retrying to avoid duplicates.'));
+      }
     } finally {
       if (mounted) setState(() => sending = false);
     }
@@ -91,6 +93,6 @@ class _RequestFormState extends State<RequestForm> {
     FilledButton.icon(onPressed: sending || !Backend.ready ? null : submit,
       icon: sending ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.send_outlined),
       label: Text(sending ? tr('جاري الإرسال…', 'Sending…') : tr('مراجعة وإرسال', 'Review and send'))),
-    if (!Backend.ready) Padding(padding: const EdgeInsets.only(top: 12), child: Text(tr('الإرسال غير متاح حتى إعداد Firebase الأصلي للتطبيق. يمكنك الاتصال هاتفياً أو عبر البريد.', 'Submission is unavailable until native Firebase is configured. You can still call or email us.'))),
+    if (!Backend.ready) Padding(padding: const EdgeInsets.only(top: 12), child: Text(tr('الإرسال غير متاح حتى إعداد Supabase الأصلي للتطبيق. يمكنك الاتصال هاتفياً أو عبر البريد.', 'Submission is unavailable until native Supabase is configured. You can still call or email us.'))),
   ])));
 }

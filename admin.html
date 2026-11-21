@@ -109,7 +109,7 @@
     <div id="auth-gate">
         <div class="text-center">
             <div class="spinner mb-4 mx-auto"></div>
-            <p class="text-[#64748B] text-sm">جاري التحقق من الصلاحيات والاتصال بـ Firebase...</p>
+            <p class="text-[#64748B] text-sm">جاري التحقق من الصلاحيات والاتصال بـ Supabase...</p>
         </div>
     </div>
 
@@ -394,7 +394,7 @@
                                 </thead>
                                 <tbody id="full-submissions-list" class="divide-y divide-zinc-900">
                                     <tr>
-                                        <td colspan="6" class="p-8 text-center text-zinc-500">جاري تحميل البيانات من Firestore...</td>
+                                        <td colspan="6" class="p-8 text-center text-zinc-500">جاري تحميل البيانات من PostgreSQL...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -540,7 +540,7 @@
                     <div class="glass-panel p-8 rounded-2xl max-w-xl flex flex-col gap-6">
                         <div class="border-b border-zinc-800 pb-4">
                             <h3 class="font-extrabold text-lg">تغيير كلمة مرور الأدمن</h3>
-                            <p class="text-zinc-500 text-xs mt-1">تحديث كلمة مرور لوحة تحكم الإدارة لـ Firebase Auth.</p>
+                            <p class="text-zinc-500 text-xs mt-1">تحديث كلمة مرور لوحة تحكم الإدارة لـ Supabase Auth.</p>
                         </div>
                         
                         <form id="admin-password-form" class="flex flex-col gap-5">
@@ -572,11 +572,10 @@
         </main>
     </div>
 
-    <!-- Firebase compat scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="./firebase-config.js"></script>
+    <!-- Supabase compat scripts -->
+    <script src="./vendor/supabase/supabase.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./supabase-backend.js"></script>
 
     <script>
     (function() {
@@ -587,7 +586,7 @@
         let isFirstLoad = true;
 
         // Only Pest Control remains a published service. Historical records for removed
-        // services are retained in Firestore but displayed as a generic custom request.
+        // services are retained in PostgreSQL but displayed as a generic custom request.
         function normaliseRequestedService(service) {
             return service === 'مكافحة الآفات' ? 'مكافحة الآفات' : 'خدمة مخصصة';
         }
@@ -617,7 +616,7 @@
                 clearInterval(checkInterval);
                 
                 // Check if admin is logged in
-                window.auth.onAuthStateChanged((user) => {
+                window.auth.onSessionChanged((user) => {
                     if (!user) {
                         // Not logged in — redirect to login
                         window.location.replace('./admin-login.html');
@@ -776,12 +775,12 @@
         });
 
         // ============================================================
-        // REAL-TIME FIRESTORE DATA LISTENERS
+        // REAL-TIME POSTGRESQL DATA LISTENERS
         // ============================================================
         function initRealtimeListeners() {
             // 1. Submissions Listener
-            window.db.collection('contact_submissions').orderBy('timestamp', 'desc')
-                .onSnapshot((snapshot) => {
+            window.db.table('requests').order('timestamp', 'desc')
+                .subscribe((snapshot) => {
                     const subArray = [];
                     snapshot.forEach(doc => {
                         subArray.push({ id: doc.id, ...doc.data() });
@@ -806,8 +805,8 @@
                 });
 
             // 2. Page Views (Analytics) Listener
-            window.db.collection('page_views').orderBy('timestamp', 'desc')
-                .onSnapshot((snapshot) => {
+            window.db.table('page_events').order('timestamp', 'desc')
+                .subscribe((snapshot) => {
                     const viewsArray = [];
                     snapshot.forEach(doc => {
                         viewsArray.push({ id: doc.id, ...doc.data() });
@@ -821,8 +820,8 @@
                 });
 
             // 3. Branches Listener
-            window.db.collection('branches')
-                .onSnapshot((snapshot) => {
+            window.db.table('company_branches')
+                .subscribe((snapshot) => {
                     const branchesArray = [];
                     snapshot.forEach(doc => {
                         branchesArray.push({ id: doc.id, ...doc.data() });
@@ -1154,14 +1153,14 @@
             });
         }
 
-        // Delete Submission from Firestore
+        // Delete Submission from PostgreSQL
         window.deleteSubmission = async function(id) {
             if (!confirm('هل أنت متأكد تماماً من رغبتك في حذف طلب التواصل هذا؟ لا يمكن استرجاع البيانات بعد الحذف.')) return;
             try {
-                await window.db.collection('contact_submissions').doc(id).delete();
+                await window.db.table('requests').record(id).delete();
                 showToast('تم الحذف', 'تم حذف طلب التواصل بنجاح من قاعدة البيانات', 'success');
             } catch (err) {
-                showToast('خطأ', 'فشل الحذف. يرجى مراجعة صلاحيات Firestore Security Rules', 'error');
+                showToast('خطأ', 'فشل الحذف. يرجى مراجعة صلاحيات PostgreSQL Security Rules', 'error');
             }
         }
 
@@ -1255,9 +1254,9 @@
             const status = document.getElementById('branch-status').value;
 
             try {
-                await window.db.collection('branches').add({
+                await window.db.table('company_branches').add({
                     nameAr, nameEn, countryAr, countryEn, status,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: new Date().toISOString()
                 });
 
                 showToast('تمت الإضافة', 'تمت إضافة الفرع بنجاح لقاعدة البيانات', 'success');
@@ -1271,7 +1270,7 @@
         window.deleteBranch = async function(id) {
             if (!confirm('هل تريد فعلاً حذف هذا الفرع من الموقع؟')) return;
             try {
-                await window.db.collection('branches').doc(id).delete();
+                await window.db.table('company_branches').record(id).delete();
                 showToast('تم الحذف', 'تم إزالة الفرع بنجاح', 'success');
             } catch (err) {
                 showToast('خطأ', 'فشل إزالة الفرع.', 'error');
@@ -1286,7 +1285,7 @@
 
         async function loadSiteSettings() {
             try {
-                const docSnap = await window.db.collection('site_settings').doc('global').get();
+                const docSnap = await window.db.table('brand_settings').record('global').get();
                 if (docSnap.exists) {
                     const data = docSnap.data();
                     document.getElementById('set-phone').value = data.phone || '';
@@ -1326,13 +1325,13 @@
             const stat4Label = document.getElementById('set-stat4-label').value.trim();
 
             try {
-                await window.db.collection('site_settings').doc('global').set({
+                await window.db.table('brand_settings').record('global').set({
                     phone, emergency, email, address,
                     stat1Value, stat1Label,
                     stat2Value, stat2Label,
                     stat3Value, stat3Label,
                     stat4Value, stat4Label,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    updatedAt: new Date().toISOString()
                 }, { merge: true });
                 showToast('تم التحديث', 'تم حفظ وتحديث بيانات الموقع والاتصال بنجاح', 'success');
             } catch (err) {
@@ -1362,14 +1361,7 @@
             }
 
             try {
-                const user = window.auth.currentUser;
-                const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
-                
-                // Reauthenticate to allow password change (Firebase Security requirement)
-                await user.reauthenticateWithCredential(credential);
-                
-                // Change password
-                await user.updatePassword(newPass);
+                await window.auth.changePassword(oldPass, newPass);
                 showToast('تم تغيير كلمة المرور', 'تم تحديث كلمة مرور حساب الإدارة بنجاح', 'success');
                 passwordForm.reset();
             } catch (err) {

@@ -15,8 +15,5 @@ ios/.symlinks/
 ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
 ios/Flutter/ephemeral/
-firebase_build.json
-firebase_options.dart
-**/google-services.json
-**/GoogleService-Info.plist
 .DS_Store
+supabase_build.json

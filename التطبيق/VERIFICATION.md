@@ -1,34 +1,20 @@
-> ملاحظة: هذا تقرير فحص النسخة المنفصلة قبل نقلها. أُضيف المشروع لاحقاً داخل `التطبيق/`، لذلك التحقق القديم من «عدم وجود ملفات مضافة» لا ينطبق على الحالة الحالية. ملفات الموقع الأصلية بقيت دون تعديل. لم يُنفّذ بناء Flutter حتى الآن.
+# Verification — phase 2
 
-# فحص التسليم
+This report is superseded by `supabase/PHASE2_STATUS.md` for final CI status.
 
-التاريخ: 2026-11-21 (UTC).
+Local checks executed:
+- No removed backend SDK imports/dependencies in Flutter runtime/manifest.
+- 35 website JS/inline-script/local-asset and mocked Supabase bridge checks passed.
+- 57 phase-1 PostgreSQL/RLS assertions passed locally (PGlite).
+- 25 phase-2 portal/contact-quota/Storage-policy assertions passed locally (PGlite).
+- Dart syntax parsed locally; this is not a substitute for Flutter analysis.
 
-## فحوص نُفّذت ونجحت
+Live Supabase checks:
+- Phase-2 integration migration applied successfully.
+- Three private buckets and four Storage object policies verified.
+- Public brand RPC returns the intended iKILL projection.
+- No privileged profiles or passwords were invented; profile_count = 0.
 
-- مطابقة SHA-256 لكل ملفات الموقع الأصلية البالغ عددها 132 ملفاً؛ لم يتغير أو يُحذف أو يُضف أي ملف في المستودع الأصلي.
-- `git status --porcelain` بدون مخرجات، و`git diff --exit-code` بنجاح في المستودع الأصلي.
-- تحليل قواعد صياغة ملفات Dart الستة (خمسة ملفات تنفيذ وملف اختبارات) باستخدام Tree-sitter Dart؛ لم تظهر أخطاء parsing.
-- قراءة جميع JSON والتحقق من XML وملفات plist.
-- التحقق من سلامة صور PNG، ووجود أصول الخدمات المحلية.
-- التحقق من Gradle wrapper JAR كأرشيف سليم.
-- التحقق من استبدال متغيرات قوالب Android وiOS، مع اسم الحزمة/Bundle `net.ikill.app`.
-- مشاريع المنصتين مستخرجة من القوالب الرسمية لـ Flutter 3.29.3 مع Gradle 8.10.2 وAGP 8.7.0 وKotlin 1.8.22.
-
-## لم يُنفّذ — لا توجد نتيجة نجاح مُدّعاة
-
-- Flutter/Dart analyzer أو اختبارات Flutter: لا يوجد Flutter SDK مثبت في البيئة. تحليل Tree-sitter **لا يثبت** سلامة الأنواع أو توافق الحزم أو نجاح البناء.
-- Android APK/AAB وiOS build/IPA: لم يتم البناء. لم تُختبر الواجهات على محاكي أو هاتف.
-- تنزيل حزم pub وحلّها، ولذلك لا يوجد `pubspec.lock` مولّد فعلياً. نفّذ `flutter pub get` ثم احتفظ بالـ lockfile في مشروع التطبيق.
-- الاتصال الحي بـ Firebase أو تسجيل مستخدمين أو إرسال طلبات أو تعديل إعدادات أو فروع أو قواعد أمان. لم تُنشأ معرّفات تطبيقات موبايل وهمية.
-- تشغيل GitHub Actions أو فتح مستودع جديد أو commit/push أو نشر متاجر.
-- توقيع Android release أو Apple signing/provisioning.
-
-## المطلوب قبل اعتماد نسخة إنتاجية
-
-1. إعداد Flutter وتشغيل `flutter pub get` ثم `flutter analyze` و`flutter test` وإصلاح ما قد يظهر من أخطاء.
-2. تسجيل Android/iOS داخل مشروع Firebase الفعلي وتشغيل أداة الإعداد المرفقة.
-3. تجربة إرسال طلب وظهوره في لوحة الإدارة، وحالات الفشل والاتصال الضعيف، على قاعدة اختبار أولاً.
-4. مراجعة صلاحيات Firestore: القواعد الأصلية تمنح الإدارة لكل مستخدم authenticated، لا لأدوار admin محددة.
-5. مراجعة الترجمة ومحتوى الشركة وسياسة الخصوصية وإقرارات جمع البيانات.
-6. اختبار Android وiPhone وiPad والحواف الآمنة وتكبير الخط والتنقل والروابط الخارجية، وإعداد التوقيع قبل النشر.
+No mobile device, live end-user Auth flow, binary upload/download, or iOS build
+has been tested locally. Local SQL tests mock Auth/Storage schemas. GitHub CI
+is used for the Android analyzer, tests and APK build; see PHASE2_STATUS.md.

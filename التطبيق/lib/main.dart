@@ -4,7 +4,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'backend.dart';
 import 'content.dart';
 import 'request_form.dart';
@@ -123,8 +122,8 @@ class _SiteShellState extends State<SiteShell> {
       ]))),
       body: SafeArea(child: ListView(controller: scroll, padding: const EdgeInsets.only(bottom: 32), children: [
         if (!Backend.ready) Padding(padding: const EdgeInsets.all(12), child: MaterialBanner(
-          content: Text(tr('المحتوى متاح دون اتصال. خدمات الطلبات والإدارة تحتاج إعداد Firebase للتطبيق.',
-            'Offline content available. Requests and administration require native Firebase configuration.')),
+          content: Text(tr('المحتوى متاح دون اتصال. خدمات الطلبات والإدارة تحتاج إعداد Supabase للتطبيق.',
+            'Offline content available. Requests and administration require Supabase configuration.')),
           leading: const Icon(Icons.cloud_off_outlined), actions: [TextButton(onPressed: () => go(5), child: Text(tr('تواصل معنا', 'Contact')))],
         )),
         if (selected == 0) ...home()
@@ -174,10 +173,10 @@ class _SiteShellState extends State<SiteShell> {
         ]),
       ])),
     ),
-    StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: Backend.ready ? Backend.db.collection('site_settings').doc('global').snapshots() : null,
+    FutureBuilder<Map<String, dynamic>>(
+      future: Backend.publicSettings(),
       builder: (context, snapshot) {
-        final data = snapshot.data?.data() ?? {};
+        final data = snapshot.data ?? {};
         return Padding(padding: const EdgeInsets.all(20), child: Wrap(spacing: 12, runSpacing: 12, children: [
           for (var i = 1; i <= 4; i++) SizedBox(width: (MediaQuery.sizeOf(context).width - 52) / 2,
             child: panel(Column(children: [
@@ -286,18 +285,18 @@ class _SiteShellState extends State<SiteShell> {
 
   Widget branches() {
     if (!Backend.ready) return const SizedBox.shrink();
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: Backend.db.collection('branches').where('status', isEqualTo: 'active').snapshots(),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: Backend.publicBranches(),
       builder: (context, snapshot) {
         if (snapshot.hasError) return Padding(padding: const EdgeInsets.all(24), child: Text(tr('تعذّر تحميل الفروع. حاول لاحقاً.', 'Unable to load branches. Please try later.')));
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        if (snapshot.data!.docs.isEmpty) return Padding(padding: const EdgeInsets.all(24), child: Text(t('locations.empty')));
-        return Column(children: [for (final doc in snapshot.data!.docs)
+        if (snapshot.data!.isEmpty) return Padding(padding: const EdgeInsets.all(24), child: Text(t('locations.empty')));
+        return Column(children: [for (final doc in snapshot.data!)
           Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: panel(ListTile(
             leading: const Icon(Icons.apartment, color: brand),
-            title: Text('${doc.data()[widget.english ? 'nameEn' : 'nameAr'] ?? ''}'),
-            subtitle: Text('${doc.data()[widget.english ? 'countryEn' : 'countryAr'] ?? ''}\n${doc.data()['phone'] ?? ''}'),
-            onTap: doc.data()['phone'] == null ? null : () => openLink(context, 'tel:${doc.data()['phone']}'),
+            title: Text('${doc[widget.english ? 'nameEn' : 'nameAr'] ?? ''}'),
+            subtitle: Text('${doc[widget.english ? 'countryEn' : 'countryAr'] ?? ''}\n${doc['phone'] ?? ''}'),
+            onTap: doc['phone'] == null ? null : () => openLink(context, 'tel:${doc['phone']}'),
           ))),
         ]);
       },

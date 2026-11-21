@@ -1,0 +1,10 @@
+{
+  "name": "ikill-phase1-schema-tests",
+  "private": true,
+  "scripts": {
+    "test": "node phase1.test.cjs && node phase2.test.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.17"
+  }
+}

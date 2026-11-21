@@ -1,12 +1,12 @@
 // ============================================================
 // analytics.js — Global Standard Script (Non-Module)
-// Tracks page views anonymously. Requires firebase-config.js.
+// Tracks page views anonymously. Requires supabase-config.js.
 // ============================================================
 
 (function trackPageView() {
   // Wait until window.db is initialized
   const checkInterval = setInterval(() => {
-    if (typeof firebase !== 'undefined' && window.db) {
+    if (window.supabaseClient && window.db) {
       clearInterval(checkInterval);
       
       try {
@@ -16,11 +16,11 @@
         // Skip admin and login pages to avoid polluting stats
         if (page === 'admin.html' || page === 'admin-login.html') return;
 
-        window.db.collection('page_views').add({
+        window.db.table('page_events').add({
           page: page,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          timestamp: new Date().toISOString(),
           referrer: document.referrer ? 'referral' : 'direct'
-        });
+        }).catch(() => {}); // Optional analytics must not reject unhandled.
       } catch (err) {
         // Silent catch for security/network issues
       }
