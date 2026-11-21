@@ -17,11 +17,13 @@ class AdminPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (supabaseClient.auth.currentSession == null) return AdminLogin(english: english);
         return FutureBuilder<ProfileAccess>(future: AuthService.requireAdmin(), builder: (context, profile) {
-          if (profile.hasError) return Scaffold(appBar: AppBar(title: const Text('Administration')),
-            body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text(profile.error is AccessDenied ? profile.error.toString() : (english ? 'Could not verify account access. Retry by signing in again.' : 'تعذّر التحقق من صلاحيات الحساب. سجّل الدخول مرة أخرى.')),
-              TextButton(onPressed: () => supabaseClient.auth.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
-            ]))));
+          if (profile.hasError) {
+            return Scaffold(appBar: AppBar(title: const Text('Administration')),
+              body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(profile.error is AccessDenied ? profile.error.toString() : (english ? 'Could not verify account access. Retry by signing in again.' : 'تعذّر التحقق من صلاحيات الحساب. سجّل الدخول مرة أخرى.')),
+                TextButton(onPressed: () => supabaseClient.auth.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
+              ]))));
+          }
           if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
           return AdminDashboard(english: english);
         });
