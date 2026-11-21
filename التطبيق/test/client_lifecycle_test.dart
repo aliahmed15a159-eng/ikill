@@ -52,20 +52,20 @@ void main() {
     }
     await tester.tap(find.text('Save')); await tester.pumpAndSettle();
     expect(repository.sites.length,1); expect(tester.takeException(),isNull);
-    await tester.scrollUntilVisible(find.text('Record findings and price'),200,scrollable:find.byType(Scrollable).first);
+    await tester.scrollUntilVisible(find.text('Record findings and price'),200,scrollable:find.byType(Scrollable).first); await tester.pumpAndSettle();
     await tester.tap(find.text('Record findings and price')); await tester.pumpAndSettle();
     for(var i=0;i<3;i++) {
       await tester.enterText(find.byType(TextFormField).at(i),['Findings','Two production rooms','1000'][i]);
     }
     await tester.tap(find.text('Save')); await tester.pumpAndSettle();
     expect(repository.surveys.single['status'],'completed');
-    await tester.scrollUntilVisible(find.text('New draft for all active sites'),200,scrollable:find.byType(Scrollable).first);
+    await tester.scrollUntilVisible(find.text('New draft for all active sites'),200,scrollable:find.byType(Scrollable).first); await tester.pumpAndSettle();
     await tester.tap(find.text('New draft for all active sites')); await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).at(2),'12000');
     await tester.tap(find.text('Save draft')); await tester.pumpAndSettle();
     expect(repository.plans.single['visits_per_month'],1);
     final activate=find.widgetWithText(FilledButton,'Sign and activate contract');
-    await tester.scrollUntilVisible(activate,200,scrollable:find.byType(Scrollable).first); await tester.tap(activate); await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(activate,200,scrollable:find.byType(Scrollable).first); await tester.pumpAndSettle(); await tester.ensureVisible(activate); await tester.pumpAndSettle(); await tester.tap(activate); await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).at(0),'Representative');
     await tester.enterText(find.byType(TextFormField).at(1),'Paper agreement 123');
     await tester.tap(find.text('Save')); await tester.pumpAndSettle();
