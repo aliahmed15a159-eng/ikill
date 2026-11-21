@@ -29,3 +29,11 @@ Local mocked PostgreSQL: 57 phase1 + 25 phase2 + 40 phase3 + 24 QR assertions pa
 **This increment implements QR administration/display only.** The earlier requested sender-phone + transferred-amount + screenshot upload/review flow is not implemented by this increment; the existing text confirmation and manual administrator payment review remain. No live transfer, authenticated real-device gallery upload, iOS build, or end-to-end bank verification has been performed.
 
 Manual acceptance: sign in as administrator, open QR settings, choose original QR, verify beneficiary, enable/save; request a residential price and check QR display. Replace image and repeat; disable it and verify a new payment attempt shows unavailable. Test PNG/JPEG rejection above 5 MB, cancellation and gallery-permission errors. No site changes or merges.
+
+## Verified APK handoff
+
+CI [44897111507](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44897111507) passed strict Flutter analysis, all Flutter tests, dependency checks, and debug APK build for code `284688a`.
+
+[Download QR-settings test APK](https://github.com/aliahmed15a159-eng/ikill/actions/runs/44897111507/artifacts/14704277562), extract ZIP and install `app-debug.apk`. ZIP SHA-256: `f0bd8f51764b837effc3bf14bfe8530ac173f25444c124654062f4e9cad1a6b0`.
+
+Paused for user testing; branch not merged. Real gallery upload/publication should be tested using the user's actual QR, not a fabricated destination.
