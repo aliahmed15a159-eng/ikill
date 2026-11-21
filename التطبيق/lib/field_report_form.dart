@@ -29,13 +29,14 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
   final materials=TextEditingController(), notes=TextEditingController(), signer=TextEditingController();
   final strokes=<List<Offset>>[];
   Future<void> saving=Future.value();
-  bool busy=false, cameraBusy=false, saveFailed=false, saved=false, loadFailed=false, consent=false;
+  bool busy=false, cameraBusy=false, saveFailed=false, saved=false, loadFailed=false, consent=false, completed=false;
   bool get sealed => draft?['sealed'] == true;
   String tr(String ar,String en)=>widget.english?en:ar;
   @override
   void initState(){super.initState();WidgetsBinding.instance.addObserver(this);load();}
   Future<void> load() async {
     try {
+      if(await widget.store.readJson('completed-${widget.visit}.json')!=null){if(mounted)setState(()=>completed=true);return;}
       final d=await widget.store.load(widget.visit) ?? {'submission':reportSubmissionKey(),'pest':'none','severity':'none','actions':<String>[], 'materials':'','notes':'','signer':'','photos':<String>[],'strokes':<dynamic>[]};
       if(!mounted)return;
       materials.text=d['materials'] as String;notes.text=d['notes'] as String;signer.text=d['signer'] as String;
@@ -105,16 +106,17 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
       final image=await signatureImage();final bytes=await image.toByteData(format:ui.ImageByteFormat.png);image.dispose();
       if(bytes==null)throw StateError('Signature render failed');
       await widget.repository.submit(widget.tenant,widget.user,widget.visit,d,widget.store,bytes.buffer.asUint8List());
+      await widget.store.writeJson('completed-${widget.visit}.json',{'submission':d['submission']});
       // Only remove local evidence after the server acknowledges atomic commit.
       try{await widget.store.remove(widget.visit);}catch(_){/* A retained local copy is safer than data loss. */}
       if(mounted){message(tr('تم إرسال التقرير وإنهاء الزيارة','Report submitted and visit completed'));Navigator.pop(context,true);}
-    }catch(_){if(mounted)message(tr('لم نتأكد من الإرسال. المسودة محفوظة على هذا الهاتف؛ تحقق من الشبكة والتعيين ثم أعد الإرسال. لا تمسح بيانات التطبيق.', 'Submission not confirmed. Draft remains on this phone. Check network and assignment then retry. Do not clear app data.'));}
+    }catch(_){if(mounted)message(saveFailed?tr('فشل حفظ المسودة على الهاتف؛ تحقق من المساحة ولا تغلق الشاشة.', 'Local save failed; check free space and do not close this screen.'):tr('لم نتأكد من الإرسال. المسودة محفوظة على هذا الهاتف؛ تحقق من الشبكة والتعيين ثم أعد الإرسال. لا تمسح بيانات التطبيق.', 'Submission not confirmed. Draft remains on this phone. Check network and assignment then retry. Do not clear app data.'));}
     finally{if(mounted)setState(()=>busy=false);}
   }
   @override
   Widget build(BuildContext context)=>PopScope(canPop:!busy&&!cameraBusy,onPopInvokedWithResult:(didPop,result){if(didPop&&draft!=null)persist();},child:Scaffold(
     appBar:AppBar(title:Text(tr('تقرير الزيارة الرقمي','Digital visit report'))),
-    body:loadFailed?Center(child:Text(tr('تعذّر استرجاع المسودة أو الكاميرا. أغلق الشاشة وأعد فتحها؛ لا تمسح بيانات التطبيق.', 'Draft/camera recovery failed. Reopen this screen; do not clear app data.'))):draft==null?const Center(child:CircularProgressIndicator()):AbsorbPointer(absorbing:busy||cameraBusy,child:ListView(padding:const EdgeInsets.all(16),children:[
+    body:completed?Center(child:Text(tr('تم تأكيد إرسال هذا التقرير وإنهاء الزيارة. حدّث قائمة المهام عند الاتصال.', 'This report was confirmed submitted and the visit completed. Refresh tasks when connected.'))):loadFailed?Center(child:Text(tr('تعذّر استرجاع المسودة أو الكاميرا. أغلق الشاشة وأعد فتحها؛ لا تمسح بيانات التطبيق.', 'Draft/camera recovery failed. Reopen this screen; do not clear app data.'))):draft==null?const Center(child:CircularProgressIndicator()):AbsorbPointer(absorbing:busy||cameraBusy,child:ListView(padding:const EdgeInsets.all(16),children:[
       if(busy||cameraBusy)const LinearProgressIndicator(),
       Text(saveFailed?tr('فشل الحفظ المحلي! تحقق من المساحة ولا تغلق الشاشة.','Local save failed! Check free space; do not close.'):saved?tr('المسودة محفوظة على الهاتف','Draft saved on this phone'):tr('جارٍ حفظ المسودة…','Saving draft…'),style:TextStyle(color:saveFailed?Colors.red:Colors.green)),
       if(sealed)Text(tr('تم تثبيت بيانات محاولة الإرسال لمنع اختلاف النسخ. أعد الإرسال كما هي عند عودة الاتصال.', 'Submission snapshot is locked to prevent conflicting retries. Retry unchanged when connected.')),

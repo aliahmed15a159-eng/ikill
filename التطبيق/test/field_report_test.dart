@@ -32,18 +32,20 @@ void main(){
     expect(reportSubmissionKey(),matches(RegExp(r'^[a-f0-9]{32}$')));
   });
   testWidgets('Report restores persisted offline fields and signature on a narrow phone',(tester)async{
-    final root=await Directory.systemTemp.createTemp('report-widget-');
+    final root=(await tester.runAsync(()=>Directory.systemTemp.createTemp('report-widget-')))!;
     final store=FieldReportStore(root);
-    await store.save('visit',exampleDraft());
+    await tester.runAsync(()=>store.save('visit',exampleDraft()));
     tester.view.physicalSize=const Size(320,800);tester.view.devicePixelRatio=1;
     addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(MaterialApp(home:FieldReportForm(tenant:'tenant',user:'user',visit:'visit',english:true,store:store)));
     await tester.runAsync(()=>Future<void>.delayed(const Duration(milliseconds:150)));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.byType(TextField).first,300,scrollable:find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
     expect(find.text('Bait 10 g'),findsOneWidget);
-    expect((await store.load('visit'))!['materials'],'Bait 10 g');
+    expect((await tester.runAsync(()=>store.load('visit')))!['materials'],'Bait 10 g');
     expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());await tester.pumpAndSettle();
-    await root.delete(recursive:true);
+    await tester.runAsync(()=>root.delete(recursive:true));
   });
 }
