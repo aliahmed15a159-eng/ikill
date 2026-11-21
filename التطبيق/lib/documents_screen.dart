@@ -74,6 +74,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
     if(email){final recipient='${client['email']??''}'.trim();if(!recipient.contains('@'))throw const FormatException('Client email required');await open(Uri(scheme:'mailto',path:recipient,query:'subject=${Uri.encodeComponent('تقرير الزيارة والفاتورة / Visit report and invoice')}&body=${Uri.encodeComponent(message)}'));}
     else{final phone=whatsappPhone('${client['phone']??''}');await open(Uri.https('wa.me','/$phone',{'text':message}));}
   }
+  Future<void> prepare(String report) async {
+    final confirm=await showDialog<bool>(context:context,builder:(ctx)=>AlertDialog(title:Text(tr('تهيئة تقرير سابق وفاتورته؟','Prepare historical report and invoice?')),content:Text(tr('قد تصدر فاتورة جديدة حسب قواعد الدورة أو الدفعة المعتمدة. راجع عدم وجود فاتورة تاريخية مستقلة قبل التأكيد. لن يعتمد أي دفع غير موثّق.','May issue a new invoice under cycle/verified-payment rules. Check for separately issued historical invoices before confirming. Unverified payments are never approved.')),actions:[TextButton(onPressed:()=>Navigator.pop(ctx,false),child:Text(tr('إلغاء','Cancel'))),FilledButton(onPressed:()=>Navigator.pop(ctx,true),child:Text(tr('تأكيد التهيئة','Confirm preparation')))]));
+    if(confirm==true)await action(()=>widget.repository.prepare(report));
+  }
   Future<void> collect(Map<String,dynamic> invoice) async {
     final reference=await showDialog<String>(context:context,builder:(_)=>CollectionDialog(english:widget.english,total:'${invoice['total']} ${invoice['currency']}'));
     if(reference==null)return;
@@ -98,6 +102,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
           Text('${(r['visits'] as Map?)?['client_sites']?['name']??''} — ${r['submitted_at']}'),
           Text(j==null?tr('تقرير سابق: يحتاج إعداد مستنداته بواسطة الإدارة','Legacy report: administration must prepare its documents'):'PDF: ${j['status']}'),
           Wrap(spacing:8,runSpacing:4,children:[
+            if(j==null&&!widget.portal)OutlinedButton(onPressed:busy?null:()=>prepare(r['id'] as String),child:Text(tr('تهيئة التقرير السابق وفاتورته','Prepare historical report and invoice'))),
             if(j?['report_path']!=null)OutlinedButton(onPressed:busy?null:()=>action(()=>download('report-pdfs',j!['report_path'] as String)),child:Text(tr('تحميل تقرير PDF','Download report PDF'))),
             if(j!=null&&j['status']!='ready')OutlinedButton(onPressed:busy?null:()=>action(()=>widget.repository.generate(r['id'] as String)),child:Text(tr('إعادة تجهيز PDF','Retry PDF generation'))),
             if(!widget.portal&&invoice!=null&&j?['report_path']!=null&&invoice['pdf_path']!=null)...[

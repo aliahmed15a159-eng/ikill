@@ -41,6 +41,7 @@ class DocumentsRepository {
     return {'reports':reports,'invoices':invoices,'sites':sites,'visits':visits,'tenant':account.tenantId};
   }
   Future<void> generate(String report) async {await AuthService.profile();await supabaseClient.functions.invoke('app-documents',body:{'report_id':report});}
+  Future<void> prepare(String report) async {await AuthService.requireAdmin();await supabaseClient.rpc('prepare_legacy_report',params:{'target_report':report});await generate(report);}
   Future<void> paid(String invoice,String reference) async {
     await AuthService.requireAdmin();await supabaseClient.rpc('record_invoice_paid',params:{'target_invoice':invoice,'reference':reference});
   }

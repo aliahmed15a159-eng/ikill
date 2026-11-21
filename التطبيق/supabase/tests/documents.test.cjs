@@ -17,7 +17,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
     ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
     GRANT USAGE ON SCHEMA storage TO authenticated,anon;
     GRANT SELECT,INSERT,UPDATE,DELETE ON storage.objects TO authenticated;`);
-  for (const file of ['phase1_schema.sql','phase2_integration.sql','phase3_requests.sql','phase4_instapay_qr.sql','phase5_client_contract_lifecycle.sql','phase6_operations.sql','phase7_field_reports.sql','phase8_billing_documents_portal.sql','phase8b_document_integrity.sql']) {
+  for (const file of ['phase1_schema.sql','phase2_integration.sql','phase3_requests.sql','phase4_instapay_qr.sql','phase5_client_contract_lifecycle.sql','phase6_operations.sql','phase7_field_reports.sql','phase8_billing_documents_portal.sql','phase8b_document_integrity.sql','phase8c_legacy_documents.sql']) {
     await db.exec(fs.readFileSync(path.join(__dirname, '..', file), 'utf8')); checks++;
   }
   const company = (await db.query("SELECT id FROM public.tenants WHERE slug='ikill'")).rows[0].id;
@@ -93,6 +93,15 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   const paid=(await db.query('SELECT * FROM invoices WHERE id=$1',[monthly.id])).rows[0];assert.equal(paid.payment_status,'paid');assert.equal(paid.pdf_path,null);checks+=2;
   await fail(()=>scalar('finish_document_job',[r1,job.lease,reportPath,ipath,null]));
   assert.equal((await db.query('SELECT status FROM document_jobs WHERE report_id=$1',[r2])).rows[0].status,'pending');checks++;
+  await db.exec(`INSERT INTO visits(id,tenant_id,client_id,site_id,technician_id,status,scheduled_start,scheduled_end,started_at,completed_at,quoted_amount,quoted_currency,payment_review,payment_verified_by,payment_verified_at) VALUES('${u(200)}','${company}','${u(10)}','${u(20)}','${u(2)}','completed',now()-interval '2 hours',now()-interval '1 hour',now()-interval '2 hours',now(),500,'EGP','verified','${u(1)}',now());
+    ALTER TABLE visit_reports DISABLE TRIGGER issue_report_invoice;
+    INSERT INTO visit_reports(id,tenant_id,visit_id,technician_id,status) VALUES('${u(201)}','${company}','${u(200)}','${u(2)}','submitted');
+    ALTER TABLE visit_reports ENABLE TRIGGER issue_report_invoice;`);
+  await role(2,()=>fail(()=>scalar('prepare_legacy_report',[u(201)])));
+  const beforeLegacy=await count('invoices');
+  await role(1,async()=>{await scalar('prepare_legacy_report',[u(201)]);await scalar('prepare_legacy_report',[u(201)]);});
+  assert.equal(await count('invoices'),beforeLegacy+1);checks++;
+  assert.equal((await db.query('SELECT * FROM document_jobs WHERE report_id=$1',[u(201)])).rows.length,1);checks++;
   await role(1,()=>scalar('set_client_portal',[u(10),false]));
   await role(3,async()=>{assert.equal((await db.query('SELECT * FROM invoices')).rows.length,0);assert.equal((await db.query("SELECT * FROM storage.objects WHERE bucket_id='report-pdfs' AND name=$1",[reportPath])).rows.length,0);checks+=2;await fail(()=>scalar('claim_document_job',[r1]));});
   await db.exec('SET ROLE anon');await fail(()=>scalar('claim_document_job',[r1]));await db.exec('RESET ROLE');
