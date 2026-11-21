@@ -71,6 +71,7 @@ class _ClientDetailState extends State<ClientDetail> {
   bool busy = false;
   final drafts = <String, Map<String, String>>{};
   String newContractId = newRequestId();
+  final contractDrafts = <String, Map<String, dynamic>>{};
   String tr(String ar, String en) => widget.english ? en : ar;
   @override
   void initState() { super.initState(); reload(); }
@@ -112,11 +113,16 @@ class _ClientDetailState extends State<ClientDetail> {
     await action(() async { await widget.repository.saveSurvey(widget.clientId, site['id'] as String, id, values); drafts.remove(key); });
   }
   Future<void> contract(List<Map<String, dynamic>> sites, List<Map<String, dynamic>> plans, [Map<String, dynamic>? existing]) async {
-    final values = await showDialog<Map<String, dynamic>>(context: context, builder: (_) => ContractEditor(english: widget.english, sites: sites, initial: existing, plans: plans));
-    if (values == null || !mounted) return;
     final id = existing?['id'] as String? ?? newContractId;
-    await action(() async { await widget.repository.saveContract(id, widget.clientId, values); newContractId = newRequestId(); });
+    final preserved = contractDrafts[id];
+    final initial = preserved == null ? existing : {'starts_on': preserved['start'], 'ends_on': preserved['end'], 'billing_amount': preserved['total'], 'billing_cycle': preserved['cycle']};
+    final initialPlans = preserved == null ? plans : List<Map<String, dynamic>>.from(preserved['plans'] as List);
+    final values = await showDialog<Map<String, dynamic>>(context: context, builder: (_) => ContractEditor(english: widget.english, sites: sites, initial: initial, plans: initialPlans));
+    if (values == null || !mounted) return;
+    contractDrafts[id] = values;
+    await action(() async { await widget.repository.saveContract(id, widget.clientId, values); contractDrafts.remove(id); newContractId = newRequestId(); });
   }
+
   Future<void> activateContract(Map<String, dynamic> contract) async {
     final values = await edit('signature', tr('توقيع وتفعيل العقد', 'Sign and activate contract'), {
       'signer': LifecycleField(tr('اسم ممثل العميل الذي وقّع', 'Signing customer representative')),

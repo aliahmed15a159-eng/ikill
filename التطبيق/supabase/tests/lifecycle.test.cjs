@@ -74,5 +74,17 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   await role(3,async()=>{assert.equal((await db.query('SELECT * FROM contract_site_plans')).rows.length,0);checks++;});
   await db.exec(`INSERT INTO tenants(id,slug,name) VALUES('${u(900)}','foreign','Foreign');INSERT INTO clients(id,tenant_id,client_code,display_name,client_type) VALUES('${u(901)}','${u(900)}','foreign','Foreign','contract');`);
   await role(1,()=>fail(()=>rpc('save_client_contract',[u(110),u(901),'2028-01-01','2028-12-31',1000,'annual',plans])));
+  assert.ok((await db.query("SELECT extract(hour FROM scheduled_start AT TIME ZONE 'Africa/Cairo')::int h FROM visits WHERE contract_id=$1 AND id<>$2",[u(100),visits[0].id])).rows.every(r=>r.h===10));checks++;
+  await db.exec(`INSERT INTO client_sites(id,tenant_id,client_id,name,sector,address) VALUES('${u(22)}','${company}','${u(10)}','Unsurveyed','factory','Address');`);
+  await role(1,async()=>{
+    await rpc('save_client_contract',[u(103),u(10),'2029-01-01','2029-01-31',1000,'annual',plans]);
+    await fail(()=>rpc('activate_client_contract',[u(103),'Rep','Ref']));
+    await rpc('save_client_contract',[u(103),u(10),'2029-01-01','2029-01-31',1000,'annual',[...plans,{site_id:u(22),visits_per_month:1}]]);
+    await fail(()=>rpc('activate_client_contract',[u(103),'Rep','Ref']));
+  });
+  assert.equal((await db.query('SELECT count(*)::int n FROM visits WHERE contract_id=$1',[u(103)])).rows[0].n,0);checks++;
+  await db.exec('SET ROLE anon');
+  await fail(()=>rpc('activate_client_contract',[u(100),'Rep','Ref']));
+  await db.exec('RESET ROLE');
   console.log(`Lifecycle: ${checks} assertions passed`);await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});
