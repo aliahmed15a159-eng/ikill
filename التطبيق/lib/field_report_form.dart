@@ -30,6 +30,7 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
   final strokes=<List<Offset>>[];
   Future<void> saving=Future.value();
   bool busy=false, cameraBusy=false, saveFailed=false, saved=false, loadFailed=false, consent=false;
+  bool get sealed => draft?['sealed'] == true;
   String tr(String ar,String en)=>widget.english?en:ar;
   @override
   void initState(){super.initState();WidgetsBinding.instance.addObserver(this);load();}
@@ -41,9 +42,12 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
       for(final stroke in d['strokes'] as List){strokes.add([for(final p in stroke as List) Offset((p[0] as num).toDouble(),(p[1] as num).toDouble())]);}
       setState(()=>draft=d);
       if(!Platform.isAndroid)return;
+      final pending=await widget.store.readJson('camera.json');
+      if(pending is! Map || pending['visit']!=widget.visit)return;
       final lost=await ImagePicker().retrieveLostData();
       if(lost.exception!=null) throw StateError('Camera recovery failed');
       if(lost.files!=null){for(final photo in lost.files!){await keepPhoto(photo.path);}}
+      await widget.store.writeJson('camera.json',<String,dynamic>{});
     } catch(_){if(mounted)setState(()=>loadFailed=true);}
   }
   Map<String,dynamic> snapshot()=>{...draft!, 'materials':materials.text,'notes':notes.text,'signer':signer.text,
@@ -74,8 +78,10 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
     setState(()=>cameraBusy=true);
     try{
       await persist();if(saveFailed)throw StateError('Local save failed');
+      await widget.store.writeJson('camera.json',{'visit':widget.visit});
       final photo=await ImagePicker().pickImage(source:ImageSource.camera,maxWidth:1600,imageQuality:80);
       if(photo!=null)await keepPhoto(photo.path);
+      await widget.store.writeJson('camera.json',<String,dynamic>{});
     }catch(_){if(mounted)message(tr('تعذّر حفظ الصورة. تحقق من إذن الكاميرا والمساحة؛ الحد 10 ميجا للصورة.', 'Could not save photo. Check camera permission and space; 10 MB per image maximum.'));}
     finally{if(mounted)setState(()=>cameraBusy=false);}
   }
@@ -93,7 +99,7 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
       content:Text(tr('سيُرفع التقرير والصور والتوقيع ويُغلق التنفيذ. لن يمكن للفني تعديل التقرير بعد الإرسال. عند فشل الاتصال تبقى المسودة؛ أعد الإرسال بنفس الشاشة.', 'Report, photos and signature will upload and the visit will complete. Submitted reports are immutable to technicians. If connection fails, keep the draft and retry here.')),
       actions:[TextButton(onPressed:()=>Navigator.pop(ctx,false),child:Text(tr('إلغاء','Cancel'))),FilledButton(onPressed:()=>Navigator.pop(ctx,true),child:Text(tr('إرسال','Submit')))]));
     if(confirmed!=true||!mounted)return;
-    setState(()=>busy=true);
+    setState((){busy=true;draft!['sealed']=true;});
     try{
       await persist();if(saveFailed)throw StateError('Local save failed');
       final image=await signatureImage();final bytes=await image.toByteData(format:ui.ImageByteFormat.png);image.dispose();
@@ -111,23 +117,24 @@ class _FieldReportFormState extends State<FieldReportForm> with WidgetsBindingOb
     body:loadFailed?Center(child:Text(tr('تعذّر استرجاع المسودة أو الكاميرا. أغلق الشاشة وأعد فتحها؛ لا تمسح بيانات التطبيق.', 'Draft/camera recovery failed. Reopen this screen; do not clear app data.'))):draft==null?const Center(child:CircularProgressIndicator()):AbsorbPointer(absorbing:busy||cameraBusy,child:ListView(padding:const EdgeInsets.all(16),children:[
       if(busy||cameraBusy)const LinearProgressIndicator(),
       Text(saveFailed?tr('فشل الحفظ المحلي! تحقق من المساحة ولا تغلق الشاشة.','Local save failed! Check free space; do not close.'):saved?tr('المسودة محفوظة على الهاتف','Draft saved on this phone'):tr('جارٍ حفظ المسودة…','Saving draft…'),style:TextStyle(color:saveFailed?Colors.red:Colors.green)),
+      if(sealed)Text(tr('تم تثبيت بيانات محاولة الإرسال لمنع اختلاف النسخ. أعد الإرسال كما هي عند عودة الاتصال.', 'Submission snapshot is locked to prevent conflicting retries. Retry unchanged when connected.')),
       Text(tr('يمكن تعبئة التقرير بلا إنترنت بعد بدء الزيارة. الإرسال يتطلب اتصالاً. المسودات خاصة بهذا الحساب على هذا الهاتف؛ حذف التطبيق أو بياناته يحذفها.', 'Fill offline after starting the visit. Submission needs internet. Drafts belong to this account on this phone; uninstalling or clearing app data removes them.')),
-      DropdownButtonFormField<String>(value:draft!['pest'] as String,decoration:InputDecoration(labelText:tr('نوع الإصابة','Pest type')),items:[for(final e in fieldPests.entries)DropdownMenuItem(value:e.key,child:Text(e.value))],onChanged:(v){setState(()=>draft!['pest']=v);persist();}),
-      DropdownButtonFormField<String>(value:draft!['severity'] as String,decoration:InputDecoration(labelText:tr('حالة الإصابة','Severity')),items:[for(final e in fieldSeverity.entries)DropdownMenuItem(value:e.key,child:Text(e.value))],onChanged:(v){setState(()=>draft!['severity']=v);persist();}),
+      DropdownButtonFormField<String>(value:draft!['pest'] as String,decoration:InputDecoration(labelText:tr('نوع الإصابة','Pest type')),items:[for(final e in fieldPests.entries)DropdownMenuItem(value:e.key,child:Text(e.value))],onChanged:sealed?null:(v){setState(()=>draft!['pest']=v);persist();}),
+      DropdownButtonFormField<String>(value:draft!['severity'] as String,decoration:InputDecoration(labelText:tr('حالة الإصابة','Severity')),items:[for(final e in fieldSeverity.entries)DropdownMenuItem(value:e.key,child:Text(e.value))],onChanged:sealed?null:(v){setState(()=>draft!['severity']=v);persist();}),
       const SizedBox(height:12),Text(tr('الإجراءات المنفذة','Actions performed')),
-      for(final e in fieldActions.entries)CheckboxListTile(contentPadding:EdgeInsets.zero,title:Text(e.value),value:(draft!['actions'] as List).contains(e.key),onChanged:(v){setState((){final a=draft!['actions'] as List;v==true?a.add(e.key):a.remove(e.key);});persist();}),
-      TextField(controller:materials,maxLength:4000,maxLines:3,decoration:InputDecoration(labelText:tr('المواد المستخدمة والكميات / لا يوجد','Materials and quantities / none')),onChanged:(_)=>persist()),
-      TextField(controller:notes,maxLength:8000,maxLines:4,decoration:InputDecoration(labelText:tr('ملاحظات وتوصيات','Notes and recommendations')),onChanged:(_)=>persist()),
+      for(final e in fieldActions.entries)CheckboxListTile(contentPadding:EdgeInsets.zero,title:Text(e.value),value:(draft!['actions'] as List).contains(e.key),onChanged:sealed?null:(v){setState((){final a=draft!['actions'] as List;v==true?a.add(e.key):a.remove(e.key);});persist();}),
+      TextField(readOnly:sealed,controller:materials,maxLength:4000,maxLines:3,decoration:InputDecoration(labelText:tr('المواد المستخدمة والكميات / لا يوجد','Materials and quantities / none')),onChanged:(_)=>persist()),
+      TextField(readOnly:sealed,controller:notes,maxLength:8000,maxLines:4,decoration:InputDecoration(labelText:tr('ملاحظات وتوصيات','Notes and recommendations')),onChanged:(_)=>persist()),
       Text(tr('الصور: حتى 6، بعد موافقة الموقع','Photos: up to 6, with site permission')),
-      for(final name in List<String>.from(draft!['photos'] as List))FutureBuilder<File>(future:widget.store.photo(widget.visit,name),builder:(context,snapshot)=>snapshot.hasData?Column(children:[Image.file(snapshot.data!,height:160,errorBuilder:(_,error,stack)=>Text(tr('الصورة غير متاحة؛ أعد التقاطها','Photo unavailable; retake'))),TextButton(onPressed:(){setState(()=>(draft!['photos'] as List).remove(name));persist();},child:Text(tr('إزالة الصورة','Remove photo')))]):const SizedBox()),
-      OutlinedButton.icon(onPressed:(draft!['photos'] as List).length>=6?null:camera,icon:const Icon(Icons.camera_alt),label:Text(tr('التقاط صورة','Take photo'))),
-      TextField(controller:signer,maxLength:160,decoration:InputDecoration(labelText:tr('اسم مسؤول الموقع الموقّع','Site representative name')),onChanged:(_)=>persist()),
+      for(final name in List<String>.from(draft!['photos'] as List))FutureBuilder<File>(future:widget.store.photo(widget.visit,name),builder:(context,snapshot)=>snapshot.hasData?Column(children:[Image.file(snapshot.data!,height:160,errorBuilder:(_,error,stack)=>Text(tr('الصورة غير متاحة؛ أعد التقاطها','Photo unavailable; retake'))),TextButton(onPressed:sealed?null:(){setState(()=>(draft!['photos'] as List).remove(name));persist();},child:Text(tr('إزالة الصورة','Remove photo')))]):const SizedBox()),
+      OutlinedButton.icon(onPressed:sealed||(draft!['photos'] as List).length>=6?null:camera,icon:const Icon(Icons.camera_alt),label:Text(tr('التقاط صورة','Take photo'))),
+      TextField(readOnly:sealed,controller:signer,maxLength:160,decoration:InputDecoration(labelText:tr('اسم مسؤول الموقع الموقّع','Site representative name')),onChanged:(_)=>persist()),
       Text(tr('توقيع مسؤول الموقع — ارسم داخل المربع','Site representative signature — draw in the box')),
       LayoutBuilder(builder:(context,constraints)=>Container(height:180,decoration:BoxDecoration(color:Colors.white,border:Border.all(color:Colors.grey)),child:GestureDetector(
-        onPanStart:(d){setState(()=>strokes.add([Offset((d.localPosition.dx/constraints.maxWidth).clamp(0,1),(d.localPosition.dy/180).clamp(0,1))]));},
-        onPanUpdate:(d){setState(()=>strokes.last.add(Offset((d.localPosition.dx/constraints.maxWidth).clamp(0,1),(d.localPosition.dy/180).clamp(0,1))));},
-        onPanEnd:(_)=>persist(),onPanCancel:()=>persist(),child:CustomPaint(painter:SignaturePainter(strokes),size:Size(constraints.maxWidth,180))))),
-      TextButton(onPressed:(){setState(()=>strokes.clear());persist();},child:Text(tr('مسح التوقيع','Clear signature'))),
+        onPanStart:sealed?null:(d){setState(()=>strokes.add([Offset((d.localPosition.dx/constraints.maxWidth).clamp(0,1),(d.localPosition.dy/180).clamp(0,1))]));},
+        onPanUpdate:sealed?null:(d){setState(()=>strokes.last.add(Offset((d.localPosition.dx/constraints.maxWidth).clamp(0,1),(d.localPosition.dy/180).clamp(0,1))));},
+        onPanEnd:sealed?null:(_)=>persist(),onPanCancel:sealed?null:()=>persist(),child:CustomPaint(painter:SignaturePainter(strokes),size:Size(constraints.maxWidth,180))))),
+      TextButton(onPressed:sealed?null:(){setState(()=>strokes.clear());persist();},child:Text(tr('مسح التوقيع','Clear signature'))),
       CheckboxListTile(value:consent,onChanged:(v)=>setState(()=>consent=v==true),title:Text(tr('أقرّ بموافقة مسؤول الموقع على تسجيل توقيعه وإرساله مع التقرير. هذا توقيع مرسوم وليس خدمة توقيع معتمدة.', 'The site representative consents to recording and submitting this drawn signature. This is not a certified digital-signature service.'))),
       OutlinedButton(onPressed:persist,child:Text(tr('حفظ المسودة محلياً','Save draft locally'))),
       FilledButton(onPressed:send,child:Text(tr('إنهاء وإرسال التقرير','Complete and submit report'))),

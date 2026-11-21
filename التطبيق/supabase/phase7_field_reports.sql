@@ -41,6 +41,7 @@ BEGIN
  OR jsonb_typeof(checklist->'actions') IS DISTINCT FROM 'array' OR jsonb_array_length(checklist->'actions') NOT BETWEEN 1 AND 8
  OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(checklist->'actions') a WHERE a NOT IN ('inspection','spraying','baiting','traps','sealing','sanitation','monitoring','advice'))
  OR materials IS NULL OR length(trim(materials)) NOT BETWEEN 1 AND 4000 OR length(coalesce(notes,''))>8000
+ OR checklist->'signature_consent' IS DISTINCT FROM 'true'::jsonb
  OR signer IS NULL OR length(trim(signer)) NOT BETWEEN 2 AND 160 OR signature_path IS NULL
  OR photos IS NULL OR cardinality(photos)>6 OR array_position(photos,NULL) IS NOT NULL THEN RAISE EXCEPTION 'INVALID_REPORT'; END IF;
  prefix:=item.tenant_id::text||'/'||item.id::text||'/'||submission||'/';

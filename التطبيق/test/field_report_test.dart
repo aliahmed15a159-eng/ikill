@@ -40,8 +40,7 @@ void main(){
     await tester.pumpWidget(MaterialApp(home:FieldReportForm(tenant:'tenant',user:'user',visit:'visit',english:true,store:store)));
     await tester.runAsync(()=>Future<void>.delayed(const Duration(milliseconds:150)));
     await tester.pumpAndSettle();
-    // Camera recovery plugin may not exist on the test runner. Its failure is
-    // explicit, and must never replace the already persisted draft.
+    expect(find.text('Bait 10 g'),findsOneWidget);
     expect((await store.load('visit'))!['materials'],'Bait 10 g');
     expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());await tester.pumpAndSettle();

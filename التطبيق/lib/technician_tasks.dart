@@ -141,6 +141,7 @@ class _TechnicianTasksState extends State<TechnicianTasks> with WidgetsBindingOb
       for (final row in snapshot.data!) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('${row['client_name']} / ${(row['site'] as Map?)?['name']} — ${visitStatusLabel(row['status'] as String, widget.english)}'),
       Text('${row['local_day'] == row['today'] ? tr('اليوم', 'Today') : row['status'] == 'in_progress' ? tr('قيد التنفيذ', 'In progress') : tr('قادمة', 'Upcoming')} — ${row['timezone']}'),
+      Text(tr('الموعد التالي بتوقيت الجهاز:', 'Time below uses device timezone:')),
       Text('${row['scheduled_start'] == null ? tr('لم تُجدول', 'Unscheduled') : DateTime.parse(row['scheduled_start'] as String).toLocal()}'),
       SelectableText('${(row['site'] as Map?)?['address']}\n${(row['site'] as Map?)?['contact_phone'] ?? ''}\n${row['instructions'] ?? ''}'),
       Wrap(spacing:8,children:[

@@ -38,7 +38,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   const fail=async fn=>{await assert.rejects(fn);checks++};
   const scalar=async(name,args=[])=>(await db.query(`SELECT public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) result`,args)).rows[0]?.result;
   const key='a'.repeat(32), prefix=`${company}/${u(30)}/${key}/`;
-  const payload=[u(30),key,JSON.stringify({pest:'rodents',severity:'low',actions:['inspection']}),'None','Notes',[prefix+'photo-1.jpg'],prefix+'signature.png','Site rep'];
+  const payload=[u(30),key,JSON.stringify({pest:'rodents',severity:'low',actions:['inspection'],signature_consent:true}),'None','Notes',[prefix+'photo-1.jpg'],prefix+'signature.png','Site rep'];
   await role(1,()=>fail(()=>scalar('get_my_field_visits',[0])));
   await role(3,()=>fail(()=>scalar('get_my_field_visits',[0])));
   await role(2,async()=>{
@@ -53,7 +53,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   assert.equal((await db.query('SELECT count(*) n FROM visit_reports')).rows[0].n,0);checks++;
   await db.query("INSERT INTO storage.objects(bucket_id,name) VALUES('visit-images',$1),('visit-signatures',$2)",[prefix+'photo-1.jpg',prefix+'signature.png']);
   await role(2,async()=>{
-    await fail(()=>scalar('submit_field_report',[...payload.slice(0,2),JSON.stringify({pest:'invalid',severity:'low',actions:['inspection']}),...payload.slice(3)]));
+    await fail(()=>scalar('submit_field_report',[...payload.slice(0,2),JSON.stringify({pest:'invalid',severity:'low',actions:['inspection'],signature_consent:true}),...payload.slice(3)]));
     await fail(()=>scalar('submit_field_report',[...payload.slice(0,5),['other-tenant/photo.jpg'],...payload.slice(6)]));
     const id=await scalar('submit_field_report',payload);assert.ok(id);checks++;
     assert.equal(await scalar('submit_field_report',payload),id);checks++;

@@ -26,7 +26,7 @@ class FieldReportRepository {
     await supabaseClient.storage.from('visit-signatures').uploadBinary(path, signature, fileOptions: const FileOptions(contentType:'image/png',upsert:true));
     await supabaseClient.rpc('submit_field_report', params: {
       'target_visit':visit,'submission':key,
-      'checklist':{'pest':draft['pest'],'severity':draft['severity'],'actions':draft['actions'],'materials':draft['materials']},
+      'checklist':{'pest':draft['pest'],'severity':draft['severity'],'actions':draft['actions'],'materials':draft['materials'],'signature_consent':true},
       'materials':draft['materials'],'notes':draft['notes'],'photos':photos,'signature_path':path,'signer':draft['signer'],
     });
   }
