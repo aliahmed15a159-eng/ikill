@@ -1,3 +1,4 @@
+import 'push_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 
@@ -5,12 +6,14 @@ class ProfileAccess {
   final Map<String, dynamic> data;
   const ProfileAccess(this.data);
   String get role => data['role'] as String? ?? '';
+  bool get incomplete => role == 'customer' && data['profile_incomplete'] == true;
+  String get fullName => data['full_name'] as String? ?? '';
   String get tenantId => data['tenant_id'] as String? ?? '';
   String? get denial {
     if (data['is_active'] != true || data['tenant_active'] != true) {
       return 'الحساب أو الشركة غير مفعّل / Account or company is inactive.';
     }
-    if (!['admin', 'technician', 'client'].contains(role) || tenantId.isEmpty) {
+    if (!['admin', 'technician', 'client', 'customer'].contains(role) || tenantId.isEmpty) {
       return 'لا توجد صلاحية حساب معتمدة / Account profile is not provisioned.';
     }
     if (role == 'client' && data['portal_enabled'] != true) {
@@ -50,7 +53,7 @@ class AuthService {
       return await profile();
     } catch (e) {
       if (e is AccessDenied) lastDenial = e.message;
-      await supabaseClient.auth.signOut(scope: SignOutScope.local);
+      await PushService.signOut(scope: SignOutScope.local);
       rethrow;
     }
   }

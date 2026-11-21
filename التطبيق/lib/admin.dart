@@ -1,77 +1,31 @@
+import 'design/brand_controller.dart';
+import 'design/components.dart';
+import 'account_page.dart';
+import 'notifications_screen.dart';
+import 'push_service.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
+import 'documents_screen.dart';
+import 'portal_admin.dart';
+import 'operations_dashboard.dart';
+import 'client_admin.dart';
+import 'admin_dialogs.dart';
 import 'request_admin.dart';
 import 'instapay_admin.dart';
 
 class AdminPage extends StatelessWidget {
   final bool english;
-  const AdminPage({super.key, required this.english});
+  const AdminPage({super.key,required this.english});
   @override
-  Widget build(BuildContext context) {
-    if (!Backend.ready) {
-      return Scaffold(appBar: AppBar(title: const Text('Administration')),
-        body: Center(child: Text(english ? 'Configure Supabase first.' : 'يلزم إعداد Supabase أولاً.')));
-    }
-    return StreamBuilder<AuthState>(stream: supabaseClient.auth.onAuthStateChange,
-      builder: (context, snapshot) {
-        if (supabaseClient.auth.currentSession == null) return AdminLogin(english: english);
-        return FutureBuilder<ProfileAccess>(future: AuthService.requireAdmin(), builder: (context, profile) {
-          if (profile.hasError) {
-            return Scaffold(appBar: AppBar(title: const Text('Administration')),
-              body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(profile.error is AccessDenied ? profile.error.toString() : (english ? 'Could not verify account access. Retry by signing in again.' : 'تعذّر التحقق من صلاحيات الحساب. سجّل الدخول مرة أخرى.')),
-                TextButton(onPressed: () => supabaseClient.auth.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
-              ]))));
-          }
-          if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          return AdminDashboard(english: english);
-        });
-      });
-  }
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
-
-class AdminLogin extends StatefulWidget {
-  final bool english;
-  const AdminLogin({super.key, required this.english});
+// Compatibility entry point: all roles now use the same secure account router.
+class AdminLogin extends StatelessWidget {
+  final bool english,technician,client;
+  const AdminLogin({super.key,required this.english,this.technician=false,this.client=false});
   @override
-  State<AdminLogin> createState() => _AdminLoginState();
-}
-class _AdminLoginState extends State<AdminLogin> {
-  final email = TextEditingController(), password = TextEditingController();
-  final form = GlobalKey<FormState>();
-  bool busy = false;
-  String? error;
-  String tr(String ar, String en) => widget.english ? en : ar;
-  @override
-  void dispose() { email.dispose(); password.dispose(); super.dispose(); }
-  Future<void> login() async {
-    if (!(form.currentState?.validate() ?? false)) return;
-    setState(() { busy = true; error = null; });
-    try {
-      await AuthService.signIn(email.text.trim(), password.text);
-    } catch (e) {
-      if (mounted) setState(() => error = e is AccessDenied ? e.message : tr('تعذّر تسجيل الدخول. تحقق من بياناتك والاتصال.', 'Sign-in failed. Check your credentials and connection.'));
-    } finally { if (mounted) setState(() => busy = false); }
-  }
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(tr('دخول الإدارة', 'Administrator sign-in'))),
-    body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Form(key: form, child: Column(children: [
-      const Icon(Icons.verified_user_outlined, size: 64), const SizedBox(height: 24),
-      TextFormField(controller: email, enabled: !busy, keyboardType: TextInputType.emailAddress,
-        autofillHints: const [AutofillHints.username], decoration: InputDecoration(labelText: tr('البريد الإلكتروني', 'Email')),
-        validator: (v) => v == null || !v.contains('@') ? tr('أدخل البريد الإلكتروني', 'Enter email') : null),
-      const SizedBox(height: 16),
-      TextFormField(controller: password, enabled: !busy, obscureText: true, autofillHints: const [AutofillHints.password],
-        decoration: InputDecoration(labelText: tr('كلمة المرور', 'Password')),
-        validator: (v) => v == null || v.isEmpty ? tr('أدخل كلمة المرور', 'Enter password') : null),
-      const SizedBox(height: 20),
-      if (error != null || AuthService.lastDenial != null) Text(error ?? AuthService.lastDenial!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-      FilledButton(onPressed: busy ? null : login, child: Text(busy ? '…' : tr('تسجيل الدخول', 'Sign in'))),
-    ]))))),
-  );
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
 
 class AdminDashboard extends StatefulWidget {
@@ -82,7 +36,7 @@ class AdminDashboard extends StatefulWidget {
 }
 class _AdminDashboardState extends State<AdminDashboard> {
   String tr(String ar, String en) => widget.english ? en : ar;
-  int tab = 0;
+  int tab = 8;
   String query = '';
   Future<void> action(Future<void> Function() fn) async {
     try { await fn(); if (mounted) setState(() {}); }
@@ -99,19 +53,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(tr('لوحة إدارة iKILL', 'iKILL administration')), actions: [
+    appBar: AppBar(title: Text(tr('لوحة الإدارة — ${BrandController.instance.name}', '${BrandController.instance.name} administration')), actions: [
+      const NotificationBell(),
       IconButton(tooltip: tr('تغيير كلمة المرور', 'Change password'), onPressed: changePassword, icon: const Icon(Icons.lock_outline)),
-      IconButton(tooltip: tr('خروج', 'Sign out'), onPressed: () => action(() => supabaseClient.auth.signOut()), icon: const Icon(Icons.logout)),
+      IconButton(tooltip: tr('خروج', 'Sign out'), onPressed: () => action(() => PushService.signOut()), icon: const Icon(Icons.logout)),
     ]),
     body: Column(children: [
-      Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(value: tab,
-        items: [tr('طلبات التواصل', 'Contact requests'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings')]
+      Padding(padding: const EdgeInsets.all(12), child: DropdownButtonFormField<int>(isExpanded:true,value: tab,
+        items: [tr('إدارة العملاء', 'Client management'), tr('الفروع', 'Branches'), tr('إعدادات الموقع', 'Site settings'), tr('الزيارات', 'Page views'), tr('أسعار الخدمات السكنية', 'Residential prices'), tr('طلبات بانتظار الجدولة', 'Pending scheduling'), tr('طلبات معاينة المنشآت', 'Business survey requests'), tr('إعداد QR إنستا باي', 'InstaPay QR settings'), tr('لوحة التشغيل والتقويم', 'Operations and calendar'), tr('التقارير والفواتير والتحصيل', 'Documents and collection'), tr('هوية التطبيق والمستندات','App and document branding')]
           .asMap().entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
         onChanged: (v) => setState(() { tab = v ?? 0; query = ''; }))),
-      if (tab == 0) Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: TextField(
-        decoration: InputDecoration(labelText: tr('بحث بالاسم أو الهاتف أو البريد', 'Search name, phone or email'), prefixIcon: const Icon(Icons.search)),
-        onChanged: (v) => setState(() => query = v.toLowerCase()))),
-      Expanded(child: tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
+      Expanded(child: tab == 10 ? DocumentBrandSettings(english: widget.english) : tab == 9 ? DocumentsScreen(english: widget.english) : tab == 8 ? OperationsDashboard(english: widget.english) : tab == 0 ? ClientAdmin(english: widget.english) : tab == 7 ? InstapayAdmin(english: widget.english) : tab >= 4 ? RequestAdmin(key: ValueKey(tab), english: widget.english, mode: tab - 4) : tab == 2 ? settings() : records()),
     ]),
     floatingActionButton: tab == 1 ? FloatingActionButton(onPressed: () => editBranch(), child: const Icon(Icons.add)) : null,
   );
@@ -119,7 +71,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget records() {
     return FutureBuilder<List<Map<String, dynamic>>>(future: Backend.records(tab), builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر تحميل البيانات. تحقق من الصلاحيات والاتصال.', 'Cannot load data. Check permissions and connection.')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+      if (!snapshot.hasData) return const SkeletonLoader();
       final docs = snapshot.data!.where((d) => query.isEmpty || d.values.join(' ').toLowerCase().contains(query)).toList();
       if (docs.isEmpty) return Center(child: Text(tr('لا توجد بيانات', 'No records')));
       return ListView.builder(padding: const EdgeInsets.all(12), itemCount: docs.length + 1, itemBuilder: (context, i) {
@@ -148,7 +100,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final keys = ['nameAr', 'nameEn', 'countryAr', 'countryEn', 'phone'];
     final initial = doc ?? <String, dynamic>{};
     final values = await editFields(tr('بيانات الفرع', 'Branch details'), keys, initial, includeStatus: true);
-    if (values == null) return;
+    if (values == null || !mounted) return;
     await action(() => Backend.saveBranch(values, id: doc?['id'] as String?));
   }
 
@@ -156,50 +108,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
     future: Backend.adminSettings(),
     builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر تحميل الإعدادات', 'Cannot load settings')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+      if (!snapshot.hasData) return const SkeletonLoader();
       final data = snapshot.data!;
       final keys = ['phone', 'emergency', 'address', for (var i = 1; i <= 4; i++) ...['stat${i}Value', 'stat${i}Label']];
       return ListView(padding: const EdgeInsets.all(20), children: [
         for (final key in keys) ListTile(title: Text(key), subtitle: Text('${data[key] ?? ''}')),
         FilledButton(onPressed: () async {
           final values = await editFields(tr('إعدادات الموقع', 'Site settings'), keys, data);
-          if (values == null) return;
-          await action(() => Backend.saveSettings({...values, 'email': 'info@ikill.net', 'stat1Value': '15'}));
+          if (values == null || !mounted) return;
+          await action(() => Backend.saveSettings(values));
           if (mounted) setState(() {});
         }, child: Text(tr('تعديل الإعدادات', 'Edit settings'))),
       ]);
     });
 
   Future<Map<String, String>?> editFields(String title, List<String> keys, Map<String, dynamic> data, {bool includeStatus = false, Set<String> secret = const {}}) async {
-    final controllers = {for (final key in keys) key: TextEditingController(text: '${data[key] ?? ''}')};
-    var status = '${data['status'] ?? 'active'}';
-    if (!['active', 'inactive'].contains(status)) status = 'inactive';
-    final formKey = GlobalKey<FormState>();
-    final result = await showDialog<Map<String, String>>(context: context, builder: (context) => StatefulBuilder(builder: (context, update) => AlertDialog(
-      title: Text(title), content: SizedBox(width: 500, child: SingleChildScrollView(child: Form(key: formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
-        for (final key in keys) Padding(padding: const EdgeInsets.only(bottom: 12), child: TextFormField(
-          controller: controllers[key], obscureText: secret.contains(key), decoration: InputDecoration(labelText: key),
-          validator: (v) => key != 'phone' && (v?.trim().isEmpty ?? true) ? tr('مطلوب', 'Required') : null)),
-        if (includeStatus) DropdownButtonFormField<String>(value: status,
-          items: ['active', 'inactive'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-          onChanged: (s) => update(() => status = s ?? status)),
-      ])))) , actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(tr('إلغاء', 'Cancel'))),
-        FilledButton(onPressed: () {
-          if (!(formKey.currentState?.validate() ?? false)) return;
-          Navigator.pop(context, {for (final e in controllers.entries) e.key: secret.contains(e.key) ? e.value.text : e.value.text.trim(), if (includeStatus) 'status': status});
-        }, child: Text(tr('حفظ', 'Save'))),
-      ],
-    )));
-    // Controllers are kept until the dialog's reverse transition is complete.
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-    for (final c in controllers.values) { c.dispose(); }
-    return result;
+    return showDialog<Map<String, String>>(context: context, builder: (_) => AdminFieldsEditor(
+      english: widget.english, title: title, fields: keys, initial: data, includeStatus: includeStatus, secret: secret));
   }
 
   Future<void> changePassword() async {
     final values = await editFields(tr('تغيير كلمة المرور', 'Change password'), ['currentPassword', 'newPassword', 'confirmPassword'], {}, secret: {'currentPassword', 'newPassword', 'confirmPassword'});
-    if (values == null) return;
+    if (values == null || !mounted) return;
     if (values['newPassword'] != values['confirmPassword'] || values['newPassword']!.length < 8) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('استخدم كلمة مرور متطابقة من 8 أحرف على الأقل.', 'Use matching passwords of at least 8 characters.'))));
       return;

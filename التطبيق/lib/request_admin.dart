@@ -1,19 +1,24 @@
+import 'design/components.dart';
 import 'package:flutter/material.dart';
 import 'request_models.dart';
 import 'request_repository.dart';
 import 'auth_service.dart';
+import 'client_admin.dart';
+import 'admin_dialogs.dart';
 import 'supabase_client.dart';
 
 class RequestAdmin extends StatefulWidget {
   final bool english;
   final int mode;
-  const RequestAdmin({super.key, required this.english, required this.mode});
+  final String? referenceId;
+  final RequestRepository repository;
+  const RequestAdmin({super.key, required this.english, required this.mode, this.referenceId, this.repository = const RequestRepository()});
   @override
   State<RequestAdmin> createState() => _RequestAdminState();
 }
 
 class _RequestAdminState extends State<RequestAdmin> {
-  final repository = const RequestRepository();
+  RequestRepository get repository => widget.repository;
   late Future<List<Map<String, dynamic>>> data;
   bool busy = false;
   String tr(String ar, String en) => widget.english ? en : ar;
@@ -21,6 +26,7 @@ class _RequestAdminState extends State<RequestAdmin> {
   void initState() { super.initState(); reload(); }
   void reload() { data = widget.mode == 0 ? repository.prices() : repository.pending(widget.mode == 2); }
   Future<void> action(Future<void> Function() operation) async {
+    if (!mounted || busy) return;
     setState(() => busy = true);
     try {
       await operation();
@@ -31,22 +37,10 @@ class _RequestAdminState extends State<RequestAdmin> {
   }
 
   Future<void> editPrice(String property, String problem, Map<String, dynamic>? row) async {
-    final controller = TextEditingController(text: row?['fixed_price']?.toString() ?? '');
-    final form = GlobalKey<FormState>();
-    var enabled = row?['is_active'] != false;
-    final saved = await showDialog<bool>(context: context, builder: (ctx) => StatefulBuilder(builder: (ctx, update) => AlertDialog(
-      title: Text('${optionLabel(propertyOptions, property, widget.english)} / ${optionLabel(problemOptions, problem, widget.english)}'),
-      content: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextFormField(controller: controller, keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(labelText: tr('السعر بعملة الشركة', 'Price in company currency')),
-          validator: (v) => validPriceInput(v ?? '') == null ? tr('أدخل سعراً موجباً بمنزلتين عشريتين كحد أقصى', 'Enter a positive price with at most two decimals') : null),
-        SwitchListTile(title: Text(tr('متاح للطلب', 'Available to order')), value: enabled, onChanged: (v) => update(() => enabled = v)),
-      ])), actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('إلغاء', 'Cancel'))),
-        FilledButton(onPressed: () { if (form.currentState!.validate()) { Navigator.pop(ctx, true); } }, child: Text(tr('حفظ', 'Save')))],
-    )));
-    final amount = validPriceInput(controller.text);
-    controller.dispose();
-    if (saved == true && amount != null) await action(() => repository.savePrice(property, problem, amount, enabled));
+    final result = await showDialog<Map<String, dynamic>>(context: context,
+      builder: (_) => PriceEditor(english: widget.english, property: property, problem: problem, initial: row));
+    if (!mounted || result == null) return;
+    await action(() => repository.savePrice(property, problem, result['amount'] as String, result['enabled'] as bool));
   }
 
   Future<void> schedule(Map<String, dynamic> row, bool survey) async {
@@ -72,16 +66,19 @@ class _RequestAdminState extends State<RequestAdmin> {
         FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('تأكيد', 'Confirm')))],
     ));
     if (confirmed != true) return;
-    await action(() async {
-      if (survey) {
+    if (!mounted) return;
+    if (!start.isAfter(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('اختر موعداً في المستقبل.', 'Choose a future appointment.'))));
+      return;
+    }
+    if (survey) {
         final account = await AuthService.requireAdmin();
         final result = await supabaseClient.from('surveys').update({'scheduled_at': start.toUtc().toIso8601String(), 'surveyor_id': technician, 'status': 'scheduled'})
           .eq('tenant_id', account.tenantId).eq('id', row['id']).eq('status', 'survey_pending').select('id');
         if (result.isEmpty) throw StateError('Request changed');
-      } else {
-        await repository.schedule(row['id'] as String, start, start.add(const Duration(hours: 1)), technician);
-      }
-    });
+    } else {
+      await repository.schedule(row['id'] as String, start, start.add(const Duration(hours: 1)), technician);
+    }
   }
 
   Future<void> review(Map<String, dynamic> row, bool approved) async {
@@ -90,7 +87,7 @@ class _RequestAdminState extends State<RequestAdmin> {
       content: Text(approved ? tr('هل تحققت فعلياً من استلام المبلغ؟ هذا ليس تحققاً إلكترونياً.', 'Have you independently verified receipt of funds? This is not electronic verification.') : tr('رفض تأكيد الدفع؟ يلزم التواصل مع العميل.', 'Reject confirmation? Contact the customer to resolve it.')),
       actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('إلغاء', 'Cancel'))), FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('تأكيد', 'Confirm')))],
     ));
-    if (confirm == true) await action(() => repository.reviewPayment(row['id'] as String, approved));
+    if (confirm == true && mounted) await action(() => repository.reviewPayment(row['id'] as String, approved));
   }
 
   @override
@@ -99,8 +96,8 @@ class _RequestAdminState extends State<RequestAdmin> {
     if (busy) const LinearProgressIndicator(),
     Expanded(child: FutureBuilder<List<Map<String, dynamic>>>(future: data, builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Could not load. Retry.')));
-      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-      final rows = snapshot.data!;
+      if (!snapshot.hasData) return const SkeletonLoader();
+      final rows = snapshot.data!.where((row)=>widget.referenceId==null||row['id']==widget.referenceId).toList();
       if (widget.mode == 0) { return ListView(children: [
         Padding(padding: const EdgeInsets.all(16), child: Text(tr('الأسعار الفعلية فقط؛ لا يمكن الطلب حتى تفعيل السعر. لا تشمل هذه الشاشة أسعار العقود.', 'Set actual prices. Requests require an enabled price. Contract pricing is not included.'))),
         for (final property in propertyOptions.keys) for (final problem in problemOptions.keys)
@@ -115,6 +112,8 @@ class _RequestAdminState extends State<RequestAdmin> {
       if (rows.isEmpty) return Center(child: Text(tr('لا توجد طلبات معلقة', 'No pending requests')));
       return ListView(children: [for (final row in rows) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         SelectableText('${(row['clients'] as Map?)?['display_name'] ?? ''}\n${(row['clients'] as Map?)?['phone'] ?? ''}\n${(row['clients'] as Map?)?['email'] ?? ''}\n${(row['client_sites'] as Map?)?['address'] ?? ''}'),
+        StatusBadge(label:StatusBadge.localized('${row[widget.mode==1?'payment_review':'status']??'survey_pending'}',widget.english),tone:StatusBadge.forStatus('${row[widget.mode==1?'payment_review':'status']??'survey_pending'}')),
+        const SizedBox(height:12),
         if (widget.mode == 1) ...[
           Text('${optionLabel(propertyOptions, row['property_type'] as String, widget.english)} / ${optionLabel(problemOptions, row['problem_code'] as String, widget.english)}'),
           SelectableText('${row['quoted_amount']} ${row['quoted_currency']}\n${row['payment_reference']}\n${row['payment_review']}\n${row['instructions'] ?? ''}'),
@@ -122,7 +121,12 @@ class _RequestAdminState extends State<RequestAdmin> {
             TextButton(onPressed: busy ? null : () => review(row, true), child: Text(tr('اعتماد بعد التحقق', 'Verify received funds'))),
             if (row['payment_review'] == 'pending_review') TextButton(onPressed: busy ? null : () => review(row, false), child: Text(tr('رفض', 'Reject'))),
           ]),
-        ] else SelectableText('${row['assessment']}'),
+        ] else ...[SelectableText('${row['assessment']}'),
+          TextButton(onPressed: busy ? null : () async {
+            await Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientDetail(english: widget.english, clientId: row['client_id'] as String)));
+            if (mounted) setState(reload);
+          }, child: Text(tr('ملف العميل والمعاينة والعقد', 'Client, survey and contract'))),
+        ],
         FilledButton(onPressed: busy || widget.mode == 1 && row['payment_review'] != 'verified' ? null : () => action(() => schedule(row, widget.mode == 2)), child: Text(tr('جدولة مع فني', 'Schedule with technician'))),
       ]))) ]);
     })),

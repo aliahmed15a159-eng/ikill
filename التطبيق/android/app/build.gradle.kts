@@ -5,6 +5,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Missing config leaves push visibly unavailable, never blocks Supabase.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "net.ikill.app"
     compileSdk = flutter.compileSdkVersion
