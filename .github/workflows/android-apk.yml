@@ -54,7 +54,7 @@ jobs:
           cd android
           ./gradlew :app:dependencies --configuration debugRuntimeClasspath > /tmp/ikill-android-dependencies.txt
           cd ..
-          python3 tool/check_backend.py /tmp/ikill-android-dependencies.txt
+          python3 tool/ci_command.py python3 tool/check_backend.py /tmp/ikill-android-dependencies.txt
       - uses: actions/upload-artifact@v4
         with:
           name: ikill-android-supabase-debug

@@ -21,7 +21,7 @@ Future<void> openNotification(BuildContext context, String id) async {
     await AuthService.profile();
     final row = await supabaseClient.from('notifications').select().eq('id',id).single();
     await supabaseClient.rpc('mark_notifications_read',params:{'target':id});
-    if (context.mounted) await Navigator.push(context,MaterialPageRoute<void>(builder:(_) => NotificationReference(kind:row['reference_kind'] as String,id:row['reference_id'] as String)));
+    if (context.mounted) unawaited(Navigator.push<void>(context,MaterialPageRoute<void>(builder:(_) => NotificationReference(kind:row['reference_kind'] as String,id:row['reference_id'] as String))));
   } catch (_) {
     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('الإشعار أو المرجع غير متاح لهذا الحساب / Reference unavailable for this account')));
   }
@@ -34,7 +34,7 @@ class NotificationNavigation {
     if(id==null||opening||supabaseClient.auth.currentSession==null)return;
     opening=true;
     PushService.clicked.value=null;
-    openNotification(context,id).whenComplete(()=>opening=false);
+    openNotification(context,id).whenComplete((){opening=false;if(context.mounted&&PushService.clicked.value!=null)handle(context);});
   }
 }
 

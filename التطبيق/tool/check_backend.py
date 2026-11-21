@@ -12,7 +12,7 @@ allowed = {'firebase_core', 'firebase_core_platform_interface', 'firebase_core_w
 # realtime DB, analytics and other vendor SDKs remain prohibited.
 def violations(text):
     errors = []
-    for name in re.findall(r'\b(?:firebase_[a-z0-9_]+|cloud_firestore)\b', text):
+    for name in re.findall(r'\b(?:firebase_[a-z0-9_]+|cloud_firestore|cloud_functions)\b', text):
         if name not in allowed:
             errors.append(name)
     for api in ['Firebase' + 'Auth', 'Firebase' + 'Storage', 'Firebase' + 'Database', 'Firebase' + 'Firestore', 'Cloud' + 'Firestore']:
@@ -54,10 +54,15 @@ for name in tracked:
 
 # Optional resolved Android dependency report from Gradle, after APK build.
 if len(sys.argv) == 2:
+    # Messaging transitive infrastructure (including an optional analytics connector,
+    # NOT the analytics SDK); no Auth/document DB/Storage SDK is allowed.
     native_allowed = {'firebase-bom', 'firebase-common', 'firebase-components', 'firebase-annotations',
-                      'firebase-messaging', 'firebase-installations', 'firebase-installations-interop',
+                      'firebase-messaging', 'firebase-datatransport', 'firebase-measurement-connector', 'firebase-installations', 'firebase-installations-interop',
                       'firebase-iid-interop', 'firebase-encoders', 'firebase-encoders-json', 'firebase-encoders-proto'}
-    for artifact in re.findall(r'com\.google\.firebase:([a-z0-9-]+):', Path(sys.argv[1]).read_text()):
+    report = Path(sys.argv[1]).read_text()
+    if re.search('com\.' + 'one' + 'signal', report, re.I):
+        errors.append('Removed provider in native dependencies')
+    for artifact in re.findall(r'com\.google\.firebase:([a-z0-9-]+):', report):
         if artifact not in native_allowed:
             errors.append(f'Forbidden native dependency: {artifact}')
 if errors:

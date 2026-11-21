@@ -40,6 +40,7 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   const scalar=async(name,args=[])=>(await db.query(`SELECT public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) result`,args)).rows[0]?.result;
   const eq=(a,b)=>{assert.deepEqual(a,b);checks++};
   await db.exec(fs.readFileSync(path.join(__dirname,'../phase10_fcm_transport.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(__dirname,'../phase10a_fcm_webhook_timeout.sql'),'utf8'));
   const token='fcm_test:device_'+'a'.repeat(140),other='fcm_other:device_'+'b'.repeat(140);
   await role(1,()=>scalar('set_client_portal',[u(10),true]));
   await db.query('UPDATE profiles SET portal_enabled=false WHERE id=$1',[u(4)]);

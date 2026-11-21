@@ -25,7 +25,7 @@ class PushService {
   static final status=ValueNotifier<PushState>(const PushState('جارٍ فحص إعدادات FCM / Checking FCM configuration'));
   static bool _initialized=false,_started=false,_loggingOut=false;
   static int _epoch=0;
-  static String? _token;
+  static String? _token,_registeredToken;
   static Future<void> _queue=Future.value();
   static bool get supported=>!kIsWeb&&(defaultTargetPlatform==TargetPlatform.android||defaultTargetPlatform==TargetPlatform.iOS);
   static bool get configured=>_initialized;
@@ -52,7 +52,7 @@ class PushService {
       FirebaseMessaging.onMessageOpenedApp.listen(_tap);
       FirebaseMessaging.instance.onTokenRefresh.listen((token) {_token=token;unawaited(sync(refreshedToken:token));},onError:(Object _) {status.value=const PushState('تعذر تحديث رمز الجهاز / Token refresh failed',configured:true);});
       supabaseClient.auth.onAuthStateChange.listen((event) {
-        if(event.event==AuthChangeEvent.signedOut) {unawaited(_localLogout());}
+        if(event.event==AuthChangeEvent.signedOut) {if(!_loggingOut&&supabaseClient.auth.currentSession==null)unawaited(_localLogout());}
         else {unawaited(sync(requestPermission:event.event==AuthChangeEvent.signedIn));}
       });
       final initial=await FirebaseMessaging.instance.getInitialMessage();
@@ -76,7 +76,7 @@ class PushService {
       final allowed=permission.authorizationStatus==AuthorizationStatus.authorized||permission.authorizationStatus==AuthorizationStatus.provisional;
       final enabled=settings['push_enabled']==true;
       if(!allowed){
-        if(supabaseClient.auth.currentUser?.id==user)await supabaseClient.rpc('unregister_my_fcm',params:{'device_token':_token});
+        if(supabaseClient.auth.currentUser?.id==user)await supabaseClient.rpc('unregister_my_fcm',params:{'device_token':_registeredToken??_token});
         status.value=PushState('إعداد FCM موجود؛ صلاحية الإشعارات غير مفعّلة. فعّلها من إعدادات الهاتف / Permission disabled',configured:true,enabled:enabled);return;
       }
       await FirebaseMessaging.instance.setAutoInitEnabled(true);
@@ -90,14 +90,14 @@ class PushService {
       if(secret==null){final random=Random.secure();secret=List.generate(32,(_)=>random.nextInt(256).toRadixString(16).padLeft(2,'0')).join();await prefs.setString('fcm_installation_secret',secret);}
       if(_loggingOut||epoch!=_epoch||supabaseClient.auth.currentUser?.id!=user)return;
       await supabaseClient.rpc('register_my_fcm',params:{'device_token':token,'installation_secret':secret});
-      _token=token;
+      _token=token;_registeredToken=token;
       status.value=PushState(enabled?'FCM: الإعداد والصلاحية ورمز الجهاز جاهزون؛ راجع حالة الخادم / Device ready; check server status':'FCM: الجهاز مسجل؛ الإرسال معطّل في إعدادات الإدارة / Registered; server sending disabled',configured:true,permission:true,registered:true,enabled:enabled);
     }).catchError((Object _) {status.value=PushState('إعداد FCM موجود؛ تعذر تسجيل الجهاز في Supabase. أعد المحاولة / Registration failed; retry',configured:_initialized);});
     return _queue;
   }
   static Future<void> _localLogout() async {
     _epoch++;
-    clicked.value=null;foreground.value=null;_token=null;
+    clicked.value=null;foreground.value=null;_token=null;_registeredToken=null;
     if(_initialized){
       try {await FirebaseMessaging.instance.setAutoInitEnabled(false);await FirebaseMessaging.instance.deleteToken().timeout(const Duration(seconds:8));}catch(_){/* Offline deletion is best-effort; push payloads contain no private content. */}
     }
@@ -108,7 +108,7 @@ class PushService {
     try {
       try {await _queue.timeout(const Duration(seconds:10));}catch(_){/* Never indefinitely delay logout. */}
       if(supabaseClient.auth.currentUser!=null){
-        try {await supabaseClient.rpc('unregister_my_fcm',params:{'device_token':_token}).timeout(const Duration(seconds:10));}catch(_){/* Offline server cleanup cannot be guaranteed; current RLS still guards all references. */}
+        try {await supabaseClient.rpc('unregister_my_fcm',params:{'device_token':_registeredToken??_token}).timeout(const Duration(seconds:10));}catch(_){/* Offline server cleanup cannot be guaranteed; current RLS still guards all references. */}
       }
       await _localLogout();
       await supabaseClient.auth.signOut(scope:scope);
