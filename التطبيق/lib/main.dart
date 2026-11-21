@@ -1,3 +1,5 @@
+import 'notifications_screen.dart';
+import 'dart:async';
 import 'push_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,8 +19,8 @@ Future<void> main() async {
   final content = await SiteContent.load();
   final preferences = await SharedPreferences.getInstance();
   await Backend.initialize();
-  if (Backend.ready) await PushService.start();
   runApp(IkillApp(content: content, preferences: preferences));
+  if (Backend.ready) unawaited(PushService.start().catchError((Object _) {}));
 }
 
 const brand = Color(0xFF15803D);
@@ -43,6 +45,20 @@ class IkillApp extends StatefulWidget {
 }
 
 class _IkillAppState extends State<IkillApp> {
+  final navigatorKey=GlobalKey<NavigatorState>();
+  @override
+  void initState() {
+    super.initState();
+    PushService.clicked.addListener(openPush);
+    WidgetsBinding.instance.addPostFrameCallback((_)=>openPush());
+  }
+  void openPush() {
+    final context=navigatorKey.currentState?.overlay?.context;
+    if(context!=null)NotificationNavigation.handle(context);
+  }
+  @override
+  void dispose(){PushService.clicked.removeListener(openPush);super.dispose();}
+
   late bool english = widget.preferences.getBool('english') ?? false;
   late bool dark = widget.preferences.getBool('dark') ?? false;
 
@@ -63,6 +79,7 @@ class _IkillAppState extends State<IkillApp> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+    navigatorKey:navigatorKey,
     title: 'iKILL', debugShowCheckedModeBanner: false,
     theme: theme(Brightness.light), darkTheme: theme(Brightness.dark),
     themeMode: dark ? ThemeMode.dark : ThemeMode.light,

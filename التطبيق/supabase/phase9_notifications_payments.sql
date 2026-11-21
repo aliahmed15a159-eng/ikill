@@ -65,7 +65,7 @@ DECLARE version text;BEGIN
  IF NEW.payment_review='pending_review' THEN
   IF TG_OP='INSERT' THEN version:=coalesce(NEW.payment_proof_url,'initial');
   ELSIF OLD.payment_review IS DISTINCT FROM NEW.payment_review OR OLD.payment_proof_url IS DISTINCT FROM NEW.payment_proof_url THEN version:=coalesce(NEW.payment_proof_url,'initial');END IF;
-  IF version IS NOT NULL THEN PERFORM app_private.notify_event(NEW.tenant_id,'admin',NULL,NULL,'payment_pending','visit',NEW.id,'دفع بانتظار المراجعة','راجع الطلب وإثبات التحويل قبل الاعتماد.','payment_pending:visit:'||NEW.id||':'||md5(version));END IF;
+  IF version IS NOT NULL THEN PERFORM app_private.notify_event(NEW.tenant_id,'admin',NULL,NULL,'payment_pending','visit',NEW.id,'دفع بانتظار المراجعة','راجع الطلب وإثبات التحويل قبل الاعتماد.','payment_pending:visit:'||NEW.id||':'||md5(version||':'||NEW.updated_at));END IF;
  END IF;
  IF NEW.technician_id IS NOT NULL THEN
   IF TG_OP='INSERT' THEN version:='assigned';
@@ -115,15 +115,15 @@ $$;
 CREATE POLICY payment_proof_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='payment-proofs' AND app_private.proof_access(name,false));
 CREATE POLICY payment_proof_insert ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='payment-proofs' AND app_private.proof_access(name,true));
 CREATE FUNCTION public.submit_payment_proof(target uuid,kind text,object_path text,payment_reference text) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
-DECLARE i public.invoices%ROWTYPE;v public.visits%ROWTYPE;BEGIN
+DECLARE i public.invoices%ROWTYPE;v public.visits%ROWTYPE;proof_id uuid;BEGIN
  IF payment_reference IS NULL OR length(trim(payment_reference)) NOT BETWEEN 3 AND 200 OR NOT app_private.proof_access(object_path,true) OR split_part(object_path,'/',2)<>target::text OR NOT EXISTS(SELECT 1 FROM storage.objects WHERE bucket_id='payment-proofs' AND name=object_path) THEN RAISE EXCEPTION 'VALID_SCOPED_PAYMENT_PROOF_REQUIRED';END IF;
  IF kind='invoice' THEN
   SELECT * INTO i FROM public.invoices WHERE id=target FOR UPDATE;
   IF NOT FOUND OR NOT (app_private.is_admin(i.tenant_id) OR app_private.client_access(i.tenant_id,i.client_id)) OR i.status<>'issued' OR i.payment_status='paid' THEN RAISE EXCEPTION 'UNPAID_INVOICE_REQUIRED';END IF;
   IF EXISTS(SELECT 1 FROM public.payment_confirmations WHERE invoice_id=i.id AND payment_proof_url=object_path AND payment_status='pending_confirmation') THEN RETURN;END IF;
-  INSERT INTO public.payment_confirmations(tenant_id,invoice_id,client_id,submitted_by,amount,payment_proof_url,reference) VALUES(i.tenant_id,i.id,i.client_id,(SELECT auth.uid()),i.total-i.amount_paid,object_path,trim(payment_reference));
+  INSERT INTO public.payment_confirmations(tenant_id,invoice_id,client_id,submitted_by,amount,payment_proof_url,reference) VALUES(i.tenant_id,i.id,i.client_id,(SELECT auth.uid()),i.total-i.amount_paid,object_path,trim(payment_reference)) RETURNING id INTO proof_id;
   UPDATE public.invoices SET payment_confirmation_status='pending_confirmation',payment_proof_url=object_path WHERE id=i.id;
-  PERFORM app_private.notify_event(i.tenant_id,'admin',NULL,NULL,'payment_pending','invoice',i.id,'إثبات دفع بانتظار التأكيد','راجع الإيصال والمبلغ قبل تسجيل التحصيل.','payment_pending:invoice:'||i.id||':'||md5(object_path));
+  PERFORM app_private.notify_event(i.tenant_id,'admin',NULL,NULL,'payment_pending','invoice',i.id,'إثبات دفع بانتظار التأكيد','راجع الإيصال والمبلغ قبل تسجيل التحصيل.','payment_pending:invoice:'||i.id||':'||proof_id);
  ELSIF kind='visit' THEN
   SELECT * INTO v FROM public.visits WHERE id=target FOR UPDATE;
   IF NOT FOUND OR NOT (app_private.is_admin(v.tenant_id) OR app_private.client_access(v.tenant_id,v.client_id)) OR v.contract_id IS NOT NULL OR v.status<>'pending_schedule' OR v.payment_review NOT IN ('pending_review','rejected') THEN RAISE EXCEPTION 'PENDING_ORDER_REQUIRED';END IF;

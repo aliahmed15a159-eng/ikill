@@ -9,8 +9,9 @@ import 'supabase_client.dart';
 class RequestAdmin extends StatefulWidget {
   final bool english;
   final int mode;
+  final String? referenceId;
   final RequestRepository repository;
-  const RequestAdmin({super.key, required this.english, required this.mode, this.repository = const RequestRepository()});
+  const RequestAdmin({super.key, required this.english, required this.mode, this.referenceId, this.repository = const RequestRepository()});
   @override
   State<RequestAdmin> createState() => _RequestAdminState();
 }
@@ -95,7 +96,7 @@ class _RequestAdminState extends State<RequestAdmin> {
     Expanded(child: FutureBuilder<List<Map<String, dynamic>>>(future: data, builder: (context, snapshot) {
       if (snapshot.hasError) return Center(child: Text(tr('تعذّر التحميل. أعد المحاولة.', 'Could not load. Retry.')));
       if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-      final rows = snapshot.data!;
+      final rows = snapshot.data!.where((row)=>widget.referenceId==null||row['id']==widget.referenceId).toList();
       if (widget.mode == 0) { return ListView(children: [
         Padding(padding: const EdgeInsets.all(16), child: Text(tr('الأسعار الفعلية فقط؛ لا يمكن الطلب حتى تفعيل السعر. لا تشمل هذه الشاشة أسعار العقود.', 'Set actual prices. Requests require an enabled price. Contract pricing is not included.'))),
         for (final property in propertyOptions.keys) for (final problem in problemOptions.keys)

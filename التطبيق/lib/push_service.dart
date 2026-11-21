@@ -73,7 +73,8 @@ class PushService {
     return _queue;
   }
   static Future<void> signOut({SignOutScope scope = SignOutScope.local}) async {
-    await _queue;
+    try { await _queue.timeout(const Duration(seconds:10)); } catch (_) { /* Logout must not wait indefinitely for transport. */ }
+    try {
     if (supported && _app != null) {
       // Opt out before logout, even when the network is unavailable.
       await OneSignal.User.pushSubscription.optOut();
@@ -82,6 +83,7 @@ class PushService {
         try { await supabaseClient.rpc('unregister_my_push',params:{'subscription':id}); } catch (_) { /* Generic payload only; next account replaces binding. */ }
       }
     }
+    } catch (_) { /* Native transport must not block Supabase logout. */ }
     clicked.value = null;
     await supabaseClient.auth.signOut(scope:scope);
   }

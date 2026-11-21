@@ -81,5 +81,50 @@ const u = n => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
   eq((await db.query('SELECT status FROM app_private.push_deliveries WHERE notification_id=$1',[delivery.notification_id])).rows[0].status,'not_configured');
   await role(2,()=>scalar('unregister_my_push',[u(500)]));
   eq((await db.query('SELECT push_subscription_id FROM profiles WHERE id=$1',[u(2)])).rows[0].push_subscription_id,null);
+  // Extension defaults must not expose webhook tokens through the pg_net queue.
+  await db.exec('CREATE SCHEMA net; CREATE TABLE net.http_request_queue(id bigint,body jsonb); CREATE TABLE net._http_response(id bigint,content text); GRANT ALL ON net.http_request_queue,net._http_response TO PUBLIC;');
+  await db.exec(fs.readFileSync(path.join(__dirname,'../phase9b_protect_webhook_queue.sql'),'utf8'));
+  eq((await db.query("SELECT has_table_privilege('authenticated','net.http_request_queue','SELECT') result")).rows[0].result,false);
+  eq((await db.query("SELECT has_table_privilege('anon','net.http_request_queue','SELECT') result")).rows[0].result,false);
+  // An administrator of a different tenant sees neither recipients nor receipts.
+  await db.query("INSERT INTO tenants(id,slug,name) VALUES($1,'notification-other','Other')",[u(900)]);
+  await db.query('INSERT INTO auth.users(id) VALUES($1)',[u(901)]);
+  await db.query("INSERT INTO profiles(id,tenant_id,role,full_name) VALUES($1,$2,'admin','Other admin')",[u(901),u(900)]);
+  await role(901,async()=>{
+    eq((await db.query('SELECT * FROM notifications')).rows.length,0);
+    eq((await db.query('SELECT * FROM payment_confirmations')).rows.length,0);
+    await scalar('mark_notifications_read');
+    await fail(()=>scalar('submit_payment_proof',[u(31),'visit',proof,'cross-tenant']));
+    await fail(()=>db.query("SELECT * FROM app_private.push_deliveries"));
+  });
+  // Financial partial balance is preserved until an administrator verifies receipt.
+  await db.query("INSERT INTO invoices(id,tenant_id,client_id,invoice_number,due_on,subtotal,amount_paid,status) VALUES($1,$2,$3,'proof-test',current_date+7,1000,250,'issued')",[u(600),company,u(10)]);
+  const invoiceProof=`${company}/${u(600)}/${u(3)}/proof.png`;
+  await db.query("INSERT INTO storage.objects(bucket_id,name) VALUES('payment-proofs',$1)",[invoiceProof]);
+  await role(3,()=>scalar('submit_payment_proof',[u(600),'invoice',invoiceProof,'invoice-ref']));
+  eq((await db.query('SELECT payment_status FROM invoices WHERE id=$1',[u(600)])).rows[0].payment_status,'partial');
+  let confirmation=(await db.query('SELECT * FROM payment_confirmations WHERE invoice_id=$1',[u(600)])).rows[0];
+  eq(Number(confirmation.amount),750);
+  await role(2,()=>fail(()=>scalar('review_invoice_payment',[confirmation.id,true])));
+  await role(3,()=>fail(()=>scalar('review_invoice_payment',[confirmation.id,true])));
+  await role(1,()=>scalar('review_invoice_payment',[confirmation.id,false]));
+  eq((await db.query('SELECT payment_confirmation_status FROM invoices WHERE id=$1',[u(600)])).rows[0].payment_confirmation_status,'rejected');
+  await role(3,()=>scalar('submit_payment_proof',[u(600),'invoice',invoiceProof,'invoice-ref']));
+  confirmation=(await db.query("SELECT * FROM payment_confirmations WHERE invoice_id=$1 AND payment_status='pending_confirmation'",[u(600)])).rows[0];
+  await role(1,()=>scalar('review_invoice_payment',[confirmation.id,true]));
+  const paid=(await db.query('SELECT * FROM invoices WHERE id=$1',[u(600)])).rows[0];
+  eq(paid.payment_status,'paid');eq(paid.payment_confirmation_status,'paid');eq(Number(paid.amount_paid),1000);
+  await role(1,()=>fail(()=>scalar('review_invoice_payment',[confirmation.id,true])));
+  await role(3,()=>fail(()=>scalar('submit_payment_proof',[u(600),'invoice',invoiceProof,'invoice-ref'])));
+  eq((await db.query("SELECT count(*)::int n FROM notifications WHERE reference_id=$1 AND type='payment_confirmed'",[u(600)])).rows[0].n,1);
+  // A configured delivery contains no transaction text and cannot be replayed while leased/sent.
+  await role(1,()=>scalar('set_notification_push_settings',[u(700),true]));
+  await role(2,()=>scalar('register_my_push',[u(500),'a'.repeat(64)]));
+  const techDelivery=(await db.query("SELECT d.* FROM app_private.push_deliveries d JOIN notifications n ON n.id=d.notification_id WHERE n.user_id=$1 LIMIT 1",[u(2)])).rows[0];
+  const payload=await scalar('claim_push_delivery',[techDelivery.notification_id,techDelivery.token]);
+  eq(payload.subscription_id,u(500));eq(payload.notification_id,techDelivery.notification_id);eq(payload.body,undefined);
+  eq((await scalar('claim_push_delivery',[techDelivery.notification_id,techDelivery.token])).skip,true);
+  await scalar('finish_push_delivery',[techDelivery.notification_id,techDelivery.token,'sent',u(800)]);
+  eq((await scalar('claim_push_delivery',[techDelivery.notification_id,techDelivery.token])).skip,true);
   console.log(`PASS: ${checks} notification/payment migration and isolation checks`);await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});

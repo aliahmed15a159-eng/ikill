@@ -1,3 +1,5 @@
+import 'request_admin.dart';
+import 'notification_settings.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,6 +27,17 @@ Future<void> openNotification(BuildContext context, String id) async {
   }
 }
 
+class NotificationNavigation {
+  static bool opening=false;
+  static void handle(BuildContext context) {
+    final id=PushService.clicked.value;
+    if(id==null||opening||supabaseClient.auth.currentSession==null)return;
+    opening=true;
+    PushService.clicked.value=null;
+    openNotification(context,id).whenComplete(()=>opening=false);
+  }
+}
+
 class NotificationBell extends StatefulWidget {
   const NotificationBell({super.key});
   @override
@@ -34,7 +47,7 @@ class _NotificationBellState extends State<NotificationBell> with WidgetsBinding
   RealtimeChannel? channel;
   Timer? timer;
   int count = 0;
-  bool available = true, opening = false;
+  bool available = true;
   @override
   void initState() {
     super.initState();
@@ -57,11 +70,7 @@ class _NotificationBellState extends State<NotificationBell> with WidgetsBinding
     } catch (_) {if(mounted)setState(() => available=false);}
   }
   void onClick() {
-    final id = PushService.clicked.value;
-    if(!mounted || id == null || opening) return;
-    opening=true;
-    PushService.clicked.value=null;
-    openNotification(context,id).whenComplete(() {opening=false;refresh();});
+    if(mounted) NotificationNavigation.handle(context);
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) { if(state==AppLifecycleState.resumed) refresh(); }
@@ -101,6 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void dispose(){if(channel!=null)unawaited(supabaseClient.removeChannel(channel!));super.dispose();}
   @override
   Widget build(BuildContext context) => Scaffold(appBar:AppBar(title:const Text('الإشعارات / Notifications'),actions:[
+    IconButton(tooltip:'إعدادات الإدارة / Admin setup',icon:const Icon(Icons.settings_outlined),onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>const NotificationSettings()))),
     IconButton(tooltip:'المدفوعات / Payments',icon:const Icon(Icons.receipt_long),onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_) => const PaymentsScreen()))),
     IconButton(tooltip:'تفعيل إشعارات الجهاز / Enable device notifications',icon:const Icon(Icons.phonelink_ring),onPressed:()=>action(() async {
       final settings=Map<String,dynamic>.from(await supabaseClient.rpc('get_notification_settings') as Map);
@@ -169,6 +179,7 @@ class _NotificationReferenceState extends State<NotificationReference> {
       SelectableText('${widget.kind} — ${widget.id}',style:Theme.of(context).textTheme.titleMedium),
       for(final key in ['invoice_number','status','scheduled_start','scheduled_end','instructions','total','amount_paid','currency','payment_status','payment_review','payment_confirmation_status','payment_reference','submitted_at','findings','actions_taken'])
         if(row[key]!=null)Padding(padding:const EdgeInsets.symmetric(vertical:5),child:SelectableText('$key: ${row[key]}')),
+      if(profile.role=='admin'&&((widget.kind=='visit'&&row['status']=='pending_schedule')||(widget.kind=='survey'&&row['status']=='survey_pending')))OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>Scaffold(appBar:AppBar(title:const Text('إدارة الطلب / Manage request')),body:RequestAdmin(english:Localizations.localeOf(context).languageCode=='en',mode:widget.kind=='survey'?2:1,referenceId:widget.id)))),child:const Text('مراجعة وجدولة هذا الطلب / Review and schedule this request')),
       if(widget.kind=='invoice'&&row['pdf_path']!=null)OutlinedButton(onPressed:()=>download('invoice-pdfs',row['pdf_path'] as String),child:const Text('تحميل الفاتورة / Invoice PDF')),
       if(widget.kind=='report')FutureBuilder<List<Map<String,dynamic>>>(future:supabaseClient.from('document_jobs').select('report_path,status').eq('report_id',widget.id),builder:(context,job){final rows=job.data ?? [];return Column(children:[for(final r in rows)if(r['report_path']!=null)OutlinedButton(onPressed:()=>download('report-pdfs',r['report_path'] as String),child:const Text('تقرير PDF / Report PDF')) else Text('PDF: ${r['status']}')]);}),
       for(final r in result['reports'] as List)OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>NotificationReference(kind:'report',id:r['id'] as String))),child:const Text('تقرير الزيارة / Visit report')),
@@ -235,7 +246,8 @@ class _PaymentPanelState extends State<PaymentPanel> {
     if(reference.text.trim().length<3)throw const FormatException('Reference required');
     final image=await ImagePicker().pickImage(source:ImageSource.gallery);
     if(image==null)return;
-    final bytes=await image.readAsBytes(),type=InstapayService.imageType(await image.readAsBytes());
+    final bytes=await image.readAsBytes();
+    final type=InstapayService.imageType(bytes);
     if(type==null)throw const FormatException('PNG/JPEG max 5MB');
     final user=supabaseClient.auth.currentUser!.id;
     final path='${widget.profile.tenantId}/${widget.row['id']}/$user/${newRequestId()}.${type=='image/png'?'png':'jpg'}';

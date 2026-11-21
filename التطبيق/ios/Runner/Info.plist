@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>اختيار شعار الشركة للمستندات بواسطة الإدارة.</string>
+	<string>اختيار إثبات تحويل إنستا باي أو صور الزيارة أو شعار الشركة بإذنك.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>التقاط صور لتوثيق تقرير الزيارة بإذن مسؤول الموقع.</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -26,8 +26,9 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>اختر صورة QR إنستا باي لعرضها للعملاء في التطبيق.</string>
+
+	<key>UIBackgroundModes</key>
+	<array><string>remote-notification</string></array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
