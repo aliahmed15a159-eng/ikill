@@ -197,7 +197,7 @@ class _SiteShellState extends State<SiteShell> {
       future: _partners(),
       builder: (context, snapshot) => SizedBox(height: 100, child: ListView.separated(
         scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: snapshot.data?.length ?? 0, separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemCount: snapshot.data?.length ?? 0, separatorBuilder: (context, index) => const SizedBox(width: 12),
         itemBuilder: (_, i) => Container(width: 130, padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
           child: Image.asset(snapshot.data![i], fit: BoxFit.contain)),
       )),
