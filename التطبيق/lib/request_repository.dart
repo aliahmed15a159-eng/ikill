@@ -1,4 +1,5 @@
 import 'auth_service.dart';
+import 'instapay_service.dart';
 import 'backend.dart';
 import 'request_models.dart';
 import 'supabase_client.dart';
@@ -7,6 +8,7 @@ import 'supabase_client.dart';
 class RequestRepository {
   const RequestRepository();
   bool get ready => Backend.ready;
+  Future<InstapayDestination?> paymentDestination() => InstapayService.published().timeout(const Duration(seconds: 20));
 
   Future<ResidentialQuote?> quote(String property, String problem) async {
     if (!ready) return null;

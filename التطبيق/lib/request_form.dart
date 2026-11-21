@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'request_repository.dart';
 import 'request_models.dart';
+import 'instapay_service.dart';
 import 'content.dart';
 
 class RequestForm extends StatefulWidget {
@@ -23,6 +24,7 @@ class _RequestFormState extends State<RequestForm> {
   RequestRepository get repository => widget.repository;
   String kind = 'residential', property = 'apartment', problem = 'cockroaches', sector = 'factory';
   ResidentialQuote? quote;
+  InstapayDestination? destination;
   bool loadingQuote = false, paymentStep = false;
   String requestId = newRequestId();
   Map<String, dynamic>? retryPayload;
@@ -32,8 +34,10 @@ class _RequestFormState extends State<RequestForm> {
     setState(() { loadingQuote = true; error = null; quote = null; });
     try {
       final result = await repository.quote(property, problem);
+      final payment = result == null ? null : await repository.paymentDestination();
       if (!mounted) return;
-      setState(() { quote = result; paymentStep = result != null;
+      setState(() { quote = result; destination = payment; paymentStep = result != null && payment != null;
+        if (result != null && payment == null) error = tr('الدفع بإنستا باي غير متاح حالياً حتى ترفع الإدارة كود QR وتفعّله. تواصل مع الإدارة.', 'InstaPay is unavailable until administration uploads and enables its QR code. Please contact administration.');
         if (result == null) error = tr('السعر غير متاح حالياً. تواصل مع الإدارة.', 'Price unavailable. Please contact administration.'); });
     } catch (_) {
       if (mounted) setState(() => error = tr('تعذّر تحميل السعر. أعد المحاولة.', 'Could not load price. Retry.'));
@@ -128,6 +132,12 @@ class _RequestFormState extends State<RequestForm> {
       ],
     ],
     if (paymentStep) Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
+      if (destination != null) ...[
+        Text(tr('حوّل عبر إنستا باي إلى المستفيد:', 'Transfer via InstaPay to:')),
+        SelectableText(destination!.beneficiary),
+        Image.memory(destination!.image, height: 260, fit: BoxFit.contain, cacheWidth: 1024, errorBuilder: (_, __, ___) => Text(tr('تعذّر عرض QR. لا تحوّل قبل التحقق مع الإدارة.', 'QR cannot be displayed. Contact administration before transferring.'))),
+        Text(tr('تحقق من اسم المستفيد داخل إنستا باي قبل التحويل. ', 'Check the beneficiary inside InstaPay before transferring.')),
+      ],
       Text('${quote!.amount} ${quote!.currency}', style: Theme.of(context).textTheme.headlineSmall),
       Text(tr('تأكيد دفع فقط: لا توجد بوابة دفع إلكتروني. لا تدخل بيانات البطاقة أو رمز التحقق. أضف مرجع الدفع أو تفاصيل التأكيد المتفق عليها مع الإدارة؛ لن يُعتمد الدفع إلا بعد المراجعة.', 'Payment confirmation only: no online payment gateway. Never enter card details or OTPs. Enter the reference or confirmation agreed with administration; payment is not verified until reviewed.')),
       if (retryPayload == null) TextButton(onPressed: sending ? null : () => setState(() { paymentStep = false; quote = null; }), child: Text(tr('تعديل التفاصيل', 'Edit details'))),

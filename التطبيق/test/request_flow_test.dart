@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:ikill_native/instapay_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ikill_native/content.dart';
 import 'package:ikill_native/request_form.dart';
@@ -7,6 +9,8 @@ import 'package:ikill_native/request_models.dart';
 
 class FakeRequests extends RequestRepository {
   Map<String, dynamic>? submitted;
+  @override
+  Future<InstapayDestination?> paymentDestination() async => InstapayDestination('qr.png', 'Test beneficiary', base64Decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a7WQAAAAASUVORK5CYII='));
   @override
   bool get ready => true;
   @override
