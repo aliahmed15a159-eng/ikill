@@ -1,3 +1,4 @@
+import 'auth_flow.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:firebase_core/firebase_core.dart';
@@ -68,7 +69,7 @@ class PushService {
   static Future<void> sync({bool requestPermission=false,String? refreshedToken}) {
     final epoch=_epoch;
     _queue=_queue.catchError((Object _) {}).then((_) async {
-      if(!_initialized||_loggingOut||epoch!=_epoch)return;
+      if(!_initialized||_loggingOut||epoch!=_epoch||AuthFlow.instance.recovering||AuthFlow.instance.handlingLink)return;
       final user=supabaseClient.auth.currentUser?.id;
       if(user==null){status.value=const PushState('إعداد FCM موجود — سجّل الدخول / Configured; sign in',configured:true);return;}
       final settings=Map<String,dynamic>.from(await supabaseClient.rpc('get_notification_settings') as Map);

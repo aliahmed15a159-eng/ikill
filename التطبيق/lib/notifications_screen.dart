@@ -1,3 +1,4 @@
+import 'auth_flow.dart';
 import 'request_admin.dart';
 import 'notification_settings.dart';
 import 'dart:async';
@@ -31,7 +32,7 @@ class NotificationNavigation {
   static bool opening=false;
   static void handle(BuildContext context) {
     final id=PushService.clicked.value;
-    if(id==null||opening||supabaseClient.auth.currentSession==null)return;
+    if(id==null||opening||AuthFlow.instance.recovering||AuthFlow.instance.handlingLink||supabaseClient.auth.currentSession==null)return;
     opening=true;
     PushService.clicked.value=null;
     openNotification(context,id).whenComplete((){opening=false;if(context.mounted&&PushService.clicked.value!=null)handle(context);});
@@ -58,7 +59,7 @@ class _NotificationBellState extends State<NotificationBell> with WidgetsBinding
       .subscribe((status,_) { if(status == RealtimeSubscribeStatus.subscribed) refresh(); });
     timer = Timer.periodic(const Duration(seconds:45),(_) => refresh());
     PushService.clicked.addListener(onClick);
-    unawaited(PushService.sync());
+    unawaited(PushService.sync(requestPermission:true));
     refresh();
     WidgetsBinding.instance.addPostFrameCallback((_) => onClick());
   }

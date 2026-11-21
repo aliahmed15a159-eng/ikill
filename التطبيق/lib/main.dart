@@ -1,3 +1,5 @@
+import 'auth_flow.dart';
+import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'dart:async';
 import 'push_service.dart';
@@ -19,6 +21,7 @@ Future<void> main() async {
   final content = await SiteContent.load();
   final preferences = await SharedPreferences.getInstance();
   await Backend.initialize();
+  if(Backend.ready)await AuthFlow.instance.start();
   runApp(IkillApp(content: content, preferences: preferences));
   if (Backend.ready) unawaited(PushService.start().catchError((Object _) {}));
 }
@@ -49,9 +52,17 @@ class _IkillAppState extends State<IkillApp> {
   @override
   void initState() {
     super.initState();
+    AuthFlow.instance.addListener(openAuth);
     PushService.clicked.addListener(openPush);
     PushService.foreground.addListener(showForegroundPush);
-    WidgetsBinding.instance.addPostFrameCallback((_)=>openPush());
+    WidgetsBinding.instance.addPostFrameCallback((_){openAuth();openPush();});
+  }
+  void openAuth() {
+    final flow=AuthFlow.instance;
+    final navigator=navigatorKey.currentState;
+    if(!mounted||!flow.navigationRequested||navigator==null)return;
+    flow.navigationRequested=false;
+    if(!AccountPage.visible)navigator.push(MaterialPageRoute<void>(builder:(_)=>AccountPage(english:english)));
   }
   void showForegroundPush() {
     final message=PushService.foreground.value;
@@ -68,7 +79,7 @@ class _IkillAppState extends State<IkillApp> {
     if(context!=null)NotificationNavigation.handle(context);
   }
   @override
-  void dispose(){PushService.foreground.removeListener(showForegroundPush);PushService.clicked.removeListener(openPush);super.dispose();}
+  void dispose(){AuthFlow.instance.removeListener(openAuth);PushService.foreground.removeListener(showForegroundPush);PushService.clicked.removeListener(openPush);super.dispose();}
 
   late bool english = widget.preferences.getBool('english') ?? false;
   late bool dark = widget.preferences.getBool('dark') ?? false;
@@ -149,6 +160,7 @@ class _SiteShellState extends State<SiteShell> {
           onTap: () { Navigator.pop(context); go(i); },
         ),
         const Divider(),
+        ListTile(leading:const Icon(Icons.login),title:Text(tr('حسابي / تسجيل الدخول','My account / Sign in')),onTap:(){Navigator.pop(context);Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>AccountPage(english:widget.english)));}),
         ListTile(leading: const Icon(Icons.account_circle_outlined), title: Text(tr('بوابة العميل', 'Client portal')),
           onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientPortalPage(english: widget.english))); }),
         ListTile(leading: const Icon(Icons.engineering_outlined), title: Text(tr('مهام الفني', 'Technician tasks')),

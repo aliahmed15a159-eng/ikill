@@ -25,7 +25,8 @@ class SupabaseConnection {
     // Never accept a privileged JWT/secret key as client configuration.
     if (!isPublicKey(anonKey)) return;
     try {
-      await Supabase.initialize(url: url, anonKey: anonKey);
+      await Supabase.initialize(url: url, anonKey: anonKey, debug: false,
+        authOptions: const FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce, detectSessionInUri: false));
       ready = true;
     } catch (_) {
       ready = false;

@@ -1,7 +1,7 @@
+import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'push_service.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 import 'auth_service.dart';
 import 'backend.dart';
@@ -15,72 +15,16 @@ import 'instapay_admin.dart';
 
 class AdminPage extends StatelessWidget {
   final bool english;
-  const AdminPage({super.key, required this.english});
+  const AdminPage({super.key,required this.english});
   @override
-  Widget build(BuildContext context) {
-    if (!Backend.ready) {
-      return Scaffold(appBar: AppBar(title: const Text('Administration')),
-        body: Center(child: Text(english ? 'Configure Supabase first.' : 'يلزم إعداد Supabase أولاً.')));
-    }
-    return StreamBuilder<AuthState>(stream: supabaseClient.auth.onAuthStateChange,
-      builder: (context, snapshot) {
-        if (supabaseClient.auth.currentSession == null) return AdminLogin(english: english);
-        return FutureBuilder<ProfileAccess>(future: AuthService.requireAdmin(), builder: (context, profile) {
-          if (profile.hasError) {
-            return Scaffold(appBar: AppBar(title: const Text('Administration')),
-              body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(profile.error is AccessDenied ? profile.error.toString() : (english ? 'Could not verify account access. Retry by signing in again.' : 'تعذّر التحقق من صلاحيات الحساب. سجّل الدخول مرة أخرى.')),
-                TextButton(onPressed: () => PushService.signOut(), child: Text(english ? 'Sign out' : 'خروج')),
-              ]))));
-          }
-          if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          return AdminDashboard(english: english);
-        });
-      });
-  }
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
-
-class AdminLogin extends StatefulWidget {
-  final bool english;
-  final bool technician;
-  final bool client;
-  const AdminLogin({super.key, required this.english, this.technician = false, this.client = false});
+// Compatibility entry point: all roles now use the same secure account router.
+class AdminLogin extends StatelessWidget {
+  final bool english,technician,client;
+  const AdminLogin({super.key,required this.english,this.technician=false,this.client=false});
   @override
-  State<AdminLogin> createState() => _AdminLoginState();
-}
-class _AdminLoginState extends State<AdminLogin> {
-  final email = TextEditingController(), password = TextEditingController();
-  final form = GlobalKey<FormState>();
-  bool busy = false;
-  String? error;
-  String tr(String ar, String en) => widget.english ? en : ar;
-  @override
-  void dispose() { email.dispose(); password.dispose(); super.dispose(); }
-  Future<void> login() async {
-    if (!(form.currentState?.validate() ?? false)) return;
-    setState(() { busy = true; error = null; });
-    try {
-      await AuthService.signIn(email.text.trim(), password.text);
-    } catch (e) {
-      if (mounted) setState(() => error = e is AccessDenied ? e.message : tr('تعذّر تسجيل الدخول. تحقق من بياناتك والاتصال.', 'Sign-in failed. Check your credentials and connection.'));
-    } finally { if (mounted) setState(() => busy = false); }
-  }
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(widget.client ? tr('دخول العميل', 'Client sign-in') : widget.technician ? tr('دخول الفني', 'Technician sign-in') : tr('دخول الإدارة', 'Administrator sign-in'))),
-    body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Form(key: form, child: Column(children: [
-      const Icon(Icons.verified_user_outlined, size: 64), const SizedBox(height: 24),
-      TextFormField(controller: email, enabled: !busy, keyboardType: TextInputType.emailAddress,
-        autofillHints: const [AutofillHints.username], decoration: InputDecoration(labelText: tr('البريد الإلكتروني', 'Email')),
-        validator: (v) => v == null || !v.contains('@') ? tr('أدخل البريد الإلكتروني', 'Enter email') : null),
-      const SizedBox(height: 16),
-      TextFormField(controller: password, enabled: !busy, obscureText: true, autofillHints: const [AutofillHints.password],
-        decoration: InputDecoration(labelText: tr('كلمة المرور', 'Password')),
-        validator: (v) => v == null || v.isEmpty ? tr('أدخل كلمة المرور', 'Enter password') : null),
-      const SizedBox(height: 20),
-      if (error != null || AuthService.lastDenial != null) Text(error ?? AuthService.lastDenial!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-      FilledButton(onPressed: busy ? null : login, child: Text(busy ? '…' : tr('تسجيل الدخول', 'Sign in'))),
-    ]))))),
-  );
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
 
 class AdminDashboard extends StatefulWidget {

@@ -1,3 +1,5 @@
+import 'auth_service.dart';
+import 'account_page.dart';
 import 'notifications_screen.dart';
 import 'push_service.dart';
 import 'dart:async';
@@ -8,9 +10,6 @@ import 'field_report_store.dart';
 import 'field_report_form.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'admin.dart';
-import 'auth_service.dart';
-import 'backend.dart';
 import 'operations_dashboard.dart';
 import 'supabase_client.dart';
 
@@ -25,6 +24,7 @@ Future<ProfileAccess> fieldAccess() async {
     if (cached == null) rethrow;
     account = ProfileAccess(Map<String, dynamic>.from(jsonDecode(cached) as Map));
     if (account.denial != null) throw AccessDenied(account.denial!);
+    if(account.role!='technician')throw const AccessDenied('Offline access is for technician drafts only.');
     return account;
   }
   if (account.role == 'technician') await preferences.setString('field-profile-$user', jsonEncode(account.data));
@@ -33,25 +33,11 @@ Future<ProfileAccess> fieldAccess() async {
 
 class TechnicianPage extends StatelessWidget {
   final bool english;
-  const TechnicianPage({super.key, required this.english});
+  const TechnicianPage({super.key,required this.english});
   @override
-  Widget build(BuildContext context) {
-    if (!Backend.ready) return Scaffold(appBar: AppBar(title: Text(english ? 'Technician tasks' : 'مهام الفني')), body: const Center(child: Text('Configure Supabase')));
-    return StreamBuilder<AuthState>(stream: supabaseClient.auth.onAuthStateChange, builder: (context, snapshot) {
-      if (supabaseClient.auth.currentSession == null) return AdminLogin(english: english, technician: true);
-      return FutureBuilder<ProfileAccess>(future: fieldAccess(), builder: (context, profile) {
-        if (profile.hasError || profile.hasData && profile.data!.role != 'technician') {
-          return Scaffold(appBar: AppBar(title: Text(english ? 'Technician tasks' : 'مهام الفني')), body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(english ? 'An active technician account is required.' : 'يلزم حساب فني نشط؛ حساب الأدمن يستخدم لوحة الإدارة.'),
-            TextButton(onPressed: () => PushService.signOut(scope: SignOutScope.local), child: Text(english ? 'Sign out' : 'خروج')),
-          ])));
-        }
-        if (!profile.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        return TechnicianTasks(key: ValueKey(supabaseClient.auth.currentUser!.id), english: english, tenant: profile.data!.tenantId);
-      });
-    });
-  }
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
+
 class TechnicianTasks extends StatefulWidget {
   final bool english;
   final String tenant;

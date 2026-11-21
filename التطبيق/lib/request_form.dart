@@ -8,10 +8,11 @@ class RequestForm extends StatefulWidget {
   final bool english;
   final RequestRepository repository;
   final SiteContent content;
-  final String initialMessage;
+  final String initialMessage,initialKind;
+  final Map<String,String> initialContact;
   final VoidCallback onPrivacy;
   const RequestForm({super.key, required this.english, required this.content,
-    required this.onPrivacy, this.initialMessage = '', this.repository = const RequestRepository()});
+    required this.onPrivacy, this.initialMessage = '', this.initialKind='residential',this.initialContact=const {},this.repository = const RequestRepository()});
   @override
   State<RequestForm> createState() => _RequestFormState();
 }
@@ -47,7 +48,7 @@ class _RequestFormState extends State<RequestForm> {
   String? error;
   String tr(String ar, String en) => widget.english ? en : ar;
   @override
-  void initState() { super.initState(); fields['message']!.text = widget.initialMessage; }
+  void initState() { super.initState(); fields['message']!.text = widget.initialMessage;kind=widget.initialKind=='contract'?'contract':'residential';for(final key in ['name','phone','email']){fields[key]!.text=widget.initialContact[key]??'';} }
   @override
   void dispose() { for (final c in fields.values) { c.dispose(); } super.dispose(); }
 

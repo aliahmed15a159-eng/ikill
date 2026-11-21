@@ -1,12 +1,9 @@
+import 'account_page.dart';
 import 'notifications_screen.dart';
-import 'push_service.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'admin.dart';
-import 'auth_service.dart';
-import 'backend.dart';
 import 'supabase_client.dart';
 import 'documents_repository.dart';
 
@@ -14,17 +11,7 @@ class ClientPortalPage extends StatelessWidget {
   final bool english;
   const ClientPortalPage({super.key,required this.english});
   @override
-  Widget build(BuildContext context){
-    if(!Backend.ready)return Scaffold(appBar:AppBar(title:Text(english?'Client portal':'بوابة العميل')),body:const Center(child:Text('Configure Supabase')));
-    return StreamBuilder<AuthState>(stream:supabaseClient.auth.onAuthStateChange,builder:(context,state){
-      if(supabaseClient.auth.currentSession==null)return AdminLogin(english:english,client:true);
-      return FutureBuilder<ProfileAccess>(future:AuthService.profile(),builder:(context,profile){
-        if(profile.hasError||profile.hasData&&profile.data!.role!='client')return Scaffold(appBar:AppBar(title:Text(english?'Client portal':'بوابة العميل')),body:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[Text(english?'An enabled client account is required.':'يلزم حساب عميل فعّال ومصرح له بالبوابة.'),TextButton(onPressed:()=>PushService.signOut(),child:Text(english?'Sign out':'خروج'))])));
-        if(!profile.hasData)return const Scaffold(body:Center(child:CircularProgressIndicator()));
-        return Scaffold(appBar:AppBar(title:Text(english?'My sites, visits and documents':'فروعي وزياراتي ومستنداتي'),actions:[const NotificationBell(),IconButton(onPressed:()=>PushService.signOut(),icon:const Icon(Icons.logout))]),body:DocumentsScreen(english:english,portal:true));
-      });
-    });
-  }
+  Widget build(BuildContext context)=>AccountPage(english:english);
 }
 Map<String,dynamic>? documentJob(Map<String,dynamic> report){final value=report['document_jobs'];if(value is Map)return Map<String,dynamic>.from(value);if(value is List&&value.isNotEmpty)return Map<String,dynamic>.from(value.first as Map);return null;}
 class DocumentsScreen extends StatefulWidget {
