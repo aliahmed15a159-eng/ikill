@@ -113,12 +113,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     IconButton(tooltip:'إعدادات الإدارة / Admin setup',icon:const Icon(Icons.settings_outlined),onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>const NotificationSettings()))),
     IconButton(tooltip:'المدفوعات / Payments',icon:const Icon(Icons.receipt_long),onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_) => const PaymentsScreen()))),
     IconButton(tooltip:'تفعيل إشعارات الجهاز / Enable device notifications',icon:const Icon(Icons.phonelink_ring),onPressed:()=>action(() async {
-      final settings=Map<String,dynamic>.from(await supabaseClient.rpc('get_notification_settings') as Map);
-      if(settings['push_enabled']!=true || settings['app_id']==null) {if(context.mounted)ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('OneSignal لم يُعدّ بعد. إشعارات التطبيق متاحة / Device push not configured; in-app notifications are available.')));return;}
       await PushService.sync(requestPermission:true);
     })),
     IconButton(tooltip:'تحديث / Refresh',icon:const Icon(Icons.refresh),onPressed:()=>setState(reload)),
   ]),body:Column(children:[
+    ValueListenableBuilder<PushState>(valueListenable:PushService.status,builder:(context,state,_)=>ListTile(leading:Icon(state.registered&&state.enabled?Icons.cloud_done:Icons.cloud_off),title:Text(state.message),subtitle:const Text('حالة الجهاز فقط؛ حالة مفتاح الخادم في الإعدادات / Device status; server credentials checked in settings'))),
     SwitchListTile(title:const Text('غير المقروء فقط / Unread only'),value:unread,onChanged:(v)=>setState(() {unread=v;reload();})),
     TextButton(onPressed:()=>action(()=>supabaseClient.rpc('mark_notifications_read')),child:const Text('تحديد الكل كمقروء / Mark all read')),
     Expanded(child:FutureBuilder<List<Map<String,dynamic>>>(future:data,builder:(context,snapshot){

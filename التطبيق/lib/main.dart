@@ -50,14 +50,25 @@ class _IkillAppState extends State<IkillApp> {
   void initState() {
     super.initState();
     PushService.clicked.addListener(openPush);
+    PushService.foreground.addListener(showForegroundPush);
     WidgetsBinding.instance.addPostFrameCallback((_)=>openPush());
+  }
+  void showForegroundPush() {
+    final message=PushService.foreground.value;
+    final context=navigatorKey.currentState?.overlay?.context;
+    if(message==null||context==null)return;
+    final id=PushService.notificationId(message.data);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content:Text('${message.notification?.title??"إشعار جديد / New notification"} — ${message.notification?.body??""}'),
+      action:id==null?null:SnackBarAction(label:'فتح / Open',onPressed:(){PushService.clicked.value=id;}),
+    ));
   }
   void openPush() {
     final context=navigatorKey.currentState?.overlay?.context;
     if(context!=null)NotificationNavigation.handle(context);
   }
   @override
-  void dispose(){PushService.clicked.removeListener(openPush);super.dispose();}
+  void dispose(){PushService.foreground.removeListener(showForegroundPush);PushService.clicked.removeListener(openPush);super.dispose();}
 
   late bool english = widget.preferences.getBool('english') ?? false;
   late bool dark = widget.preferences.getBool('dark') ?? false;

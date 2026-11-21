@@ -1,3 +1,5 @@
+> **Historical snapshot — superseded:** external transport is now FCM only. Do not follow the old provider setup below. See `FCM_TRANSPORT_STATUS.md`. Existing payment/in-app notification features remain on Supabase.
+
 # Product phase eight — notifications and manual payment review
 
 ## Scope

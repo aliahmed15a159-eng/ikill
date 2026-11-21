@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "27384687475",
+    "project_id": "ikill-4e337",
+    "storage_bucket": "ikill-4e337.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27384687475:android:9c5b8d56093691e02ef306",
+        "android_client_info": {
+          "package_name": "net.ikill.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF2ZdSK4KglLtBDPKbgDZJTIY9Fq4Dcro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

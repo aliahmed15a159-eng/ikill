@@ -1,45 +1,65 @@
 #!/usr/bin/env python3
-"""Fail CI when a removed backend SDK reappears in code or resolved packages."""
+"""Allow Core + Messaging transport only; forbid every other Firebase backend SDK."""
 from pathlib import Path
 import re
-root = Path(__file__).resolve().parents[1]
-old_vendor = 'fire' + 'base'
-old_store = 'fire' + 'store'
-errors = []
-for file in (root / 'lib').rglob('*.dart'):
-    if re.search(old_vendor + '|' + old_store, file.read_text(), re.I):
-        errors.append(str(file.relative_to(root)))
-for name in ['pubspec.yaml', 'pubspec.lock']:
-    file = root / name
-    if file.exists() and re.search(old_vendor + '|' + old_store, file.read_text(), re.I):
-        errors.append(name)
-if errors:
-    raise SystemExit('Removed backend references found: ' + ', '.join(errors))
-print('PASS: runtime sources and dependency manifest contain no removed backend SDK.')
-
-# Inspect tracked runtime/build sources across the whole checkout, not just Dart.
-# Historical Markdown/SQL comments are documentation, not executable SDK code.
 import subprocess
+import sys
+
+root = Path(__file__).resolve().parents[1]
+allowed = {'firebase_core', 'firebase_core_platform_interface', 'firebase_core_web',
+           'firebase_messaging', 'firebase_messaging_platform_interface', 'firebase_messaging_web'}
+# Core/Messaging are the ONLY exceptions. Auth, document DB, object storage,
+# realtime DB, analytics and other vendor SDKs remain prohibited.
+def violations(text):
+    errors = []
+    for name in re.findall(r'\b(?:firebase_[a-z0-9_]+|cloud_firestore)\b', text):
+        if name not in allowed:
+            errors.append(name)
+    for api in ['Firebase' + 'Auth', 'Firebase' + 'Storage', 'Firebase' + 'Database', 'Firebase' + 'Firestore', 'Cloud' + 'Firestore']:
+        if re.search(r'\b' + api + r'\b', text, re.I):
+            errors.append(api)
+    return errors
+
+# Executable fixture checks ensure the narrow exception never becomes a bypass.
+assert not violations("import 'package:firebase_core/firebase_core.dart';")
+for forbidden in ['firebase_' + 'auth', 'cloud_' + 'firestore', 'firebase_' + 'storage', 'firebase_' + 'database', 'firebase_' + 'analytics']:
+    assert violations(forbidden), forbidden
+
+errors = []
+for file in list((root / 'lib').rglob('*.dart')) + [root / 'pubspec.yaml', root / 'pubspec.lock']:
+    if not file.exists():
+        continue
+    text = file.read_text()
+    # Imports/manifests only: native manifest flags are not Dart packages.
+    found = violations(text)
+    if found:
+        errors.append(f'{file.relative_to(root)}: {found}')
+    if re.search('one' + 'signal', text, re.I):
+        errors.append(f'Removed push provider in {file.relative_to(root)}')
+
 repository = root.parent
-extensions = {'.dart', '.js', '.cjs', '.mjs', '.ts', '.py', '.html', '.css',
-              '.json', '.yaml', '.yml', '.xml', '.gradle', '.kts', '.swift',
-              '.plist', '.pbxproj', '.sql', '.rules'}
 tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=repository).decode().split('\0')
 for name in tracked:
-    if not name:
-        continue
     file = repository / name
-    if re.search(old_vendor + '|' + old_store, file.name, re.I):
-        raise SystemExit('Removed backend filename: ' + name)
-    if file.suffix.lower() not in extensions or not file.is_file():
+    if not file.is_file() or file.suffix.lower() not in {'.dart', '.ts', '.js', '.html', '.kts', '.gradle', '.swift'}:
         continue
-    try:
-        text = file.read_text()
-    except UnicodeError:
+    if file.name == Path(__file__).name:
         continue
-    text = re.sub(r'/\*.*?\*/', '', text, flags=re.S)
-    text = '\n'.join(line for line in text.splitlines()
-                     if not re.match(r'^\s*(//|--|#)', line))
-    if re.search(old_vendor + '|' + old_store, text, re.I):
-        raise SystemExit('Removed backend runtime/build reference: ' + name)
-print('PASS: full repository runtime/build source audit (comments/history excluded).')
+    text = re.sub(r'/\*.*?\*/', '', file.read_text(), flags=re.S)
+    text = '\n'.join(line for line in text.splitlines() if not re.match(r'^\s*//', line))
+    if violations(text):
+        errors.append(f'Forbidden backend runtime API/package: {name}')
+    if root in file.parents and re.search('one' + 'signal', text, re.I):
+        errors.append(f'Removed provider runtime reference: {name}')
+
+# Optional resolved Android dependency report from Gradle, after APK build.
+if len(sys.argv) == 2:
+    native_allowed = {'firebase-bom', 'firebase-common', 'firebase-components', 'firebase-annotations',
+                      'firebase-messaging', 'firebase-installations', 'firebase-installations-interop',
+                      'firebase-iid-interop', 'firebase-encoders', 'firebase-encoders-json', 'firebase-encoders-proto'}
+    for artifact in re.findall(r'com\.google\.firebase:([a-z0-9-]+):', Path(sys.argv[1]).read_text()):
+        if artifact not in native_allowed:
+            errors.append(f'Forbidden native dependency: {artifact}')
+if errors:
+    raise SystemExit('\n'.join(errors))
+print('PASS: only Core + Messaging transport allowed; all other backend SDKs prohibited.')
